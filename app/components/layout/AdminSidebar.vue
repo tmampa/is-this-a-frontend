@@ -1,28 +1,63 @@
 <template>
-  <div class="w-72 h-full bg-base-100 border-r border-base-200">
+  <aside class="w-72 h-full bg-base-100 shadow-lg">
+    <!-- Header -->
     <div class="px-6 h-16 flex items-center border-b border-base-200">
-      <h1 class="text-lg font-semibold tracking-wide text-base-content/90">
-        Library Admin
-      </h1>
+      <div class="flex items-center gap-3">
+        <div
+          class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-5 h-5 text-primary-content"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"
+            />
+          </svg>
+        </div>
+        <h1 class="text-lg font-bold text-base-content">Library Admin</h1>
+      </div>
     </div>
 
-    <ul class="menu px-4 py-6 gap-2 text-base-content/75 text-sm">
-      <li v-for="item in navigationItems" :key="item.path">
-        <NuxtLink
-          :to="item.path"
-          class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors hover:bg-base-200"
-          :class="{
-            'bg-primary/10 text-primary hover:bg-primary/15': isCurrentPath(
-              item.path
-            ),
-          }"
-        >
-          <component :is="item.icon" class="opacity-75" />
-          <span class="font-medium">{{ item.label }}</span>
-        </NuxtLink>
-      </li>
-    </ul>
-  </div>
+    <!-- Navigation -->
+    <nav class="px-3 py-4">
+      <ul class="space-y-1">
+        <li v-for="item in navigationItems" :key="item.path">
+          <NuxtLink
+            :to="item.path"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium hover:bg-base-200"
+            :class="{
+              'bg-primary text-primary-content shadow-sm hover:bg-primary/90':
+                isActivePath(item.path),
+              'text-base-content/70 hover:text-base-content': !isActivePath(
+                item.path
+              ),
+            }"
+            @click="$emit('navigate')"
+          >
+            <component
+              :is="item.icon"
+              class="w-5 h-5 flex-shrink-0"
+              :class="{
+                'opacity-100': isActivePath(item.path),
+                'opacity-70': !isActivePath(item.path),
+              }"
+            />
+            <span>{{ item.label }}</span>
+          </NuxtLink>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Footer -->
+    <div class="absolute bottom-4 left-3 right-3">
+      <div class="text-xs text-base-content/40 text-center py-2">
+        Library Management v1.0
+      </div>
+    </div>
+  </aside>
 </template>
 
 <script setup lang="ts">
@@ -30,6 +65,10 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
+
+const emit = defineEmits<{
+  navigate: [];
+}>();
 
 const navigationItems = [
   {
@@ -98,8 +137,11 @@ const navigationItems = [
   },
 ];
 
-function isCurrentPath(path: string) {
-  return route.path === path;
+function isActivePath(path: string) {
+  if (path === "/admin") {
+    return route.path === "/admin" || route.path === "/admin/";
+  }
+  return route.path.startsWith(path);
 }
 </script>
 

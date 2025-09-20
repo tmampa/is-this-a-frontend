@@ -1,20 +1,18 @@
 <template>
-  <div class="space-y-8">
+  <div class="space-y-6">
     <!-- Page Header -->
     <div
-      class="flex justify-between items-center pb-6 border-b border-base-200"
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
     >
       <div>
-        <h1 class="text-2xl font-semibold text-base-content/90">
-          Borrowed Books
-        </h1>
-        <p class="text-sm text-base-content/60 mt-1.5">
+        <h1 class="text-2xl font-bold text-base-content">Borrowed Books</h1>
+        <p class="text-sm text-base-content/60 mt-1">
           Manage book borrowing and returns
         </p>
       </div>
       <button
         @click="showBorrowModal = true"
-        class="btn btn-primary btn-sm normal-case px-6 gap-2"
+        class="btn btn-primary normal-case px-6 gap-2"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
