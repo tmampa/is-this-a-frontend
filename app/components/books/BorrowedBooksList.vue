@@ -1,0 +1,245 @@
+<template>
+  <div class="card bg-base-100 shadow-sm">
+    <div class="overflow-x-auto rounded-box">
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            <th class="bg-base-200/50 font-medium">Book Title</th>
+            <th class="bg-base-200/50 font-medium">Student</th>
+            <th class="bg-base-200/50 font-medium">Borrow Date</th>
+            <th class="bg-base-200/50 font-medium">Due Date</th>
+            <th class="bg-base-200/50 font-medium">Status</th>
+            <th class="bg-base-200/50 font-medium text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="book in books" :key="book.id" class="hover">
+            <td>{{ book.bookTitle }}</td>
+            <td>{{ book.studentName }}</td>
+            <td>{{ formatDate(book.borrowDate) }}</td>
+            <td>
+              <span :class="isOverdue(book.dueDate) ? 'text-error' : ''">
+                {{ formatDate(book.dueDate) }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" :class="getStatusBadgeClass(book.status)">
+                {{ book.status }}
+              </span>
+            </td>
+            <td>
+              <div class="flex items-center gap-2">
+                <button
+                  v-if="book.status === 'borrowed'"
+                  @click="$emit('return-book', book)"
+                  class="btn btn-sm btn-ghost"
+                >
+                  Return
+                </button>
+                <button
+                  @click="showDetails(book)"
+                  class="btn btn-sm btn-ghost btn-square"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Details Modal -->
+      <dialog id="book_details_modal" class="modal">
+        <div class="modal-box max-w-3xl bg-base-100">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-lg font-semibold">Borrow Details</h3>
+            <form method="dialog">
+              <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+            </form>
+          </div>
+
+          <div v-if="selectedBook" class="space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="card bg-base-200">
+                <div class="card-body">
+                  <h4 class="card-title text-base">Book Information</h4>
+                  <div class="space-y-3">
+                    <div
+                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
+                    >
+                      <span class="text-sm text-base-content/60">Title</span>
+                      <span class="font-medium">{{
+                        selectedBook.bookTitle
+                      }}</span>
+                    </div>
+                    <div
+                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
+                    >
+                      <span class="text-sm text-base-content/60">Student</span>
+                      <span class="font-medium">{{
+                        selectedBook.studentName
+                      }}</span>
+                    </div>
+                    <div
+                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
+                    >
+                      <span class="text-sm text-base-content/60"
+                        >Borrow Date</span
+                      >
+                      <span>{{ formatDate(selectedBook.borrowDate) }}</span>
+                    </div>
+                    <div
+                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
+                    >
+                      <span class="text-sm text-base-content/60">Due Date</span>
+                      <span
+                        :class="
+                          isOverdue(selectedBook.dueDate) ? 'text-error' : ''
+                        "
+                      >
+                        {{ formatDate(selectedBook.dueDate) }}
+                      </span>
+                    </div>
+                    <div
+                      v-if="selectedBook.returnDate"
+                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
+                    >
+                      <span class="text-sm text-base-content/60"
+                        >Return Date</span
+                      >
+                      <span class="text-success">{{
+                        formatDate(selectedBook.returnDate)
+                      }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 class="font-medium mb-2">Condition Images</h4>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-sm text-base-content/60 mb-2">
+                      Before Condition Images
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <img
+                        v-for="(
+                          image, index
+                        ) in selectedBook.beforeConditionImages"
+                        :key="`before-${index}`"
+                        :src="image"
+                        :alt="`Before condition ${index + 1}`"
+                        class="rounded-lg w-full object-cover aspect-4/3"
+                      />
+                    </div>
+                  </div>
+                  <div v-if="selectedBook.afterConditionImages?.length > 0">
+                    <p class="text-sm text-base-content/60 mb-2">
+                      After Condition Images
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <img
+                        v-for="(
+                          image, index
+                        ) in selectedBook.afterConditionImages"
+                        :key="`after-${index}`"
+                        :src="image"
+                        :alt="`After condition ${index + 1}`"
+                        class="rounded-lg w-full object-cover aspect-4/3"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="selectedBook.conditionNotes" class="pt-4 border-t">
+              <h4 class="font-medium mb-2">Condition Notes</h4>
+              <p class="text-sm text-base-content/75">
+                {{ selectedBook.conditionNotes }}
+              </p>
+            </div>
+          </div>
+
+          <div class="modal-action">
+            <form method="dialog">
+              <button class="btn">Close</button>
+            </form>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from "vue";
+import type { BorrowedBook } from "~/types/books";
+
+const props = defineProps<{
+  books: BorrowedBook[];
+}>();
+
+defineEmits<{
+  (e: "return-book", book: BorrowedBook): void;
+}>();
+
+// State
+const selectedBook = ref<BorrowedBook | null>(null);
+
+// Utils
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString();
+};
+
+const isOverdue = (dueDate: string) => {
+  return new Date(dueDate) < new Date();
+};
+
+const isDueThisWeek = (dueDate: string) => {
+  const today = new Date();
+  const due = new Date(dueDate);
+  const weekFromNow = new Date();
+  weekFromNow.setDate(today.getDate() + 7);
+  return due > today && due <= weekFromNow;
+};
+
+const getStatusBadgeClass = (status: "borrowed" | "returned") => {
+  return {
+    "badge-success bg-success/20 text-success border-0": status === "returned",
+    "badge-warning bg-warning/20 text-warning border-0": status === "borrowed",
+  };
+};
+
+// Handlers
+const showDetails = (book: BorrowedBook) => {
+  selectedBook.value = book;
+  const modal = document.getElementById(
+    "book_details_modal"
+  ) as HTMLDialogElement;
+  modal.showModal();
+};
+</script>
