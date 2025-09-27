@@ -15,7 +15,9 @@
         <!-- Title -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Title <span class="text-error">*</span></span>
+            <span class="label-text"
+              >Title <span class="text-error">*</span></span
+            >
           </label>
           <input
             type="text"
@@ -29,7 +31,9 @@
         <!-- Author -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Author <span class="text-error">*</span></span>
+            <span class="label-text"
+              >Author <span class="text-error">*</span></span
+            >
           </label>
           <input
             type="text"
@@ -43,7 +47,9 @@
         <!-- ISBN -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text">ISBN <span class="text-error">*</span></span>
+            <span class="label-text"
+              >ISBN <span class="text-error">*</span></span
+            >
           </label>
           <input
             type="text"
@@ -57,7 +63,9 @@
         <!-- Category -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Category <span class="text-error">*</span></span>
+            <span class="label-text"
+              >Category <span class="text-error">*</span></span
+            >
           </label>
           <select
             v-model="formData.category"
@@ -143,11 +151,14 @@ const formData = ref({
 });
 
 // Reset form when modal is opened with new initial title
-watch(() => props.initialTitle, (newTitle) => {
-  if (newTitle && props.show) {
-    formData.value.title = newTitle;
+watch(
+  () => props.initialTitle,
+  (newTitle) => {
+    if (newTitle && props.show) {
+      formData.value.title = newTitle;
+    }
   }
-});
+);
 
 const handleSubmit = async () => {
   loading.value = true;
@@ -159,7 +170,7 @@ const handleSubmit = async () => {
       category: formData.value.category,
       description: formData.value.description || undefined,
     });
-    
+
     emit("created", newBook);
     resetForm();
     closeModal();
@@ -186,9 +197,12 @@ const closeModal = () => {
 };
 
 // Reset form when modal is closed
-watch(() => props.show, (isOpen) => {
-  if (!isOpen) {
-    resetForm();
+watch(
+  () => props.show,
+  (isOpen) => {
+    if (!isOpen) {
+      resetForm();
+    }
   }
-});
+);
 </script>

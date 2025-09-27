@@ -48,8 +48,9 @@
             :min-search-length="1"
           />
           <div class="label">
-            <span class="label-text-alt text-base-content/60">
-              💡 Type to search by name, student number, or email. Can't find them? Create a new student!
+            <span class="label-text-alt text-xs text-base-content/60">
+              💡 Type to search by name, student number, or email. Can't find
+              them? Create a new student!
             </span>
           </div>
         </div>
@@ -81,8 +82,9 @@
             :min-search-length="1"
           />
           <div class="label">
-            <span class="label-text-alt text-base-content/60">
-              💡 Type to search by title, author, ISBN, or category. Need to add a new book? Create it on the fly!
+            <span class="label-text-alt text-xs text-base-content/60">
+              💡 Type to search by title, author, ISBN, or category. Need to add
+              a new book? Create it on the fly!
             </span>
           </div>
         </div>
@@ -146,8 +148,9 @@
             <option value="damaged">📕 Damaged - Visible damage</option>
           </select>
           <div class="label">
-            <span class="label-text-alt text-base-content/60">
-              💡 This will be compared with the return condition to assess damage
+            <span class="label-text-alt text-xs text-base-content/60">
+              💡 This will be compared with the return condition to assess
+              damage
             </span>
           </div>
         </div>
@@ -192,7 +195,7 @@
       :initial-name="newStudentName"
       @created="handleStudentCreated"
     />
-    
+
     <CreateBookModal
       v-model:show="showCreateBookModal"
       :initial-title="newBookTitle"

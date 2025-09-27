@@ -15,7 +15,9 @@
         <!-- First Names -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text">First Names <span class="text-error">*</span></span>
+            <span class="label-text"
+              >First Names <span class="text-error">*</span></span
+            >
           </label>
           <input
             type="text"
@@ -29,7 +31,9 @@
         <!-- Last Name -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Last Name <span class="text-error">*</span></span>
+            <span class="label-text"
+              >Last Name <span class="text-error">*</span></span
+            >
           </label>
           <input
             type="text"
@@ -43,7 +47,9 @@
         <!-- Student Number -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Student Number <span class="text-error">*</span></span>
+            <span class="label-text"
+              >Student Number <span class="text-error">*</span></span
+            >
           </label>
           <input
             type="number"
@@ -57,7 +63,9 @@
         <!-- Email -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Email <span class="text-error">*</span></span>
+            <span class="label-text"
+              >Email <span class="text-error">*</span></span
+            >
           </label>
           <input
             type="email"
@@ -134,14 +142,18 @@ const formData = ref({
 });
 
 // Reset form when modal is opened with new initial name
-watch(() => props.initialName, (newName) => {
-  if (newName && props.show) {
-    // Split the name into first and last parts
-    const nameParts = newName.split(' ');
-    formData.value.firstNames = nameParts.slice(0, -1).join(' ') || newName;
-    formData.value.lastName = nameParts.length > 1 ? (nameParts[nameParts.length - 1] || '') : '';
+watch(
+  () => props.initialName,
+  (newName) => {
+    if (newName && props.show) {
+      // Split the name into first and last parts
+      const nameParts = newName.split(" ");
+      formData.value.firstNames = nameParts.slice(0, -1).join(" ") || newName;
+      formData.value.lastName =
+        nameParts.length > 1 ? nameParts[nameParts.length - 1] || "" : "";
+    }
   }
-});
+);
 
 const handleSubmit = async () => {
   loading.value = true;
@@ -151,9 +163,9 @@ const handleSubmit = async () => {
       lastName: formData.value.lastName,
       email: formData.value.email,
       address: formData.value.address,
-      parents: []
+      parents: [],
     });
-    
+
     emit("created", newStudent);
     resetForm();
     closeModal();
@@ -180,9 +192,12 @@ const closeModal = () => {
 };
 
 // Reset form when modal is closed
-watch(() => props.show, (isOpen) => {
-  if (!isOpen) {
-    resetForm();
+watch(
+  () => props.show,
+  (isOpen) => {
+    if (!isOpen) {
+      resetForm();
+    }
   }
-});
+);
 </script>

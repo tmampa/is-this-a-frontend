@@ -26,7 +26,7 @@
 
     <!-- Helpful guidance -->
     <div class="label">
-      <span class="label-text-alt text-base-content/60">
+      <span class="label-text-alt text-xs text-base-content/60">
         💡 Tip: Take clear photos showing the book's condition from different
         angles
       </span>
