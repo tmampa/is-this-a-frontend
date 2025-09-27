@@ -258,6 +258,13 @@
     :student="selectedStudent"
     @submit="handleEditStudent"
   />
+
+  <!-- View Student Modal -->
+  <ViewStudentModal
+    v-model:show="showViewModal"
+    :student="selectedStudent"
+    @edit="handleViewEdit"
+  />
 </template>
 
 <script setup lang="ts">
@@ -265,10 +272,12 @@ import { ref, computed, onMounted } from "vue";
 import type { Student } from "~/types/books";
 import { LibraryAPI } from "~/composables/useLibraryAPI";
 import AddStudentForm from "~/components/students/CreateStudentForm.vue";
+import ViewStudentModal from "~/components/students/ViewStudentModal.vue";
 
 // Component state
 const showAddModal = ref(false);
 const showEditModal = ref(false);
+const showViewModal = ref(false);
 const selectedStudent = ref<Student | null>(null);
 const searchQuery = ref("");
 const selectedFilter = ref("");
@@ -340,7 +349,8 @@ function getInitials(name: string): string {
 
 function viewStudent(student: Student) {
   console.log("View student:", student);
-  // TODO: Implement view modal
+  selectedStudent.value = student;
+  showViewModal.value = true;
 }
 
 function editStudent(student: Student) {
@@ -374,5 +384,11 @@ const handleEditStudent = async () => {
   } catch (error) {
     console.error("Failed to update student:", error);
   }
+};
+
+const handleViewEdit = (student: Student) => {
+  showViewModal.value = false;
+  selectedStudent.value = student;
+  showEditModal.value = true;
 };
 </script>
