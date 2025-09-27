@@ -2,12 +2,13 @@
   <div class="card bg-base-100 shadow-sm mx-5" style="margin-top: 15px">
     <div class="overflow-x-auto rounded-box">
       <table class="table table-zebra">
-        <thead>
+        <thead style="background-color: #458c7f; color: white">
           <tr>
             <th class="bg-base-200/50 font-medium">Book</th>
             <th class="bg-base-200/50 font-medium">Student</th>
             <th class="bg-base-200/50 font-medium">Borrow date</th>
             <th class="bg-base-200/50 font-medium">Expected return date</th>
+            <th class="bg-base-200/50 font-medium text-right"></th>
           </tr>
         </thead>
         <tbody>

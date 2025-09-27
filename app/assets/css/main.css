@@ -1,2 +1,60 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+/* Brand Colors */
+:root {
+  --brand-primary: #458C7F;
+  --brand-primary-hover: #3a7569;
+  --brand-primary-active: #2f5e53;
+}
+
+/* Primary Button Styles */
+.btn-primary {
+  background-color: var(--brand-primary) !important;
+  border-color: var(--brand-primary) !important;
+  color: white !important;
+}
+
+.text-primary {
+  color: var(--brand-primary) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--brand-primary-hover) !important;
+  border-color: var(--brand-primary-hover) !important;
+  color: white !important;
+}
+
+.btn-primary:active,
+.btn-primary.btn-active {
+  background-color: var(--brand-primary-active) !important;
+  border-color: var(--brand-primary-active) !important;
+  color: white !important;
+}
+
+/* Soft primary button variant */
+.btn-primary.btn-soft {
+  background-color: rgba(69, 140, 127, 0.1) !important;
+  border-color: var(--brand-primary) !important;
+  color: var(--brand-primary) !important;
+}
+
+.btn-primary.btn-soft:hover {
+  background-color: var(--brand-primary) !important;
+  border-color: var(--brand-primary) !important;
+  color: white !important;
+}
+
+/* Input focus styles with brand color */
+.input:focus,
+.input:focus-within {
+  outline: 2px solid rgba(69, 140, 127, 0.3) !important;
+  outline-offset: 2px;
+  border-color: var(--brand-primary) !important;
+  box-shadow: 0 0 0 3px rgba(69, 140, 127, 0.1) !important;
+}
+
+.input-bordered {
+  border-color: hsl(var(--bc) / 0.2);
+  transition: all 0.2s ease-in-out;
+}

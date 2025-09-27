@@ -5,18 +5,18 @@
     <book-card-stats />
 
     <div
-      class="flex flex-row justify-between items-center mb-4 mx-5"
+      class="grid grid-cols-12 gap-4 items-center mb-4 mx-5"
       style="margin-top: 60px"
     >
-      <div class="basis-1/4 md:basis-1/3 lg:basis-1/4">
-        <label class="input">
+      <div class="col-span-6">
+        <label class="input input-bordered flex items-center gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
-            class="size-6"
+            class="size-5 opacity-70"
           >
             <path
               stroke-linecap="round"
@@ -24,15 +24,18 @@
               d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
             />
           </svg>
-
-          <input type="search" class="grow" placeholder="Search" />
+          <input
+            type="search"
+            class="grow"
+            placeholder="Search books and students..."
+          />
         </label>
       </div>
 
-      <div class="basis-1/4 md:basis-1/3 lg:basis-1/4 text-right">
+      <div class="col-span-6 text-right">
         <button
           @click="showBorrowModal = true"
-          class="btn btn-soft btn-primary normal-case px-6 gap-2"
+          class="btn btn-primary normal-case px-6 gap-2"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +51,7 @@
               d="M12 4v16m8-8H4"
             />
           </svg>
-          Borrow Book
+          Issue book
         </button>
       </div>
     </div>
