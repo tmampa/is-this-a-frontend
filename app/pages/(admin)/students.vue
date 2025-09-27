@@ -249,8 +249,15 @@
     </div>
   </div>
 
-  <!-- Borrow Book Modal -->
+  <!-- Add Student Modal -->
   <AddStudentForm v-model:show="showAddModal" @submit="handleAddStudent" />
+
+  <!-- Edit Student Modal -->
+  <AddStudentForm
+    v-model:show="showEditModal"
+    :student="selectedStudent"
+    @submit="handleEditStudent"
+  />
 </template>
 
 <script setup lang="ts">
@@ -261,6 +268,8 @@ import AddStudentForm from "~/components/students/CreateStudentForm.vue";
 
 // Component state
 const showAddModal = ref(false);
+const showEditModal = ref(false);
+const selectedStudent = ref<Student | null>(null);
 const searchQuery = ref("");
 const selectedFilter = ref("");
 const loading = ref(false);
@@ -336,7 +345,8 @@ function viewStudent(student: Student) {
 
 function editStudent(student: Student) {
   console.log("Edit student:", student);
-  // TODO: Implement edit modal
+  selectedStudent.value = student;
+  showEditModal.value = true;
 }
 
 function deleteStudent(student: Student) {
@@ -352,6 +362,17 @@ const handleAddStudent = async () => {
     showAddModal.value = false;
   } catch (error) {
     console.error("Failed to add student:", error);
+  }
+};
+
+const handleEditStudent = async () => {
+  try {
+    // Refresh the students list after successful update
+    await fetchStudents();
+    showEditModal.value = false;
+    selectedStudent.value = null;
+  } catch (error) {
+    console.error("Failed to update student:", error);
   }
 };
 </script>

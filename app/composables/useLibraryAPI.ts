@@ -65,6 +65,35 @@ export const LibraryAPI = {
     }
   },
 
+  async updateStudent(
+    studentId: string,
+    studentData: {
+      firstNames: string;
+      lastName: string;
+      email: string;
+      address: string;
+      parents: { name: string; email: string; relationship: string }[];
+    }
+  ): Promise<Student> {
+    try {
+      const response = await $fetch<Student>(
+        `${API_BASE}/students/${studentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(studentData),
+        }
+      );
+      console.log("Student updated:", response);
+      return response;
+    } catch (error) {
+      console.error("Failed to update student:", error);
+      throw error;
+    }
+  },
+
   // Borrow Records API
   async getBorrowRecords(): Promise<BorrowedBook[]> {
     try {

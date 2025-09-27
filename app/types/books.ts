@@ -17,8 +17,12 @@ export interface Email {
 export interface Student {
   id: string;
   fullName: string;
+  firstNames?: string;
+  lastName?: string;
   studentNumber: number;
   email: string;
+  address?: string;
+  parents?: { name: string; email: string; relationship: string }[];
   borrowedBooks: string[];
 }
 

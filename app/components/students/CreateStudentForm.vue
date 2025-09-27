@@ -1,7 +1,9 @@
 <template>
   <dialog :open="show" class="modal">
     <div class="modal-box max-w-2xl">
-      <h3 class="font-bold text-lg mb-6">Create a Student</h3>
+      <h3 class="font-bold text-lg mb-6">
+        {{ editMode ? "Edit Student" : "Create a Student" }}
+      </h3>
 
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- Student Selection -->
@@ -141,7 +143,15 @@
             :class="{ loading: loading }"
             :disabled="loading"
           >
-            {{ loading ? "Creating..." : "Create Student" }}
+            {{
+              loading
+                ? editMode
+                  ? "Updating..."
+                  : "Creating..."
+                : editMode
+                ? "Update Student"
+                : "Create Student"
+            }}
           </button>
         </div>
       </form>
@@ -153,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, watch } from "vue";
 import type { Student } from "~/types/books";
 
 // Define student creation data type
@@ -167,32 +177,19 @@ type CreateStudentData = {
 
 const props = defineProps<{
   show: boolean;
+  student?: Student | null;
 }>();
 
 const emit = defineEmits<{
   (e: "update:show", value: boolean): void;
-  (e: "submit", data: CreateStudentData): void;
+  (e: "submit", data: CreateStudentData, isEdit: boolean): void;
 }>();
 
+// Check if we're in edit mode
+const editMode = computed(() => !!props.student);
+
 // API calls for real data
-const students = ref<Student[]>([]);
 const loading = ref(false);
-
-// Fetch students from API (for reference/validation if needed)
-const fetchStudents = async () => {
-  try {
-    console.log("Fetching students from API...");
-    students.value = await LibraryAPI.getStudents();
-    console.log("Students loaded:", students.value);
-  } catch (error) {
-    console.error("Failed to fetch students:", error);
-  }
-};
-
-// Load data when component mounts
-onMounted(() => {
-  fetchStudents();
-});
 
 // Form state
 const formData = ref({
@@ -206,6 +203,40 @@ const formData = ref({
     relationship: string;
   }[],
 });
+
+// Watch for student prop changes to populate form when editing
+watch(
+  () => props.student,
+  (newStudent) => {
+    if (newStudent) {
+      // Parse the fullName into firstNames and lastName
+      const nameParts = newStudent.fullName.split(" ");
+      const lastName = nameParts.pop() || "";
+      const firstNames = nameParts.join(" ");
+
+      formData.value = {
+        firstNames,
+        lastName,
+        email: newStudent.email || "",
+        address: (newStudent as any).address || "",
+        parents:
+          (newStudent as any).parents && (newStudent as any).parents.length > 0
+            ? [...(newStudent as any).parents]
+            : [{ name: "", email: "", relationship: "" }],
+      };
+    } else {
+      // Reset form for create mode
+      formData.value = {
+        firstNames: "",
+        lastName: "",
+        email: "",
+        address: "",
+        parents: [{ name: "", email: "", relationship: "" }],
+      };
+    }
+  },
+  { immediate: true }
+);
 
 // Parent management functions
 const addParent = () => {
@@ -259,13 +290,21 @@ const handleSubmit = async () => {
       parents: validParents,
     };
 
-    console.log("Creating student:", studentData);
+    console.log(
+      editMode.value ? "Updating student:" : "Creating student:",
+      studentData
+    );
 
-    // Create student using the API
-    const createdStudent = await LibraryAPI.createStudent(studentData);
+    if (editMode.value && props.student) {
+      // Update existing student
+      await LibraryAPI.updateStudent(props.student.id, studentData);
+    } else {
+      // Create new student
+      await LibraryAPI.createStudent(studentData);
+    }
 
     // Emit success event
-    emit("submit", studentData);
+    emit("submit", studentData, editMode.value);
 
     // Reset form
     formData.value = {
@@ -279,8 +318,15 @@ const handleSubmit = async () => {
     // Close modal
     closeModal();
   } catch (error) {
-    console.error("Failed to create student:", error);
-    alert("Failed to create student. Please try again.");
+    console.error(
+      `Failed to ${editMode.value ? "update" : "create"} student:`,
+      error
+    );
+    alert(
+      `Failed to ${
+        editMode.value ? "update" : "create"
+      } student. Please try again.`
+    );
   } finally {
     loading.value = false;
   }
