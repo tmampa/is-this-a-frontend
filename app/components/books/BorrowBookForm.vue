@@ -25,32 +25,31 @@
         <div class="form-control">
           <div
             class="tooltip tooltip-right"
-            data-tip="Select the student who will borrow this book"
+            data-tip="Search for the student who will borrow this book"
           >
             <label class="label">
               <span class="label-text"
                 >Student <span class="text-error">*</span></span
               >
-              <span class="label-text-alt">👤 Required</span>
+              <span class="label-text-alt">� Search & select</span>
             </label>
           </div>
-          <select
-            v-model="formData.studentId"
-            class="select select-bordered w-full"
-            required
-          >
-            <option value="" disabled selected>Select a student</option>
-            <option
-              v-for="student in students"
-              :key="student.id"
-              :value="student.id"
-            >
-              {{ student.fullName }}
-            </option>
-          </select>
+          <SearchableSelect
+            :items="students"
+            placeholder="Search students by name or student number..."
+            display-key="fullName"
+            subtitle-key="studentNumber"
+            id-key="id"
+            :search-keys="['fullName', 'studentNumber', 'email']"
+            v-model="selectedStudent"
+            @update:model-value="updateSelectedStudent"
+            :allow-create="true"
+            @create="handleCreateStudent"
+            :min-search-length="1"
+          />
           <div class="label">
             <span class="label-text-alt text-base-content/60">
-              💡 Can't find the student? Add them from the Students page first
+              💡 Type to search by name, student number, or email. Can't find them? Create a new student!
             </span>
           </div>
         </div>
@@ -59,29 +58,33 @@
         <div class="form-control">
           <div
             class="tooltip tooltip-right"
-            data-tip="Choose which book to issue - only available books are shown"
+            data-tip="Search for an available book to issue - only books that are not currently borrowed are shown"
           >
             <label class="label">
               <span class="label-text"
                 >Book <span class="text-error">*</span></span
               >
-              <span class="label-text-alt">📖 Available only</span>
+              <span class="label-text-alt">� Available only</span>
             </label>
           </div>
-          <select
-            v-model="formData.bookId"
-            class="select select-bordered w-full"
-            required
-          >
-            <option value="" disabled selected>Select a book</option>
-            <option
-              v-for="book in availableBooks"
-              :key="book.id"
-              :value="book.id"
-            >
-              {{ book.title }}
-            </option>
-          </select>
+          <SearchableSelect
+            :items="availableBooks"
+            placeholder="Search books by title, author, or ISBN..."
+            display-key="title"
+            subtitle-key="author"
+            id-key="id"
+            :search-keys="['title', 'author', 'isbn', 'category']"
+            v-model="selectedBook"
+            @update:model-value="updateSelectedBook"
+            :allow-create="true"
+            @create="handleCreateBook"
+            :min-search-length="1"
+          />
+          <div class="label">
+            <span class="label-text-alt text-base-content/60">
+              💡 Type to search by title, author, ISBN, or category. Need to add a new book? Create it on the fly!
+            </span>
+          </div>
         </div>
 
         <!-- Dates
@@ -116,31 +119,45 @@
           </div>
         </div> -->
 
-        <!-- create select for book condition -->
+        <!-- Book Condition Assessment -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">Book Condition</span>
-          </label>
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Assess the book's current condition before lending - this helps track damage and loss"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Initial Book Condition <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">🔍 Before lending</span>
+            </label>
+          </div>
           <select
             v-model="formData.bookCondition"
             class="select select-bordered w-full"
             required
           >
-            <option value="" disabled selected>Select book condition</option>
-            <option value="new">New</option>
-            <option value="excellent">Excellent</option>
-            <option value="good">Good</option>
-            <option value="fair">Fair</option>
-            <option value="poor">Poor</option>
-            <option value="damaged">Damaged</option>
+            <option value="" disabled selected>Assess current condition</option>
+            <option value="new">📗 New - Pristine condition</option>
+            <option value="excellent">📘 Excellent - Minimal wear</option>
+            <option value="good">📙 Good - Light wear, no damage</option>
+            <option value="fair">📒 Fair - Noticeable wear</option>
+            <option value="poor">📑 Poor - Significant wear</option>
+            <option value="damaged">📕 Damaged - Visible damage</option>
           </select>
+          <div class="label">
+            <span class="label-text-alt text-base-content/60">
+              💡 This will be compared with the return condition to assess damage
+            </span>
+          </div>
         </div>
 
-        <!-- Book Condition Images -->
+        <!-- Multiple Condition Images -->
         <ImageUploader
-          label="Book Condition Images"
+          label="📸 Document Book Condition (Multiple Photos)"
           :multiple="true"
           :max-images="5"
+          :required="true"
           @update:images="handleImagesUpdate"
         />
 
@@ -168,6 +185,19 @@
     <form method="dialog" class="modal-backdrop">
       <button @click="closeModal">close</button>
     </form>
+
+    <!-- Creation Modals -->
+    <CreateStudentModal
+      v-model:show="showCreateStudentModal"
+      :initial-name="newStudentName"
+      @created="handleStudentCreated"
+    />
+    
+    <CreateBookModal
+      v-model:show="showCreateBookModal"
+      :initial-title="newBookTitle"
+      @created="handleBookCreated"
+    />
   </dialog>
 </template>
 
@@ -175,6 +205,10 @@
 import { ref, computed, onMounted } from "vue";
 import type { Book, Student, BorrowBookData } from "~/types/books";
 import ImageUploader from "~/components/layout/ImageUploader.vue";
+import SearchableSelect from "~/components/layout/SearchableSelect.vue";
+import CreateStudentModal from "~/components/modals/CreateStudentModal.vue";
+import CreateBookModal from "~/components/modals/CreateBookModal.vue";
+import { LibraryAPI } from "~/composables/useLibraryAPI";
 
 const props = defineProps<{
   show: boolean;
@@ -231,6 +265,53 @@ const formData = ref({
   bookCondition: "",
   beforeConditionImages: [] as File[],
 });
+
+// Selected items for SearchableSelect components
+const selectedStudent = ref<Student | null>(null);
+const selectedBook = ref<Book | null>(null);
+
+// Update handlers for SearchableSelect components
+const updateSelectedStudent = (student: Student | null) => {
+  selectedStudent.value = student;
+  formData.value.studentId = student?.id || "";
+};
+
+const updateSelectedBook = (book: Book | null) => {
+  selectedBook.value = book;
+  formData.value.bookId = book?.id || "";
+};
+
+// Create handlers for new items
+const showCreateStudentModal = ref(false);
+const showCreateBookModal = ref(false);
+const newStudentName = ref("");
+const newBookTitle = ref("");
+
+const handleCreateStudent = (query: string) => {
+  newStudentName.value = query;
+  showCreateStudentModal.value = true;
+};
+
+const handleCreateBook = (query: string) => {
+  newBookTitle.value = query;
+  showCreateBookModal.value = true;
+};
+
+const handleStudentCreated = async (student: Student) => {
+  // Add the new student to the list and select it
+  students.value.push(student);
+  selectedStudent.value = student;
+  formData.value.studentId = student.id;
+  showCreateStudentModal.value = false;
+};
+
+const handleBookCreated = async (book: Book) => {
+  // Add the new book to the list and select it
+  availableBooks.value.push(book);
+  selectedBook.value = book;
+  formData.value.bookId = book.id;
+  showCreateBookModal.value = false;
+};
 
 // Handlers
 const handleImagesUpdate = (images: File[]) => {
