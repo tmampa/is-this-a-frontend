@@ -1,170 +1,200 @@
 <template>
-  <dialog :open="show" class="modal">
-    <div class="modal-box max-w-2xl">
-      <h3 class="font-bold text-lg mb-6">
-        {{ editMode ? "Edit Student" : "Create a Student" }}
-      </h3>
-
-      <form @submit.prevent="handleSubmit" class="space-y-6">
-        <!-- Student Selection -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">First names:</span>
-          </label>
-          <input
-            type="text"
-            v-model="formData.firstNames"
-            class="input w-full"
-            required
-          />
-        </div>
-
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Last name: </span>
-          </label>
-          <input
-            type="text"
-            v-model="formData.lastName"
-            class="input w-full"
-            required
-          />
-        </div>
-
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Email: </span>
-          </label>
-          <input
-            type="email"
-            v-model="formData.email"
-            class="input w-full"
-            required
-          />
-        </div>
-
-        <!-- Book Selection -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Address:</span>
-          </label>
-
-          <textarea
-            class="textarea w-full"
-            placeholder="Address"
-            v-model="formData.address"
-            required
-          ></textarea>
-        </div>
-
-        <!-- Parents/Guardians -->
-        <div class="form-control">
-          <div class="flex justify-between items-center mb-4">
-            <label class="label">
-              <span class="label-text">Parents/Guardians:</span>
-            </label>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline btn-primary"
-              @click="addParent"
-            >
-              Add Parent/Guardian
-            </button>
-          </div>
-          <div
-            v-for="(parent, index) in formData.parents"
-            :key="index"
-            class="border p-4 rounded-lg mb-4 relative"
-          >
-            <button
-              v-if="formData.parents.length > 1"
-              type="button"
-              class="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
-              @click="removeParent(index)"
-            >
-              ✕
-            </button>
-            <div class="form-control mb-2">
-              <label class="label">
-                <span class="label-text">Name:</span>
-              </label>
-              <input
-                type="text"
-                v-model="parent.name"
-                class="input w-full"
-                required
-              />
-            </div>
-            <div class="form-control mb-2">
-              <label class="label">
-                <span class="label-text">Email:</span>
-              </label>
-              <input
-                type="email"
-                v-model="parent.email"
-                class="input w-full"
-                required
-              />
-            </div>
-            <div class="form-control mb-2">
-              <label class="label">
-                <span class="label-text">Relationship:</span>
-              </label>
-              <input
-                type="text"
-                v-model="parent.relationship"
-                class="input w-full"
-                required
-              />
-            </div>
-          </div>
-          <div
-            v-if="formData.parents.length === 0"
-            class="text-gray-500 text-center py-8"
-          >
-            No parents/guardians added yet. Click "Add Parent/Guardian" to add
-            one.
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="modal-action">
+  <div
+    class="modal fade"
+    :class="{ show: show }"
+    :style="{ display: show ? 'block' : 'none' }"
+    tabindex="-1"
+    aria-labelledby="createStudentModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createStudentModalLabel">
+            {{ editMode ? "Edit Student" : "Create a Student" }}
+          </h5>
           <button
             type="button"
-            class="btn"
+            class="btn-close"
             @click="closeModal"
-            :disabled="loading"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            :class="{ loading: loading }"
-            :disabled="loading"
-          >
-            {{
-              loading
-                ? editMode
-                  ? "Updating..."
-                  : "Creating..."
-                : editMode
-                ? "Update Student"
-                : "Create Student"
-            }}
-          </button>
+            aria-label="Close"
+          ></button>
         </div>
-      </form>
+
+        <form @submit.prevent="handleSubmit">
+          <div class="modal-body">
+            <div class="row g-3">
+              <!-- Student Information -->
+              <div class="col-md-6">
+                <label for="firstNames" class="form-label">First names:</label>
+                <input
+                  type="text"
+                  id="firstNames"
+                  v-model="formData.firstNames"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="col-md-6">
+                <label for="lastName" class="form-label">Last name:</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  v-model="formData.lastName"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="col-12">
+                <label for="email" class="form-label">Email:</label>
+                <input
+                  type="email"
+                  id="email"
+                  v-model="formData.email"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <!-- Address -->
+              <div class="col-12">
+                <label for="address" class="form-label">Address:</label>
+                <textarea
+                  id="address"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Address"
+                  v-model="formData.address"
+                  required
+                ></textarea>
+              </div>
+
+              <!-- Parents/Guardians -->
+              <div class="col-12">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                >
+                  <label class="form-label mb-0">Parents/Guardians:</label>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-primary"
+                    @click="addParent"
+                  >
+                    <i class="bi bi-plus-lg me-1"></i>Add Parent/Guardian
+                  </button>
+                </div>
+
+                <div
+                  v-for="(parent, index) in formData.parents"
+                  :key="index"
+                  class="border rounded p-3 mb-3 position-relative"
+                >
+                  <button
+                    v-if="formData.parents.length > 1"
+                    type="button"
+                    class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2"
+                    @click="removeParent(index)"
+                  >
+                    <i class="bi bi-x"></i>
+                  </button>
+
+                  <div class="row g-2">
+                    <div class="col-12">
+                      <label
+                        :for="`parentName${index}`"
+                        class="form-label small"
+                        >Name:</label
+                      >
+                      <input
+                        :id="`parentName${index}`"
+                        type="text"
+                        v-model="parent.name"
+                        class="form-control"
+                        required
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label
+                        :for="`parentEmail${index}`"
+                        class="form-label small"
+                        >Email:</label
+                      >
+                      <input
+                        :id="`parentEmail${index}`"
+                        type="email"
+                        v-model="parent.email"
+                        class="form-control"
+                        required
+                      />
+                    </div>
+                    <div class="col-md-6">
+                      <label
+                        :for="`parentRelationship${index}`"
+                        class="form-label small"
+                        >Relationship:</label
+                      >
+                      <input
+                        :id="`parentRelationship${index}`"
+                        type="text"
+                        v-model="parent.relationship"
+                        class="form-control"
+                        placeholder="e.g., Mother, Father, Guardian"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  v-if="formData.parents.length === 0"
+                  class="text-muted text-center py-4"
+                >
+                  No parents/guardians added yet. Click "Add Parent/Guardian" to
+                  add one.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="closeModal"
+              :disabled="loading"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" :disabled="loading">
+              <span
+                v-if="loading"
+                class="spinner-border spinner-border-sm me-2"
+                role="status"
+              ></span>
+              {{
+                loading
+                  ? editMode
+                    ? "Updating..."
+                    : "Creating..."
+                  : editMode
+                  ? "Update Student"
+                  : "Create Student"
+              }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-    <form method="dialog" class="modal-backdrop">
-      <button @click="closeModal">close</button>
-    </form>
-  </dialog>
+  </div>
+  <div v-if="show" class="modal-backdrop fade show" @click="closeModal"></div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import type { Student } from "~/types/books";
+import { LibraryAPI } from "~/composables/useLibraryAPI";
 
 // Define student creation data type
 type CreateStudentData = {

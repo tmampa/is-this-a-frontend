@@ -1,136 +1,129 @@
 <template>
-  <dialog :open="show" class="modal">
-    <div class="modal-box max-w-2xl">
-      <h3 class="font-bold text-lg mb-6">Borrow a Book</h3>
-
-      <form @submit.prevent="handleSubmit" class="space-y-6">
-        <!-- Student Selection -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Student</span>
-          </label>
-          <select
-            v-model="formData.studentId"
-            class="select select-bordered w-full"
-            required
-          >
-            <option value="" disabled selected>Select a student</option>
-            <option
-              v-for="student in students"
-              :key="student.id"
-              :value="student.id"
-            >
-              {{ student.fullName }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Book Selection -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Book</span>
-          </label>
-          <select
-            v-model="formData.bookId"
-            class="select select-bordered w-full"
-            required
-          >
-            <option value="" disabled selected>Select a book</option>
-            <option
-              v-for="book in availableBooks"
-              :key="book.id"
-              :value="book.id"
-            >
-              {{ book.title }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Dates
-        <div class="grid grid-cols-1 gap-4">
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Borrow Date</span>
-            </label>
-            <input
-              type="date"
-              :value="currentDate"
-              class="input input-bordered bg-base-200"
-              disabled
-            />
-            <label class="label">
-              <span class="label-text-alt text-base-content/60"
-                >Automatically set to today</span
-              >
-            </label>
-          </div>
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Due Date</span>
-            </label>
-            <input
-              type="date"
-              v-model="formData.dueDate"
-              class="input input-bordered"
-              :min="currentDate"
-              required
-            />
-          </div>
-        </div> -->
-
-        <!-- create select for book condition -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Book Condition</span>
-          </label>
-          <select
-            v-model="formData.bookCondition"
-            class="select select-bordered w-full"
-            required
-          >
-            <option value="" disabled selected>Select book condition</option>
-            <option value="new">New</option>
-            <option value="excellent">Excellent</option>
-            <option value="good">Good</option>
-            <option value="fair">Fair</option>
-            <option value="poor">Poor</option>
-            <option value="damaged">Damaged</option>
-          </select>
-        </div>
-
-        <!-- Book Condition Images -->
-        <ImageUploader
-          label="Book Condition Images"
-          :multiple="true"
-          :max-images="5"
-          @update:images="handleImagesUpdate"
-        />
-
-        <!-- Action Buttons -->
-        <div class="modal-action">
+  <div
+    class="modal fade"
+    :class="{ show: show }"
+    :style="{ display: show ? 'block' : 'none' }"
+    tabindex="-1"
+    aria-labelledby="borrowBookModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="borrowBookModalLabel">Borrow a Book</h5>
           <button
             type="button"
-            class="btn"
+            class="btn-close"
             @click="closeModal"
-            :disabled="loading"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            :class="{ loading: loading }"
-            :disabled="loading"
-          >
-            {{ loading ? "Creating..." : "Borrow Book" }}
-          </button>
+            aria-label="Close"
+          ></button>
         </div>
-      </form>
+
+        <form @submit.prevent="handleSubmit">
+          <div class="modal-body">
+            <div class="row g-3">
+              <!-- Student Selection -->
+              <div class="col-md-6">
+                <label for="studentSelect" class="form-label"
+                  >Student <span class="text-danger">*</span></label
+                >
+                <select
+                  id="studentSelect"
+                  v-model="formData.studentId"
+                  class="form-select"
+                  required
+                >
+                  <option value="" disabled selected>Select a student</option>
+                  <option
+                    v-for="student in students"
+                    :key="student.id"
+                    :value="student.id"
+                  >
+                    {{ student.fullName }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Book Selection -->
+              <div class="col-md-6">
+                <label for="bookSelect" class="form-label"
+                  >Book <span class="text-danger">*</span></label
+                >
+                <select
+                  id="bookSelect"
+                  v-model="formData.bookId"
+                  class="form-select"
+                  required
+                >
+                  <option value="" disabled selected>Select a book</option>
+                  <option
+                    v-for="book in availableBooks"
+                    :key="book.id"
+                    :value="book.id"
+                  >
+                    {{ book.title }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Book Condition -->
+              <div class="col-12">
+                <label for="bookCondition" class="form-label"
+                  >Book Condition <span class="text-danger">*</span></label
+                >
+                <select
+                  id="bookCondition"
+                  v-model="formData.bookCondition"
+                  class="form-select"
+                  required
+                >
+                  <option value="" disabled selected>
+                    Select book condition
+                  </option>
+                  <option value="new">New</option>
+                  <option value="excellent">Excellent</option>
+                  <option value="good">Good</option>
+                  <option value="fair">Fair</option>
+                  <option value="poor">Poor</option>
+                  <option value="damaged">Damaged</option>
+                </select>
+              </div>
+
+              <!-- Book Condition Images -->
+              <div class="col-12">
+                <ImageUploader
+                  label="Book Condition Images"
+                  :multiple="true"
+                  :max-images="5"
+                  @update:images="handleImagesUpdate"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="closeModal"
+              :disabled="loading"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" :disabled="loading">
+              <span
+                v-if="loading"
+                class="spinner-border spinner-border-sm me-2"
+                role="status"
+              ></span>
+              {{ loading ? "Creating..." : "Borrow Book" }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-    <form method="dialog" class="modal-backdrop">
-      <button @click="closeModal">close</button>
-    </form>
-  </dialog>
+  </div>
+  <div v-if="show" class="modal-backdrop fade show" @click="closeModal"></div>
 </template>
 
 <script setup lang="ts">

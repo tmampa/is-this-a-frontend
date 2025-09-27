@@ -1,134 +1,149 @@
 <template>
-  <dialog :open="show" class="modal">
-    <div class="modal-box max-w-2xl">
-      <h3 class="font-bold text-lg mb-6">
-        {{ editMode ? "Edit Book" : "Add New Book" }}
-      </h3>
-
-      <form @submit.prevent="handleSubmit" class="space-y-6">
-        <!-- Title -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text"
-              >Title <span class="text-error">*</span></span
-            >
-          </label>
-          <input
-            type="text"
-            v-model="formData.title"
-            class="input input-bordered w-full"
-            placeholder="Enter book title"
-            required
-          />
-        </div>
-
-        <!-- Author -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text"
-              >Author <span class="text-error">*</span></span
-            >
-          </label>
-          <input
-            type="text"
-            v-model="formData.author"
-            class="input input-bordered w-full"
-            placeholder="Enter author name"
-            required
-          />
-        </div>
-
-        <!-- ISBN -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text"
-              >ISBN <span class="text-error">*</span></span
-            >
-          </label>
-          <input
-            type="text"
-            v-model="formData.isbn"
-            class="input input-bordered w-full"
-            placeholder="Enter ISBN (e.g., 978-3-16-148410-0)"
-            required
-          />
-        </div>
-
-        <!-- Category -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text"
-              >Category <span class="text-error">*</span></span
-            >
-          </label>
-          <select
-            v-model="formData.category"
-            class="select select-bordered w-full"
-            required
-          >
-            <option value="" disabled>Select a category</option>
-            <option value="Fiction">Fiction</option>
-            <option value="Non-Fiction">Non-Fiction</option>
-            <option value="Science">Science</option>
-            <option value="Technology">Technology</option>
-            <option value="History">History</option>
-            <option value="Biography">Biography</option>
-            <option value="Mystery">Mystery</option>
-            <option value="Romance">Romance</option>
-            <option value="Fantasy">Fantasy</option>
-            <option value="Self-Help">Self-Help</option>
-            <option value="Educational">Educational</option>
-            <option value="Children">Children</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <!-- Description -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Description</span>
-          </label>
-          <textarea
-            v-model="formData.description"
-            class="textarea textarea-bordered w-full"
-            placeholder="Enter book description (optional)"
-            rows="4"
-          ></textarea>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="modal-action">
+  <div
+    class="modal fade"
+    :class="{ show: show }"
+    :style="{ display: show ? 'block' : 'none' }"
+    tabindex="-1"
+    aria-labelledby="bookFormModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bookFormModalLabel">
+            {{ editMode ? "Edit Book" : "Add New Book" }}
+          </h5>
           <button
             type="button"
-            class="btn"
+            class="btn-close"
             @click="closeModal"
-            :disabled="loading"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            :class="{ loading: loading }"
-            :disabled="loading"
-          >
-            {{
-              loading
-                ? editMode
-                  ? "Updating..."
-                  : "Creating..."
-                : editMode
-                ? "Update Book"
-                : "Create Book"
-            }}
-          </button>
+            aria-label="Close"
+          ></button>
         </div>
-      </form>
+
+        <form @submit.prevent="handleSubmit">
+          <div class="modal-body">
+            <div class="row g-3">
+              <!-- Title -->
+              <div class="col-12">
+                <label for="bookTitle" class="form-label">
+                  Title <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="bookTitle"
+                  v-model="formData.title"
+                  class="form-control"
+                  placeholder="Enter book title"
+                  required
+                />
+              </div>
+
+              <!-- Author -->
+              <div class="col-md-6">
+                <label for="bookAuthor" class="form-label">
+                  Author <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="bookAuthor"
+                  v-model="formData.author"
+                  class="form-control"
+                  placeholder="Enter author name"
+                  required
+                />
+              </div>
+
+              <!-- ISBN -->
+              <div class="col-md-6">
+                <label for="bookISBN" class="form-label">
+                  ISBN <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="bookISBN"
+                  v-model="formData.isbn"
+                  class="form-control"
+                  placeholder="Enter ISBN (e.g., 978-3-16-148410-0)"
+                  required
+                />
+              </div>
+
+              <!-- Category -->
+              <div class="col-12">
+                <label for="bookCategory" class="form-label">
+                  Category <span class="text-danger">*</span>
+                </label>
+                <select
+                  id="bookCategory"
+                  v-model="formData.category"
+                  class="form-select"
+                  required
+                >
+                  <option value="" disabled>Select a category</option>
+                  <option value="Fiction">Fiction</option>
+                  <option value="Non-Fiction">Non-Fiction</option>
+                  <option value="Science">Science</option>
+                  <option value="Technology">Technology</option>
+                  <option value="History">History</option>
+                  <option value="Biography">Biography</option>
+                  <option value="Mystery">Mystery</option>
+                  <option value="Romance">Romance</option>
+                  <option value="Fantasy">Fantasy</option>
+                  <option value="Self-Help">Self-Help</option>
+                  <option value="Educational">Educational</option>
+                  <option value="Children">Children</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <!-- Description -->
+              <div class="col-12">
+                <label for="bookDescription" class="form-label"
+                  >Description</label
+                >
+                <textarea
+                  id="bookDescription"
+                  v-model="formData.description"
+                  class="form-control"
+                  placeholder="Enter book description (optional)"
+                  rows="4"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="closeModal"
+              :disabled="loading"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" :disabled="loading">
+              <span
+                v-if="loading"
+                class="spinner-border spinner-border-sm me-2"
+                role="status"
+              ></span>
+              {{
+                loading
+                  ? editMode
+                    ? "Updating..."
+                    : "Creating..."
+                  : editMode
+                  ? "Update Book"
+                  : "Create Book"
+              }}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-    <form method="dialog" class="modal-backdrop">
-      <button @click="closeModal">close</button>
-    </form>
-  </dialog>
+  </div>
+  <div v-if="show" class="modal-backdrop fade show" @click="closeModal"></div>
 </template>
 
 <script setup lang="ts">
