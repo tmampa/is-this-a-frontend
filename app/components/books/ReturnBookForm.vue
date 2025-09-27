@@ -142,6 +142,8 @@ const defaultReturnConditions = [
   "💧 Water damage",
   "🍂 Stains present",
   "🔍 Binding loose/broken",
+  "🔖 Lost",
+  "📕 Torn pages",
 ];
 
 // Form state
