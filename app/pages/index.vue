@@ -1,38 +1,52 @@
 <template>
   <NavBar />
 
-  <div class="">
-    <book-card-stats />
+  <div class="bg-light min-vh-100">
+    <!-- Clean Header Section -->
+    <div class="container py-4">
+      <!-- Simple Stats -->
+      <book-card-stats class="mb-4" />
 
-    <div class="container">
-      <div class="row justify-content-between">
-        <div class="col">
-          <form class="d-flex" role="search">
-            <input
-              class="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button class="btn btn-outline-success" type="submit">
-              Search
-            </button>
-          </form>
+      <!-- Clean Search and Action Bar -->
+      <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+          <input
+            class="form-control"
+            type="search"
+            placeholder="Search borrowed books..."
+            aria-label="Search"
+          />
         </div>
-        <div class="col text-end">
-          <button @click="showBorrowModal = true" class="btn btn-primary">
-            Borrow Book
+        <div class="col-md-4 text-end">
+          <button
+            @click="showBorrowModal = true"
+            class="btn px-4"
+            style="background-color: #f25c05; color: white; border: none"
+          >
+            Issue book to student
           </button>
         </div>
       </div>
+
+      <!-- Main Content -->
+      <div class="bg-white rounded shadow-sm p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0" style="color: #f25c05">Recently issued books</h5>
+          <small class="text-muted"
+            >{{ borrowedBooks.length }} active loans</small
+          >
+        </div>
+
+        <BorrowedBooksList
+          :books="borrowedBooks"
+          @return-book="handleReturnBook"
+        />
+      </div>
     </div>
 
-    <BorrowedBooksList :books="borrowedBooks" @return-book="handleReturnBook" />
-
-    <!-- Borrow Book Modal -->
+    <!-- Modals -->
     <BorrowBookForm v-model:show="showBorrowModal" @submit="handleBorrow" />
 
-    <!-- Return Book Modal -->
     <ReturnBookForm
       v-if="selectedBook"
       v-model:show="showReturnModal"
@@ -41,6 +55,23 @@
     />
   </div>
 </template>
+
+<style scoped>
+body,
+html {
+  background-color: #fafafa;
+}
+
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.form-control:focus {
+  border-color: #f25c05;
+  box-shadow: 0 0 0 0.2rem rgba(242, 92, 5, 0.25);
+}
+</style>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
