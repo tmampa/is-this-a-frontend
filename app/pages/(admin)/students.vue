@@ -97,7 +97,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="student in filteredStudents" :key="student.id">
+            <tr v-for="student in paginatedStudents" :key="student.id">
               <td>
                 <div class="flex items-center gap-3">
                   <div class="avatar">
@@ -209,6 +209,91 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div
+        class="flex flex-col sm:flex-row justify-between items-center p-4 border-t border-base-200"
+      >
+        <div class="text-sm text-base-content/60 mb-2 sm:mb-0">
+          Showing {{ startIndex + 1 }} to
+          {{ Math.min(endIndex, totalFilteredStudents) }} of
+          {{ totalFilteredStudents }} students
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Items per page selector -->
+          <div class="flex items-center gap-2 mr-4">
+            <span class="text-sm text-base-content/60">Show:</span>
+            <select
+              v-model="itemsPerPage"
+              @change="currentPage = 1"
+              class="select select-sm select-bordered"
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+
+          <!-- Pagination buttons -->
+          <div class="join">
+            <button
+              @click="goToPage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-disabled': currentPage === 1 }"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+
+            <button
+              v-for="page in visiblePages"
+              :key="page"
+              @click="goToPage(page)"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-primary': page === currentPage }"
+            >
+              {{ page }}
+            </button>
+
+            <button
+              @click="goToPage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-disabled': currentPage === totalPages }"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -401,6 +486,10 @@ const selectedFilter = ref("");
 const loading = ref(false);
 const deleteLoading = ref(false);
 
+// Pagination state
+const currentPage = ref(1);
+const itemsPerPage = ref(5);
+
 // Students data from API
 const students = ref<Student[]>([]);
 
@@ -456,7 +545,48 @@ const filteredStudents = computed(() => {
   return filtered;
 });
 
+// Pagination computed properties
+const totalFilteredStudents = computed(() => filteredStudents.value.length);
+const totalPages = computed(() =>
+  Math.ceil(totalFilteredStudents.value / itemsPerPage.value)
+);
+
+const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
+const endIndex = computed(() => startIndex.value + itemsPerPage.value);
+
+const paginatedStudents = computed(() => {
+  return filteredStudents.value.slice(startIndex.value, endIndex.value);
+});
+
+const visiblePages = computed(() => {
+  const pages = [];
+  const maxVisiblePages = 5;
+
+  let startPage = Math.max(
+    1,
+    currentPage.value - Math.floor(maxVisiblePages / 2)
+  );
+  let endPage = Math.min(totalPages.value, startPage + maxVisiblePages - 1);
+
+  // Adjust start page if we're near the end
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+
+  return pages;
+});
+
 // Methods
+const goToPage = (page: number) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
+
 function getInitials(name: string): string {
   return name
     .split(" ")
