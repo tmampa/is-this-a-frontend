@@ -1,181 +1,210 @@
 <template>
-  <div class="card bg-base-100 shadow-sm mx-5" style="margin-top: 15px">
-    <div class="overflow-x-auto rounded-box">
-      <table class="table table-zebra">
-        <thead>
-          <tr>
-            <th class="bg-base-200/50 font-medium">Book</th>
-            <th class="bg-base-200/50 font-medium">Student</th>
-            <th class="bg-base-200/50 font-medium">Borrow date</th>
-            <th class="bg-base-200/50 font-medium">Expected return date</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="book in books" :key="book.id" class="hover">
-            <td>{{ book.bookTitle }}</td>
-            <td>{{ book.studentName }}</td>
-            <td>{{ formatDate(book.borrowDate) }}</td>
-            <td>
-              <span :class="isOverdue(book.dueDate) ? 'text-error' : ''">
-                {{ formatDate(book.dueDate) }}
-              </span>
-            </td>
-
-            <td>
-              <div class="dropdown dropdown-right dropdown-center">
-                <div tabindex="0" role="button" class="text-right">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    class="size-6"
+  <div class="card shadow-sm mx-4" style="margin-top: 15px">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="fw-medium">Book</th>
+              <th class="fw-medium">Student</th>
+              <th class="fw-medium">Borrow date</th>
+              <th class="fw-medium">Expected return date</th>
+              <th class="fw-medium text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="book in books" :key="book.id">
+              <td>{{ book.bookTitle }}</td>
+              <td>{{ book.studentName }}</td>
+              <td>{{ formatDate(book.borrowDate) }}</td>
+              <td>
+                <span :class="isOverdue(book.dueDate) ? 'text-danger' : ''">
+                  {{ formatDate(book.dueDate) }}
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="dropdown">
+                  <button
+                    class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    type="button"
+                    :id="`dropdown-${book.id}`"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
-                    />
-                  </svg>
+                    <i class="bi bi-three-dots-vertical"></i>
+                  </button>
+                  <ul
+                    class="dropdown-menu"
+                    :aria-labelledby="`dropdown-${book.id}`"
+                  >
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent="showDetails(book)"
+                      >
+                        <i class="bi bi-eye me-2"></i>View Details
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="#"
+                        @click.prevent="$emit('return-book', book)"
+                      >
+                        <i class="bi bi-arrow-return-left me-2"></i>Return Book
+                      </a>
+                    </li>
+                  </ul>
                 </div>
-                <ul
-                  tabindex="0"
-                  class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-                >
-                  <li><a @click="showDetails(book)"> View </a></li>
-                  <li><a @click="$emit('return-book', book)"> Return </a></li>
-                </ul>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- Details Modal -->
-      <dialog id="book_details_modal" class="modal">
-        <div class="modal-box max-w-3xl bg-base-100">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-semibold">Borrow Details</h3>
-            <form method="dialog">
-              <button class="btn btn-sm btn-circle btn-ghost">✕</button>
-            </form>
-          </div>
+      <div
+        class="modal fade"
+        id="bookDetailsModal"
+        tabindex="-1"
+        aria-labelledby="bookDetailsModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="bookDetailsModalLabel">
+                Borrow Details
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
 
-          <div v-if="selectedBook" class="space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div class="card bg-base-200">
-                <div class="card-body">
-                  <h4 class="card-title text-base">Book Information</h4>
-                  <div class="space-y-3">
-                    <div
-                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
-                    >
-                      <span class="text-sm text-base-content/60">Title</span>
-                      <span class="font-medium">{{
-                        selectedBook.bookTitle
-                      }}</span>
+            <div class="modal-body" v-if="selectedBook">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <div class="card bg-light">
+                    <div class="card-body">
+                      <h6 class="card-title">Book Information</h6>
+                      <div class="row mb-2">
+                        <div class="col-3 text-muted small">Title:</div>
+                        <div class="col-9 fw-medium">
+                          {{ selectedBook.bookTitle }}
+                        </div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-3 text-muted small">Student:</div>
+                        <div class="col-9 fw-medium">
+                          {{ selectedBook.studentName }}
+                        </div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-3 text-muted small">Borrow Date:</div>
+                        <div class="col-9">
+                          {{ formatDate(selectedBook.borrowDate) }}
+                        </div>
+                      </div>
+                      <div class="row mb-2">
+                        <div class="col-3 text-muted small">Due Date:</div>
+                        <div
+                          class="col-9"
+                          :class="
+                            isOverdue(selectedBook.dueDate) ? 'text-danger' : ''
+                          "
+                        >
+                          {{ formatDate(selectedBook.dueDate) }}
+                        </div>
+                      </div>
+                      <div v-if="selectedBook.returnDate" class="row mb-2">
+                        <div class="col-3 text-muted small">Return Date:</div>
+                        <div class="col-9 text-success">
+                          {{ formatDate(selectedBook.returnDate) }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <h6 class="fw-medium mb-3">Condition Images</h6>
+                  <div class="row g-3">
+                    <div class="col-6">
+                      <p class="text-muted small mb-2">
+                        Before Condition Images
+                      </p>
+                      <div class="row g-2">
+                        <div
+                          v-for="(
+                            image, index
+                          ) in selectedBook.beforeConditionImages"
+                          :key="`before-${index}`"
+                          class="col-6"
+                        >
+                          <img
+                            :src="image"
+                            :alt="`Before condition ${index + 1}`"
+                            class="img-fluid rounded"
+                            style="aspect-ratio: 4/3; object-fit: cover"
+                          />
+                        </div>
+                      </div>
                     </div>
                     <div
-                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
+                      v-if="selectedBook.afterConditionImages?.length > 0"
+                      class="col-6"
                     >
-                      <span class="text-sm text-base-content/60">Student</span>
-                      <span class="font-medium">{{
-                        selectedBook.studentName
-                      }}</span>
-                    </div>
-                    <div
-                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
-                    >
-                      <span class="text-sm text-base-content/60"
-                        >Borrow Date</span
-                      >
-                      <span>{{ formatDate(selectedBook.borrowDate) }}</span>
-                    </div>
-                    <div
-                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
-                    >
-                      <span class="text-sm text-base-content/60">Due Date</span>
-                      <span
-                        :class="
-                          isOverdue(selectedBook.dueDate) ? 'text-error' : ''
-                        "
-                      >
-                        {{ formatDate(selectedBook.dueDate) }}
-                      </span>
-                    </div>
-                    <div
-                      v-if="selectedBook.returnDate"
-                      class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
-                    >
-                      <span class="text-sm text-base-content/60"
-                        >Return Date</span
-                      >
-                      <span class="text-success">{{
-                        formatDate(selectedBook.returnDate)
-                      }}</span>
+                      <p class="text-muted small mb-2">
+                        After Condition Images
+                      </p>
+                      <div class="row g-2">
+                        <div
+                          v-for="(
+                            image, index
+                          ) in selectedBook.afterConditionImages"
+                          :key="`after-${index}`"
+                          class="col-6"
+                        >
+                          <img
+                            :src="image"
+                            :alt="`After condition ${index + 1}`"
+                            class="img-fluid rounded"
+                            style="aspect-ratio: 4/3; object-fit: cover"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <h4 class="font-medium mb-2">Condition Images</h4>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <p class="text-sm text-base-content/60 mb-2">
-                      Before Condition Images
-                    </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <img
-                        v-for="(
-                          image, index
-                        ) in selectedBook.beforeConditionImages"
-                        :key="`before-${index}`"
-                        :src="image"
-                        :alt="`Before condition ${index + 1}`"
-                        class="rounded-lg w-full object-cover aspect-4/3"
-                      />
-                    </div>
-                  </div>
-                  <div v-if="selectedBook.afterConditionImages?.length > 0">
-                    <p class="text-sm text-base-content/60 mb-2">
-                      After Condition Images
-                    </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <img
-                        v-for="(
-                          image, index
-                        ) in selectedBook.afterConditionImages"
-                        :key="`after-${index}`"
-                        :src="image"
-                        :alt="`After condition ${index + 1}`"
-                        class="rounded-lg w-full object-cover aspect-4/3"
-                      />
-                    </div>
-                  </div>
-                </div>
+              <div
+                v-if="selectedBook.conditionNotes"
+                class="mt-4 pt-3 border-top"
+              >
+                <h6 class="fw-medium mb-2">Condition Notes</h6>
+                <p class="text-muted small">
+                  {{ selectedBook.conditionNotes }}
+                </p>
               </div>
             </div>
 
-            <div v-if="selectedBook.conditionNotes" class="pt-4 border-t">
-              <h4 class="font-medium mb-2">Condition Notes</h4>
-              <p class="text-sm text-base-content/75">
-                {{ selectedBook.conditionNotes }}
-              </p>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
             </div>
-          </div>
-
-          <div class="modal-action">
-            <form method="dialog">
-              <button class="btn">Close</button>
-            </form>
           </div>
         </div>
-        <form method="dialog" class="modal-backdrop">
-          <button>close</button>
-        </form>
-      </dialog>
+      </div>
     </div>
   </div>
 </template>
@@ -222,9 +251,11 @@ const getStatusBadgeClass = (status: "borrowed" | "returned") => {
 // Handlers
 const showDetails = (book: BorrowedBook) => {
   selectedBook.value = book;
-  const modal = document.getElementById(
-    "book_details_modal"
-  ) as HTMLDialogElement;
-  modal.showModal();
+  // Use data-bs-toggle approach or manual modal show
+  const modalElement = document.getElementById("bookDetailsModal");
+  if (modalElement) {
+    const modal = new (window as any).bootstrap.Modal(modalElement);
+    modal.show();
+  }
 };
 </script>

@@ -1,56 +1,29 @@
 <template>
-  
   <NavBar />
 
   <div class="">
     <book-card-stats />
 
-    <div
-      class="flex flex-row justify-between items-center mb-4 mx-5"
-      style="margin-top: 60px"
-    >
-      <div class="basis-1/4 md:basis-1/3 lg:basis-1/4">
-        <label class="input">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+    <div class="container">
+      <div class="row justify-content-between">
+        <div class="col">
+          <form class="d-flex" role="search">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
             />
-          </svg>
-
-          <input type="search" class="grow" placeholder="Search" />
-        </label>
-      </div>
-
-      <div class="basis-1/4 md:basis-1/3 lg:basis-1/4 text-right">
-        <button
-          @click="showBorrowModal = true"
-          class="btn btn-primary normal-case px-6 gap-2"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          Borrow Book
-        </button>
+            <button class="btn btn-outline-success" type="submit">
+              Search
+            </button>
+          </form>
+        </div>
+        <div class="col text-end">
+          <button @click="showBorrowModal = true" class="btn btn-primary">
+            Borrow Book
+          </button>
+        </div>
       </div>
     </div>
 
