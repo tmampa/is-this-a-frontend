@@ -20,7 +20,7 @@
               :key="student.id"
               :value="student.id"
             >
-              {{ student.name }}
+              {{ student.fullName }}
             </option>
           </select>
         </div>
@@ -46,7 +46,7 @@
           </select>
         </div>
 
-        <!-- Dates -->
+        <!-- Dates
         <div class="grid grid-cols-1 gap-4">
           <div class="form-control">
             <label class="label">
@@ -76,6 +76,26 @@
               required
             />
           </div>
+        </div> -->
+
+        <!-- create select for book condition -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Book Condition</span>
+          </label>
+          <select
+            v-model="formData.bookCondition"
+            class="select select-bordered w-full"
+            required
+          >
+            <option value="" disabled selected>Select book condition</option>
+            <option value="new">New</option>
+            <option value="excellent">Excellent</option>
+            <option value="good">Good</option>
+            <option value="fair">Fair</option>
+            <option value="poor">Poor</option>
+            <option value="damaged">Damaged</option>
+          </select>
         </div>
 
         <!-- Book Condition Images -->
@@ -88,8 +108,22 @@
 
         <!-- Action Buttons -->
         <div class="modal-action">
-          <button type="button" class="btn" @click="closeModal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Borrow Book</button>
+          <button
+            type="button"
+            class="btn"
+            @click="closeModal"
+            :disabled="loading"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            :class="{ loading: loading }"
+            :disabled="loading"
+          >
+            {{ loading ? "Creating..." : "Borrow Book" }}
+          </button>
         </div>
       </form>
     </div>
@@ -100,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import type { Book, Student, BorrowBookData } from "~/types/books";
 import ImageUploader from "~/components/layout/ImageUploader.vue";
 
@@ -118,48 +152,45 @@ const currentDate = computed(() => {
   return new Date().toISOString().split("T")[0];
 });
 
-// Mock data - Replace with API calls
-const students = ref<Student[]>([
-  {
-    id: "1",
-    name: "John Doe",
-    studentId: "STU001",
-    email: "john@example.com",
-    borrowedBooks: [],
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    studentId: "STU002",
-    email: "jane@example.com",
-    borrowedBooks: [],
-  },
-]);
+// API calls for real data
+const students = ref<Student[]>([]);
+const availableBooks = ref<Book[]>([]);
+const loading = ref(false);
 
-const availableBooks = ref<Book[]>([
-  {
-    id: "1",
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    isbn: "978-0743273565",
-    category: "Fiction",
-    status: "available",
-  },
-  {
-    id: "2",
-    title: "1984",
-    author: "George Orwell",
-    isbn: "978-0451524935",
-    category: "Fiction",
-    status: "available",
-  },
-]);
+// Fetch students from API
+const fetchStudents = async () => {
+  try {
+    console.log("Fetching students from API...");
+    students.value = await LibraryAPI.getStudents();
+    console.log("Students loaded:", students.value);
+  } catch (error) {
+    console.error("Failed to fetch students:", error);
+  }
+};
+
+// Fetch available books from API
+const fetchBooks = async () => {
+  try {
+    console.log("Fetching books from API...");
+    availableBooks.value = await LibraryAPI.getAvailableBooks();
+    console.log("Books loaded:", availableBooks.value);
+  } catch (error) {
+    console.error("Failed to fetch books:", error);
+  }
+};
+
+// Load data when component mounts
+onMounted(() => {
+  fetchStudents();
+  fetchBooks();
+});
 
 // Form state
 const formData = ref({
   studentId: "",
   bookId: "",
   dueDate: "",
+  bookCondition: "",
   beforeConditionImages: [] as File[],
 });
 
@@ -168,27 +199,88 @@ const handleImagesUpdate = (images: File[]) => {
   formData.value.beforeConditionImages = images;
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (formData.value.beforeConditionImages.length === 0) {
     alert("Please upload at least one condition image");
     return;
   }
 
-  emit("submit", {
-    studentId: formData.value.studentId,
-    bookId: formData.value.bookId,
-    borrowDate: currentDate.value,
-    dueDate: formData.value.dueDate,
-    beforeConditionImages: formData.value.beforeConditionImages,
-  } as BorrowBookData);
+  loading.value = true;
+  try {
+    // Find the selected book to get its title
+    const selectedBook = availableBooks.value.find(
+      (book) => book.id === formData.value.bookId
+    );
+    if (!selectedBook) {
+      alert("Selected book not found");
+      return;
+    }
 
-  // Reset form
-  formData.value = {
-    studentId: "",
-    bookId: "",
-    dueDate: "",
-    beforeConditionImages: [],
-  };
+    // Find the selected student to get their details
+    const selectedStudent = students.value.find(
+      (student) => student.id === formData.value.studentId
+    );
+    if (!selectedStudent) {
+      alert("Selected student not found");
+      return;
+    }
+
+    // Debug logging to help identify data structure issues
+    console.log("Selected student:", selectedStudent);
+    console.log("Student Number field:", selectedStudent.studentNumber);
+
+    // Use student number directly
+    const studentNumber = selectedStudent.studentNumber;
+
+    if (!studentNumber || studentNumber === 0) {
+      console.warn("Invalid student number:", selectedStudent.studentNumber);
+      alert("Invalid student number. Please contact administrator.");
+      return;
+    }
+
+    // Step 1: Create borrow record using LibraryAPI
+    const recordId = await LibraryAPI.createBorrowRecord(selectedBook.title, {
+      fullName: `${selectedStudent.fullName}`,
+      studentNumber: studentNumber,
+      emails: [], // Backend will get from existing student data
+      address: "", // Backend will get from existing student data
+      bookCondition: formData.value.bookCondition,
+      beforeConditionImages: formData.value.beforeConditionImages,
+    });
+
+    // Step 2: Upload images using the returned recordId
+    await LibraryAPI.uploadImages(
+      recordId,
+      formData.value.beforeConditionImages
+    );
+
+    // Emit success event
+    emit("submit", {
+      fullName: `${selectedStudent.fullName}`,
+      studentNumber: studentNumber,
+      emails: [],
+      address: "",
+      bookCondition: formData.value.bookCondition,
+      beforeConditionImages: formData.value.beforeConditionImages,
+    });
+
+    // Reset form
+    formData.value = {
+      studentId: "",
+      bookId: "",
+      dueDate: "",
+      bookCondition: "",
+      beforeConditionImages: [],
+    };
+
+    // Close modal
+    closeModal();
+  } catch (error) {
+    console.error("Failed to create borrow record:", error);
+    alert("Failed to borrow book. Please try again.");
+  } finally {
+    loading.value = false;
+  }
 };
 
 const closeModal = () => {

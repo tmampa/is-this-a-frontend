@@ -1,15 +1,13 @@
 <template>
-  <div class="card bg-base-100 shadow-sm">
+  <div class="card bg-base-100 shadow-sm mx-5" style="margin-top: 15px">
     <div class="overflow-x-auto rounded-box">
       <table class="table table-zebra">
         <thead>
           <tr>
-            <th class="bg-base-200/50 font-medium">Book Title</th>
+            <th class="bg-base-200/50 font-medium">Book</th>
             <th class="bg-base-200/50 font-medium">Student</th>
-            <th class="bg-base-200/50 font-medium">Borrow Date</th>
-            <th class="bg-base-200/50 font-medium">Due Date</th>
-            <th class="bg-base-200/50 font-medium">Status</th>
-            <th class="bg-base-200/50 font-medium text-right">Actions</th>
+            <th class="bg-base-200/50 font-medium">Borrow date</th>
+            <th class="bg-base-200/50 font-medium">Expected return date</th>
           </tr>
         </thead>
         <tbody>
@@ -22,45 +20,32 @@
                 {{ formatDate(book.dueDate) }}
               </span>
             </td>
+
             <td>
-              <span class="badge" :class="getStatusBadgeClass(book.status)">
-                {{ book.status }}
-              </span>
-            </td>
-            <td>
-              <div class="flex items-center gap-2">
-                <button
-                  v-if="book.status === 'borrowed'"
-                  @click="$emit('return-book', book)"
-                  class="btn btn-sm btn-ghost"
-                >
-                  Return
-                </button>
-                <button
-                  @click="showDetails(book)"
-                  class="btn btn-sm btn-ghost btn-square"
-                >
+              <div class="dropdown dropdown-right dropdown-center">
+                <div tabindex="0" role="button" class="text-right">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
                     fill="none"
                     viewBox="0 0 24 24"
+                    stroke-width="1.5"
                     stroke="currentColor"
+                    class="size-6"
                   >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
                     />
                   </svg>
-                </button>
+                </div>
+                <ul
+                  tabindex="0"
+                  class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                >
+                  <li><a @click="showDetails(book)"> View </a></li>
+                  <li><a @click="$emit('return-book', book)"> Return </a></li>
+                </ul>
               </div>
             </td>
           </tr>

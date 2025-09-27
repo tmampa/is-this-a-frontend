@@ -2,7 +2,7 @@
   <div class="space-y-6">
     <!-- Page Header -->
     <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-5 mx-15"
     >
       <div>
         <h1 class="text-2xl font-bold text-base-content">Borrowed Books</h1>
@@ -12,7 +12,7 @@
       </div>
       <button
         @click="showBorrowModal = true"
-        class="btn btn-primary normal-case px-6 gap-2"
+        class="btn btn-soft btn-primary normal-case px-6 gap-2"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -32,37 +32,6 @@
       </button>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="stats shadow-sm bg-base-100">
-        <div class="stat">
-          <div class="stat-title">Total Borrowed</div>
-          <div class="stat-value text-primary">{{ borrowedBooks.length }}</div>
-          <div class="stat-desc">Active borrowings</div>
-        </div>
-      </div>
-
-      <div class="stats shadow-sm bg-base-100">
-        <div class="stat">
-          <div class="stat-title">Overdue Books</div>
-          <div class="stat-value text-error">
-            {{ borrowedBooks.filter((b) => isOverdue(b.dueDate)).length }}
-          </div>
-          <div class="stat-desc">Need attention</div>
-        </div>
-      </div>
-
-      <div class="stats shadow-sm bg-base-100">
-        <div class="stat">
-          <div class="stat-title">Due This Week</div>
-          <div class="stat-value text-warning">
-            {{ borrowedBooks.filter((b) => isDueThisWeek(b.dueDate)).length }}
-          </div>
-          <div class="stat-desc">Coming up</div>
-        </div>
-      </div>
-    </div>
-
     <!-- Borrowed Books List -->
     <BorrowedBooksList :books="borrowedBooks" @return-book="handleReturnBook" />
 
@@ -80,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import type {
   BorrowedBook,
   Book,
@@ -88,118 +57,69 @@ import type {
   BorrowBookData,
   ReturnBookData,
 } from "~/types/books";
+import { LibraryAPI } from "~/composables/useLibraryAPI";
 
 // Component imports
 import BorrowedBooksList from "~/components/books/BorrowedBooksList.vue";
 import BorrowBookForm from "~/components/books/BorrowBookForm.vue";
 import ReturnBookForm from "~/components/books/ReturnBookForm.vue";
 
-// Mock data for testing
-const students: Student[] = [
-  {
-    id: "1",
-    name: "John Doe",
-    studentId: "STU001",
-    email: "john@example.com",
-    borrowedBooks: [],
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    studentId: "STU002",
-    email: "jane@example.com",
-    borrowedBooks: [],
-  },
-];
-
-const availableBooks: Book[] = [
-  {
-    id: "1",
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    isbn: "978-0743273565",
-    category: "Fiction",
-    status: "available",
-  },
-  {
-    id: "2",
-    title: "1984",
-    author: "George Orwell",
-    isbn: "978-0451524935",
-    category: "Fiction",
-    status: "available",
-  },
-];
-
-// Utils
-const isOverdue = (dueDate: string) => {
-  return new Date(dueDate) < new Date();
-};
-
-const isDueThisWeek = (dueDate: string) => {
-  const today = new Date();
-  const due = new Date(dueDate);
-  const weekFromNow = new Date();
-  weekFromNow.setDate(today.getDate() + 7);
-  return due > today && due <= weekFromNow;
-};
-
 // State
 const showBorrowModal = ref(false);
 const showReturnModal = ref(false);
 const selectedBook = ref<BorrowedBook | null>(null);
+const loading = ref(false);
 
-// Mock data - Replace with actual API calls
-const borrowedBooks = ref<BorrowedBook[]>([
-  {
-    id: "1",
-    bookId: "1",
-    studentId: "1",
-    bookTitle: "The Great Gatsby",
-    studentName: "John Doe",
-    borrowDate: "2025-09-19",
-    dueDate: "2025-10-03",
-    status: "borrowed",
-    beforeConditionImages: ["https://picsum.photos/200/300"],
-    afterConditionImages: [],
-  },
-  {
-    id: "2",
-    bookId: "2",
-    studentId: "2",
-    bookTitle: "1984",
-    studentName: "Jane Smith",
-    borrowDate: "2025-09-15",
-    dueDate: "2025-09-29",
-    status: "borrowed",
-    beforeConditionImages: ["https://picsum.photos/200/300"],
-    afterConditionImages: [],
-  },
-]);
+// Data from API
+const borrowedBooks = ref<BorrowedBook[]>([]);
+const students = ref<Student[]>([]);
+const availableBooks = ref<Book[]>([]);
+
+// Fetch data from API
+const fetchBorrowedBooks = async () => {
+  loading.value = true;
+  try {
+    borrowedBooks.value = await LibraryAPI.getBorrowRecords();
+  } catch (error) {
+    console.error("Failed to fetch borrowed books:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fetchStudents = async () => {
+  try {
+    students.value = await LibraryAPI.getStudents();
+  } catch (error) {
+    console.error("Failed to fetch students:", error);
+  }
+};
+
+const fetchBooks = async () => {
+  try {
+    const books = await LibraryAPI.getBooks();
+    availableBooks.value = books.filter((book) => book.status === "available");
+  } catch (error) {
+    console.error("Failed to fetch books:", error);
+  }
+};
+
+// Initialize data on mount
+onMounted(() => {
+  fetchBorrowedBooks();
+  fetchStudents();
+  fetchBooks();
+});
 
 // Handlers
 const handleBorrow = async (data: BorrowBookData) => {
-  // TODO: Implement API call
-  console.log("Borrow book:", data);
-  showBorrowModal.value = false;
-
-  // Mock implementation - add to list
-  borrowedBooks.value.unshift({
-    id: Math.random().toString(),
-    bookId: data.bookId,
-    studentId: data.studentId,
-    bookTitle:
-      availableBooks.find((b) => b.id === data.bookId)?.title || "Unknown Book",
-    studentName:
-      students.find((s) => s.id === data.studentId)?.name || "Unknown Student",
-    borrowDate: data.borrowDate,
-    dueDate: data.dueDate,
-    status: "borrowed",
-    beforeConditionImages: data.beforeConditionImages.map((file) =>
-      URL.createObjectURL(file)
-    ),
-    afterConditionImages: [],
-  });
+  try {
+    // Refresh the borrowed books list after successful borrow
+    await fetchBorrowedBooks();
+    showBorrowModal.value = false;
+  } catch (error) {
+    console.error("Failed to borrow book:", error);
+  }
 };
 
 const handleReturnBook = (book: BorrowedBook) => {
@@ -208,25 +128,17 @@ const handleReturnBook = (book: BorrowedBook) => {
 };
 
 const handleReturn = async (data: ReturnBookData) => {
-  // TODO: Implement API call
-  console.log("Return book:", data);
+  try {
+    // Use API to return book
+    await LibraryAPI.returnBook(data);
 
-  // Mock implementation - update book status
-  const book = borrowedBooks.value.find(
-    (b: BorrowedBook) => b.id === data.borrowedBookId
-  );
-  if (book) {
-    book.status = "returned";
-    book.returnDate = data.returnDate;
-    book.afterConditionImages = data.afterConditionImages.map((file) =>
-      URL.createObjectURL(file)
-    );
-    if (data.conditionNotes) {
-      book.conditionNotes = data.conditionNotes;
-    }
+    // Refresh the borrowed books list
+    await fetchBorrowedBooks();
+
+    showReturnModal.value = false;
+    selectedBook.value = null;
+  } catch (error) {
+    console.error("Failed to return book:", error);
   }
-
-  showReturnModal.value = false;
-  selectedBook.value = null;
 };
 </script>

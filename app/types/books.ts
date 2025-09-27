@@ -8,10 +8,16 @@ export interface Book {
   status: "available" | "borrowed";
 }
 
+export interface Email {
+  name: string;
+  relationship: string;
+  email: string;
+}
+
 export interface Student {
   id: string;
-  name: string;
-  studentId: string;
+  fullName: string;
+  studentNumber: number;
   email: string;
   borrowedBooks: string[];
 }
@@ -32,10 +38,11 @@ export interface BorrowedBook {
 }
 
 export interface BorrowBookData {
-  studentId: string;
-  bookId: string;
-  borrowDate: string;
-  dueDate: string;
+  fullName: string;
+  studentNumber: number;
+  emails: Email[];
+  address: string;
+  bookCondition: string;
   beforeConditionImages: File[];
 }
 
