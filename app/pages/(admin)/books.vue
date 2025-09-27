@@ -1,222 +1,187 @@
 <template>
   <NavBar />
-  <div class="space-y-6">
+  <div class="container-fluid py-4">
     <!-- Page Header -->
-    <div
-      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-      style="margin-top: 60px"
-    >
-      <div class="px-5">
-        <h1 class="text-2xl font-bold text-base-content">Books Management</h1>
-        <p class="text-sm text-base-content/60 mt-1">
-          Manage your library's book collection
-        </p>
+    <div class="row align-items-center mb-4" style="margin-top: 60px">
+      <div class="col">
+        <div class="px-3">
+          <h1 class="h2 fw-bold text-dark mb-1">Books Management</h1>
+          <p class="text-muted small mb-0">
+            Manage your library's book collection
+          </p>
+        </div>
       </div>
-      <button
-        @click="showAddModal = true"
-        class="btn btn-soft btn-primary normal-case px-6 gap-2"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+      <div class="col-auto">
+        <button
+          @click="showAddModal = true"
+          class="btn btn-primary d-flex align-items-center gap-2"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-        Add Book
-      </button>
+          <i class="bi bi-plus-lg"></i>
+          Add Book
+        </button>
+      </div>
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div class="stats shadow-sm bg-base-100">
-        <div class="stat">
-          <div class="stat-title">Total Books</div>
-          <div class="stat-value text-primary">{{ books.length }}</div>
-          <div class="stat-desc">In collection</div>
+    <div class="row g-4 mb-4">
+      <div class="col-lg-3 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="text-muted small text-uppercase mb-1">Total Books</div>
+            <div class="h3 fw-bold text-primary mb-1">{{ books.length }}</div>
+            <div class="text-muted small">In collection</div>
+          </div>
         </div>
       </div>
-      <div class="stats shadow-sm bg-base-100">
-        <div class="stat">
-          <div class="stat-title">Available</div>
-          <div class="stat-value text-success">{{ availableBooks }}</div>
-          <div class="stat-desc">Ready to borrow</div>
+      <div class="col-lg-3 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="text-muted small text-uppercase mb-1">Available</div>
+            <div class="h3 fw-bold text-success mb-1">{{ availableBooks }}</div>
+            <div class="text-muted small">Ready to borrow</div>
+          </div>
         </div>
       </div>
-      <div class="stats shadow-sm bg-base-100">
-        <div class="stat">
-          <div class="stat-title">Borrowed</div>
-          <div class="stat-value text-warning">{{ borrowedBooks }}</div>
-          <div class="stat-desc">Currently out</div>
+      <div class="col-lg-3 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="text-muted small text-uppercase mb-1">Borrowed</div>
+            <div class="h3 fw-bold text-warning mb-1">{{ borrowedBooks }}</div>
+            <div class="text-muted small">Currently out</div>
+          </div>
         </div>
       </div>
-      <div class="stats shadow-sm bg-base-100">
-        <div class="stat">
-          <div class="stat-title">Categories</div>
-          <div class="stat-value text-info">{{ uniqueCategories }}</div>
-          <div class="stat-desc">Different genres</div>
+      <div class="col-lg-3 col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <div class="text-muted small text-uppercase mb-1">Categories</div>
+            <div class="h3 fw-bold text-info mb-1">{{ uniqueCategories }}</div>
+            <div class="text-muted small">Different genres</div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Filters and Search -->
-    <div class="bg-base-100 rounded-lg shadow-sm px-5 mb-5">
-      <div class="flex flex-col md:flex-row gap-4">
-        <div class="form-control flex-1">
-          <input
-            type="text"
-            v-model="searchQuery"
-            placeholder="Search books by title, author, or ISBN..."
-            class="input input-bordered w-full"
-          />
-        </div>
-        <div class="form-control">
-          <select v-model="selectedCategory" class="select select-bordered">
-            <option value="">All Categories</option>
-            <option
-              v-for="category in categories"
-              :key="category"
-              :value="category"
-            >
-              {{ category }}
-            </option>
-          </select>
-        </div>
-        <div class="form-control">
-          <select v-model="selectedStatus" class="select select-bordered">
-            <option value="">All Status</option>
-            <option value="available">Available</option>
-            <option value="borrowed">Borrowed</option>
-          </select>
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input
+                type="text"
+                v-model="searchQuery"
+                placeholder="Search books by title, author, or ISBN..."
+                class="form-control"
+              />
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select v-model="selectedCategory" class="form-select">
+              <option value="">All Categories</option>
+              <option
+                v-for="category in categories"
+                :key="category"
+                :value="category"
+              >
+                {{ category }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select v-model="selectedStatus" class="form-select">
+              <option value="">All Status</option>
+              <option value="available">Available</option>
+              <option value="borrowed">Borrowed</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Books List -->
-    <div class="bg-base-100 rounded-lg shadow-sm overflow-hidden px-5">
-      <div class="overflow-x-auto">
-        <table class="table table-zebra">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Category</th>
-              <th>ISBN</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="book in filteredBooks" :key="book.id">
-              <td>
-                <div class="font-medium">{{ book.title }}</div>
-                <div
-                  v-if="book.description"
-                  class="text-sm text-base-content/60 truncate max-w-xs"
-                >
-                  {{ book.description }}
-                </div>
-              </td>
-              <td>{{ book.author }}</td>
-              <td>
-                <span class="badge badge-outline">{{ book.category }}</span>
-              </td>
-              <td class="font-mono text-sm">{{ book.isbn }}</td>
-              <td>
-                <span
-                  class="badge"
-                  :class="{
-                    'badge-success': book.status === 'available',
-                    'badge-warning': book.status === 'borrowed',
-                  }"
-                >
-                  {{ book.status === "available" ? "Available" : "Borrowed" }}
-                </span>
-              </td>
-              <td>
-                <div class="flex gap-2">
-                  <button
-                    @click="editBook(book)"
-                    class="btn btn-sm btn-ghost"
-                    title="Edit book"
+    <div class="card shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="fw-medium">Title</th>
+                <th class="fw-medium">Author</th>
+                <th class="fw-medium">Category</th>
+                <th class="fw-medium">ISBN</th>
+                <th class="fw-medium">Status</th>
+                <th class="fw-medium text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="book in filteredBooks" :key="book.id">
+                <td>
+                  <div class="fw-medium">{{ book.title }}</div>
+                  <div
+                    v-if="book.description"
+                    class="text-muted small text-truncate"
+                    style="max-width: 300px"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    @click="deleteBook(book)"
-                    class="btn btn-sm btn-ghost text-error"
-                    title="Delete book"
+                    {{ book.description }}
+                  </div>
+                </td>
+                <td>{{ book.author }}</td>
+                <td>
+                  <span class="badge bg-light text-dark border">{{
+                    book.category
+                  }}</span>
+                </td>
+                <td class="font-monospace small">{{ book.isbn }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    :class="{
+                      'bg-success': book.status === 'available',
+                      'bg-warning': book.status === 'borrowed',
+                    }"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                    {{ book.status === "available" ? "Available" : "Borrowed" }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button
+                      @click="editBook(book)"
+                      class="btn btn-outline-primary"
+                      title="Edit book"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button
+                      @click="deleteBook(book)"
+                      class="btn btn-outline-danger"
+                      title="Delete book"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- Empty State -->
-    <div v-if="filteredBooks.length === 0" class="text-center py-12">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="mx-auto h-12 w-12 text-base-content/40"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
-      <h3 class="mt-2 text-sm font-medium text-base-content/60">
-        No books found
-      </h3>
-      <p class="mt-1 text-sm text-base-content/40">
+    <div v-if="filteredBooks.length === 0" class="text-center py-5">
+      <div class="mb-3">
+        <i class="bi bi-journal-text display-1 text-muted opacity-50"></i>
+      </div>
+      <h5 class="text-muted mb-2">No books found</h5>
+      <p class="text-muted mb-4">
         Get started by adding your first book to the collection.
       </p>
-      <div class="mt-6">
-        <button @click="showAddModal = true" class="btn btn-primary">
-          Add Book
-        </button>
-      </div>
+      <button @click="showAddModal = true" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-2"></i>Add Book
+      </button>
     </div>
   </div>
 
@@ -231,96 +196,90 @@
   />
 
   <!-- Delete Confirmation Modal -->
-  <dialog :open="showDeleteModal" class="modal">
-    <div class="modal-box">
-      <div class="flex items-center gap-4 mb-4">
-        <div
-          class="w-12 h-12 bg-error/20 rounded-full flex items-center justify-center"
-        >
-          <svg
-            class="w-6 h-6 text-error"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-            ></path>
-          </svg>
-        </div>
-        <div>
-          <h3 class="font-bold text-lg text-base-content">Delete Book</h3>
-          <p class="text-sm text-base-content/70 mt-1">
-            This action cannot be undone
-          </p>
-        </div>
-      </div>
-
-      <div v-if="selectedBook" class="mb-6">
-        <div class="bg-base-200 rounded-lg p-4">
-          <div class="flex items-center gap-3">
+  <div
+    class="modal fade"
+    :class="{ show: showDeleteModal }"
+    :style="{ display: showDeleteModal ? 'block' : 'none' }"
+    tabindex="-1"
+    aria-labelledby="deleteModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <div class="d-flex align-items-center gap-3">
             <div
-              class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center"
+              class="d-flex align-items-center justify-content-center bg-danger bg-opacity-10 rounded-circle"
+              style="width: 48px; height: 48px"
             >
-              <svg
-                class="w-6 h-6 text-primary"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"
-                ></path>
-              </svg>
+              <i class="bi bi-exclamation-triangle text-danger fs-4"></i>
             </div>
-            <div class="flex-1">
-              <p class="font-medium text-base-content">
-                {{ selectedBook.title }}
-              </p>
-              <p class="text-sm text-base-content/70">
-                by {{ selectedBook.author }}
-              </p>
-              <p class="text-xs text-base-content/50 mt-1">
-                ISBN: {{ selectedBook.isbn }}
-              </p>
-            </div>
-            <div
-              class="badge"
-              :class="{
-                'badge-success': selectedBook.status === 'available',
-                'badge-warning': selectedBook.status === 'borrowed',
-              }"
-            >
-              {{
-                selectedBook.status === "available" ? "Available" : "Borrowed"
-              }}
+            <div>
+              <h5 class="modal-title fw-bold" id="deleteModalLabel">
+                Delete Book
+              </h5>
+              <p class="text-muted small mb-0">This action cannot be undone</p>
             </div>
           </div>
+          <button
+            type="button"
+            class="btn-close"
+            @click="
+              showDeleteModal = false;
+              selectedBook = null;
+            "
+            aria-label="Close"
+          ></button>
         </div>
 
-        <div class="mt-4 p-4 bg-warning/10 border border-warning/30 rounded-lg">
-          <div class="flex items-start gap-2">
-            <svg
-              class="w-5 h-5 text-warning mt-0.5 flex-shrink-0"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                clip-rule="evenodd"
-              ></path>
-            </svg>
-            <div class="text-sm">
-              <p class="font-medium text-warning">Warning:</p>
-              <p class="text-base-content/70 mt-1">
+        <div class="modal-body" v-if="selectedBook">
+          <div class="card bg-light mb-3">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-3">
+                <div
+                  class="d-flex align-items-center justify-content-center bg-primary bg-opacity-10 rounded"
+                  style="width: 48px; height: 48px"
+                >
+                  <i class="bi bi-book text-primary"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">{{ selectedBook.title }}</h6>
+                  <p class="text-muted small mb-1">
+                    by {{ selectedBook.author }}
+                  </p>
+                  <p class="text-muted small mb-0">
+                    ISBN: {{ selectedBook.isbn }}
+                  </p>
+                </div>
+                <span
+                  class="badge"
+                  :class="{
+                    'bg-success': selectedBook.status === 'available',
+                    'bg-warning': selectedBook.status === 'borrowed',
+                  }"
+                >
+                  {{
+                    selectedBook.status === "available"
+                      ? "Available"
+                      : "Borrowed"
+                  }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-warning d-flex align-items-start gap-2">
+            <i
+              class="bi bi-exclamation-triangle-fill text-warning flex-shrink-0"
+            ></i>
+            <div class="small">
+              <strong>Warning:</strong>
+              <p class="mb-0 mt-1">
                 Deleting this book will permanently remove it from your library
                 collection.
                 <span
                   v-if="selectedBook.status === 'borrowed'"
-                  class="font-medium text-error block mt-1"
+                  class="d-block mt-1 text-danger fw-medium"
                 >
                   This book is currently borrowed and cannot be deleted until it
                   is returned.
@@ -329,46 +288,49 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="modal-action">
-        <button
-          type="button"
-          class="btn"
-          @click="
-            showDeleteModal = false;
-            selectedBook = null;
-          "
-          :disabled="deleteLoading"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          class="btn btn-error"
-          @click="handleDeleteConfirm"
-          :class="{ loading: deleteLoading }"
-          :disabled="deleteLoading || selectedBook?.status === 'borrowed'"
-        >
-          <span v-if="deleteLoading">Deleting...</span>
-          <span v-else-if="selectedBook?.status === 'borrowed'"
-            >Cannot Delete - Currently Borrowed</span
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="
+              showDeleteModal = false;
+              selectedBook = null;
+            "
+            :disabled="deleteLoading"
           >
-          <span v-else>Delete Book</span>
-        </button>
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            @click="handleDeleteConfirm"
+            :disabled="deleteLoading || selectedBook?.status === 'borrowed'"
+          >
+            <span v-if="deleteLoading">
+              <span
+                class="spinner-border spinner-border-sm me-2"
+                role="status"
+              ></span>
+              Deleting...
+            </span>
+            <span v-else-if="selectedBook?.status === 'borrowed'">
+              Cannot Delete - Currently Borrowed
+            </span>
+            <span v-else>Delete Book</span>
+          </button>
+        </div>
       </div>
     </div>
-    <form method="dialog" class="modal-backdrop">
-      <button
-        @click="
-          showDeleteModal = false;
-          selectedBook = null;
-        "
-      >
-        close
-      </button>
-    </form>
-  </dialog>
+  </div>
+  <div
+    v-if="showDeleteModal"
+    class="modal-backdrop fade show"
+    @click="
+      showDeleteModal = false;
+      selectedBook = null;
+    "
+  ></div>
 </template>
 
 <script setup lang="ts">
