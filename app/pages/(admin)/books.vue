@@ -4,8 +4,9 @@
     <!-- Page Header -->
     <div
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+      style="margin-top: 60px"
     >
-      <div>
+      <div class="px-5">
         <h1 class="text-2xl font-bold text-base-content">Books Management</h1>
         <p class="text-sm text-base-content/60 mt-1">
           Manage your library's book collection
@@ -13,7 +14,7 @@
       </div>
       <button
         @click="showAddModal = true"
-        class="btn btn-primary normal-case px-6 gap-2"
+        class="btn btn-soft btn-primary normal-case px-6 gap-2"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -66,7 +67,7 @@
     </div>
 
     <!-- Filters and Search -->
-    <div class="bg-base-100 rounded-lg shadow-sm p-6">
+    <div class="bg-base-100 rounded-lg shadow-sm px-5 mb-5">
       <div class="flex flex-col md:flex-row gap-4">
         <div class="form-control flex-1">
           <input
@@ -99,7 +100,7 @@
     </div>
 
     <!-- Books List -->
-    <div class="bg-base-100 rounded-lg shadow-sm overflow-hidden">
+    <div class="bg-base-100 rounded-lg shadow-sm overflow-hidden px-5">
       <div class="overflow-x-auto">
         <table class="table table-zebra">
           <thead>
@@ -218,19 +219,174 @@
       </div>
     </div>
   </div>
+
+  <!-- Add Book Modal -->
+  <BookForm v-model:show="showAddModal" @submit="handleAddBook" />
+
+  <!-- Edit Book Modal -->
+  <BookForm
+    v-model:show="showEditModal"
+    :book="selectedBook"
+    @submit="handleEditBook"
+  />
+
+  <!-- Delete Confirmation Modal -->
+  <dialog :open="showDeleteModal" class="modal">
+    <div class="modal-box">
+      <div class="flex items-center gap-4 mb-4">
+        <div
+          class="w-12 h-12 bg-error/20 rounded-full flex items-center justify-center"
+        >
+          <svg
+            class="w-6 h-6 text-error"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg text-base-content">Delete Book</h3>
+          <p class="text-sm text-base-content/70 mt-1">
+            This action cannot be undone
+          </p>
+        </div>
+      </div>
+
+      <div v-if="selectedBook" class="mb-6">
+        <div class="bg-base-200 rounded-lg p-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-6 h-6 text-primary"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"
+                ></path>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium text-base-content">
+                {{ selectedBook.title }}
+              </p>
+              <p class="text-sm text-base-content/70">
+                by {{ selectedBook.author }}
+              </p>
+              <p class="text-xs text-base-content/50 mt-1">
+                ISBN: {{ selectedBook.isbn }}
+              </p>
+            </div>
+            <div
+              class="badge"
+              :class="{
+                'badge-success': selectedBook.status === 'available',
+                'badge-warning': selectedBook.status === 'borrowed',
+              }"
+            >
+              {{
+                selectedBook.status === "available" ? "Available" : "Borrowed"
+              }}
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-4 bg-warning/10 border border-warning/30 rounded-lg">
+          <div class="flex items-start gap-2">
+            <svg
+              class="w-5 h-5 text-warning mt-0.5 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            <div class="text-sm">
+              <p class="font-medium text-warning">Warning:</p>
+              <p class="text-base-content/70 mt-1">
+                Deleting this book will permanently remove it from your library
+                collection.
+                <span
+                  v-if="selectedBook.status === 'borrowed'"
+                  class="font-medium text-error block mt-1"
+                >
+                  This book is currently borrowed and cannot be deleted until it
+                  is returned.
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-action">
+        <button
+          type="button"
+          class="btn"
+          @click="
+            showDeleteModal = false;
+            selectedBook = null;
+          "
+          :disabled="deleteLoading"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-error"
+          @click="handleDeleteConfirm"
+          :class="{ loading: deleteLoading }"
+          :disabled="deleteLoading || selectedBook?.status === 'borrowed'"
+        >
+          <span v-if="deleteLoading">Deleting...</span>
+          <span v-else-if="selectedBook?.status === 'borrowed'"
+            >Cannot Delete - Currently Borrowed</span
+          >
+          <span v-else>Delete Book</span>
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button
+        @click="
+          showDeleteModal = false;
+          selectedBook = null;
+        "
+      >
+        close
+      </button>
+    </form>
+  </dialog>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import type { Book } from "~/types/books";
 import { LibraryAPI } from "~/composables/useLibraryAPI";
+import BookForm from "~/components/books/BookForm.vue";
 
 // Component state
 const showAddModal = ref(false);
+const showEditModal = ref(false);
+const showDeleteModal = ref(false);
+const selectedBook = ref<Book | null>(null);
 const searchQuery = ref("");
 const selectedCategory = ref("");
 const selectedStatus = ref("");
 const loading = ref(false);
+const deleteLoading = ref(false);
 
 // Books data from API
 const books = ref<Book[]>([]);
@@ -298,11 +454,68 @@ const filteredBooks = computed(() => {
 // Methods
 function editBook(book: Book) {
   console.log("Edit book:", book);
-  // TODO: Implement edit modal
+  selectedBook.value = book;
+  showEditModal.value = true;
 }
 
 function deleteBook(book: Book) {
   console.log("Delete book:", book);
-  // TODO: Implement delete confirmation
+  selectedBook.value = book;
+  showDeleteModal.value = true;
 }
+
+// Handlers
+const handleAddBook = async () => {
+  try {
+    // Refresh the books list after successful creation
+    await fetchBooks();
+    showAddModal.value = false;
+  } catch (error) {
+    console.error("Failed to add book:", error);
+  }
+};
+
+const handleEditBook = async () => {
+  try {
+    // Refresh the books list after successful update
+    await fetchBooks();
+    showEditModal.value = false;
+    selectedBook.value = null;
+  } catch (error) {
+    console.error("Failed to update book:", error);
+  }
+};
+
+// Delete confirmation handler
+const handleDeleteConfirm = async () => {
+  if (!selectedBook.value) return;
+
+  // Additional safety check - prevent deletion if book is borrowed
+  if (selectedBook.value.status === "borrowed") {
+    alert(
+      "Cannot delete a book that is currently borrowed. Please wait for it to be returned first."
+    );
+    return;
+  }
+
+  deleteLoading.value = true;
+  try {
+    await LibraryAPI.deleteBook(selectedBook.value.id);
+
+    // Refresh the books list after successful deletion
+    await fetchBooks();
+
+    // Close modal and reset
+    showDeleteModal.value = false;
+    selectedBook.value = null;
+
+    // Show success message
+    console.log("Book deleted successfully!");
+  } catch (error) {
+    console.error("Failed to delete book:", error);
+    alert("Failed to delete book. Please try again.");
+  } finally {
+    deleteLoading.value = false;
+  }
+};
 </script>

@@ -30,6 +30,67 @@ export const LibraryAPI = {
     }
   },
 
+  async createBook(bookData: {
+    title: string;
+    author: string;
+    isbn: string;
+    category: string;
+    description?: string;
+  }): Promise<Book> {
+    try {
+      const response = await $fetch<Book>(`${API_BASE}/books`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookData),
+      });
+      console.log("Book created:", response);
+      return response;
+    } catch (error) {
+      console.error("Failed to create book:", error);
+      throw error;
+    }
+  },
+
+  async updateBook(
+    bookId: string,
+    bookData: {
+      title: string;
+      author: string;
+      isbn: string;
+      category: string;
+      description?: string;
+    }
+  ): Promise<Book> {
+    try {
+      const response = await $fetch<Book>(`${API_BASE}/books/${bookId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookData),
+      });
+      console.log("Book updated:", response);
+      return response;
+    } catch (error) {
+      console.error("Failed to update book:", error);
+      throw error;
+    }
+  },
+
+  async deleteBook(bookId: string): Promise<void> {
+    try {
+      await $fetch(`${API_BASE}/books/${bookId}`, {
+        method: "DELETE",
+      });
+      console.log("Book deleted:", bookId);
+    } catch (error) {
+      console.error("Failed to delete book:", error);
+      throw error;
+    }
+  },
+
   // Students API
   async getStudents(): Promise<Student[]> {
     try {
