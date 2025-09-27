@@ -39,6 +39,7 @@ export interface BorrowedBook {
   beforeConditionImages: string[];
   afterConditionImages: string[];
   returnDate?: string;
+  returnConditions?: string[];
   conditionNotes?: string;
 }
 
@@ -53,7 +54,7 @@ export interface BorrowBookData {
 
 export interface ReturnBookData {
   borrowedBookId: string;
-  returnDate: string;
+  returnConditions: string[];
   afterConditionImages: File[];
   conditionNotes?: string;
 }

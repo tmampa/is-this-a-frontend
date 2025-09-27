@@ -239,8 +239,7 @@ export const LibraryAPI = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          returnDate: data.returnDate,
-          conditionNotes: data.conditionNotes,
+          returnConditions: data.returnConditions,
           afterConditionImages: data.afterConditionImages.map(
             (file) => file.name
           ),
