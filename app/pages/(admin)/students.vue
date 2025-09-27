@@ -1,10 +1,8 @@
 <template>
-  <NavBar />
   <div class="space-y-6">
     <!-- Page Header -->
     <div
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
-      style="margin-top: 60px"
     >
       <div class="px-5">
         <h1 class="text-2xl font-bold text-base-content">
@@ -525,6 +523,12 @@ import type { Student } from "~/types/books";
 import { LibraryAPI } from "~/composables/useLibraryAPI";
 import AddStudentForm from "~/components/students/CreateStudentForm.vue";
 import ViewStudentModal from "~/components/students/ViewStudentModal.vue";
+
+// Check authentication on page load
+const { checkAuth } = useAuth();
+if (!checkAuth()) {
+  await navigateTo("/login");
+}
 
 // Component state
 const showAddModal = ref(false);

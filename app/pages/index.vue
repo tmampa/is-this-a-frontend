@@ -1,6 +1,4 @@
 <template>
-  <NavBar />
-
   <div class="">
     <book-card-stats />
 
@@ -161,6 +159,12 @@ import type {
   ReturnBookData,
 } from "~/types/books";
 import { LibraryAPI } from "~/composables/useLibraryAPI";
+
+// Check authentication on page load
+const { checkAuth } = useAuth();
+if (!checkAuth()) {
+  await navigateTo("/login");
+}
 
 // Component imports
 import BorrowedBooksList from "~/components/books/BorrowedBooksList.vue";

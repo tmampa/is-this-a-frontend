@@ -9,11 +9,25 @@ import type {
 
 const API_BASE = "http://localhost:8080/api/admin";
 
+// Helper function to get auth headers
+const getAuthHeaders = (): Record<string, string> => {
+  const token = process.client ? localStorage.getItem("auth-token") : null;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+};
+
 export const LibraryAPI = {
   // Books API
   async getBooks(): Promise<Book[]> {
     try {
-      return await $fetch<Book[]>(`${API_BASE}/books`);
+      return await $fetch<Book[]>(`${API_BASE}/books`, {
+        headers: getAuthHeaders(),
+      });
     } catch (error) {
       console.error("Failed to fetch books:", error);
       throw error;
@@ -235,9 +249,7 @@ export const LibraryAPI = {
       // This endpoint may need to be created on the backend
       await $fetch(`${API_BASE}/books/return/${data.borrowedBookId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           returnConditions: data.returnConditions,
           afterConditionImages: data.afterConditionImages.map(
