@@ -4,11 +4,11 @@
       <table class="table table-zebra">
         <thead style="background-color: #458c7f; color: white">
           <tr>
-            <th class="bg-base-200/50 font-medium">Book</th>
-            <th class="bg-base-200/50 font-medium">Student</th>
-            <th class="bg-base-200/50 font-medium">Borrow date</th>
-            <th class="bg-base-200/50 font-medium">Expected return date</th>
-            <th class="bg-base-200/50 font-medium text-right"></th>
+            <th class="font-medium">Book</th>
+            <th class="font-medium">Student</th>
+            <th class="font-medium">Borrow date</th>
+            <th class="font-medium">Expected return date</th>
+            <th class="font-medium text-right"></th>
           </tr>
         </thead>
         <tbody>
