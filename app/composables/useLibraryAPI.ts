@@ -94,6 +94,18 @@ export const LibraryAPI = {
     }
   },
 
+  async deleteStudent(studentId: string): Promise<void> {
+    try {
+      await $fetch(`${API_BASE}/students/${studentId}`, {
+        method: "DELETE",
+      });
+      console.log("Student deleted:", studentId);
+    } catch (error) {
+      console.error("Failed to delete student:", error);
+      throw error;
+    }
+  },
+
   // Borrow Records API
   async getBorrowRecords(): Promise<BorrowedBook[]> {
     try {

@@ -265,6 +265,129 @@
     :student="selectedStudent"
     @edit="handleViewEdit"
   />
+
+  <!-- Delete Confirmation Modal -->
+  <dialog :open="showDeleteModal" class="modal">
+    <div class="modal-box">
+      <div class="flex items-center gap-4 mb-4">
+        <div
+          class="w-12 h-12 bg-error/20 rounded-full flex items-center justify-center"
+        >
+          <svg
+            class="w-6 h-6 text-error"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-lg text-base-content">Delete Student</h3>
+          <p class="text-sm text-base-content/70 mt-1">
+            This action cannot be undone
+          </p>
+        </div>
+      </div>
+
+      <div v-if="selectedStudent" class="mb-6">
+        <div class="bg-base-200 rounded-lg p-4">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"
+            >
+              <span class="text-sm font-medium text-primary">
+                {{ getInitials(selectedStudent.fullName) }}
+              </span>
+            </div>
+            <div>
+              <p class="font-medium text-base-content">
+                {{ selectedStudent.fullName }}
+              </p>
+              <p class="text-sm text-base-content/70">
+                ID: {{ selectedStudent.studentNumber }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-4 bg-warning/10 border border-warning/30 rounded-lg">
+          <div class="flex items-start gap-2">
+            <svg
+              class="w-5 h-5 text-warning mt-0.5 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
+            <div class="text-sm">
+              <p class="font-medium text-warning">Warning:</p>
+              <p class="text-base-content/70 mt-1">
+                Deleting this student will permanently remove all their
+                information, including borrowing history.
+                <span
+                  v-if="(selectedStudent?.borrowedBooks?.length || 0) > 0"
+                  class="font-medium text-error"
+                >
+                  This student currently has
+                  {{ selectedStudent?.borrowedBooks?.length || 0 }} borrowed
+                  book(s).
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-action">
+        <button
+          type="button"
+          class="btn"
+          @click="
+            showDeleteModal = false;
+            selectedStudent = null;
+          "
+          :disabled="deleteLoading"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-error"
+          @click="handleDeleteConfirm"
+          :class="{ loading: deleteLoading }"
+          :disabled="
+            deleteLoading || (selectedStudent?.borrowedBooks?.length || 0) > 0
+          "
+        >
+          <span v-if="deleteLoading">Deleting...</span>
+          <span v-else-if="(selectedStudent?.borrowedBooks?.length || 0) > 0"
+            >Cannot Delete - Has Borrowed Books</span
+          >
+          <span v-else>Delete Student</span>
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button
+        @click="
+          showDeleteModal = false;
+          selectedStudent = null;
+        "
+      >
+        close
+      </button>
+    </form>
+  </dialog>
 </template>
 
 <script setup lang="ts">
@@ -278,10 +401,12 @@ import ViewStudentModal from "~/components/students/ViewStudentModal.vue";
 const showAddModal = ref(false);
 const showEditModal = ref(false);
 const showViewModal = ref(false);
+const showDeleteModal = ref(false);
 const selectedStudent = ref<Student | null>(null);
 const searchQuery = ref("");
 const selectedFilter = ref("");
 const loading = ref(false);
+const deleteLoading = ref(false);
 
 // Students data from API
 const students = ref<Student[]>([]);
@@ -361,8 +486,42 @@ function editStudent(student: Student) {
 
 function deleteStudent(student: Student) {
   console.log("Delete student:", student);
-  // TODO: Implement delete confirmation
+  selectedStudent.value = student;
+  showDeleteModal.value = true;
 }
+
+// Delete confirmation handler
+const handleDeleteConfirm = async () => {
+  if (!selectedStudent.value) return;
+
+  // Additional safety check - prevent deletion if student has borrowed books
+  if ((selectedStudent.value?.borrowedBooks?.length || 0) > 0) {
+    alert(
+      "Cannot delete student with active borrowed books. Please ensure all books are returned first."
+    );
+    return;
+  }
+
+  deleteLoading.value = true;
+  try {
+    await LibraryAPI.deleteStudent(selectedStudent.value.id);
+
+    // Refresh the students list after successful deletion
+    await fetchStudents();
+
+    // Close modal and reset
+    showDeleteModal.value = false;
+    selectedStudent.value = null;
+
+    // Show success message (you could replace this with a toast notification)
+    console.log("Student deleted successfully!");
+  } catch (error) {
+    console.error("Failed to delete student:", error);
+    alert("Failed to delete student. Please try again.");
+  } finally {
+    deleteLoading.value = false;
+  }
+};
 
 // Handlers
 const handleAddStudent = async () => {
