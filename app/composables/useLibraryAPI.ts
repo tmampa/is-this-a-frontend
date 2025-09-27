@@ -188,7 +188,7 @@ export const LibraryAPI = {
         studentNumber: data.studentNumber,
         emails: data.emails,
         address: data.address,
-        bookCondition: data.bookCondition,
+        bookConditions: data.bookConditions,
       };
 
       const response = await $fetch<{ id: number }>(

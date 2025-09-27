@@ -125,32 +125,117 @@
         <div class="form-control">
           <div
             class="tooltip tooltip-right"
-            data-tip="Assess the book's current condition before lending - this helps track damage and loss"
+            data-tip="Select multiple conditions that apply to the book - this helps track specific issues"
           >
             <label class="label">
               <span class="label-text"
                 >Initial Book Condition <span class="text-error">*</span></span
               >
-              <span class="label-text-alt">🔍 Before lending</span>
+              <span class="label-text-alt">
+                🔍
+                {{
+                  formData.bookConditions.length > 0
+                    ? `${formData.bookConditions.length} selected`
+                    : "Select conditions"
+                }}
+              </span>
             </label>
           </div>
-          <select
-            v-model="formData.bookCondition"
-            class="select select-bordered w-full"
-            required
+
+          <div
+            class="grid grid-cols-1 gap-2 p-4 border border-base-300 rounded-box bg-base-50"
           >
-            <option value="" disabled selected>Assess current condition</option>
-            <option value="new">📗 New - Pristine condition</option>
-            <option value="excellent">📘 Excellent - Minimal wear</option>
-            <option value="good">📙 Good - Light wear, no damage</option>
-            <option value="fair">📒 Fair - Noticeable wear</option>
-            <option value="poor">📑 Poor - Significant wear</option>
-            <option value="damaged">📕 Damaged - Visible damage</option>
-          </select>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="new"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📗 New - Pristine condition</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="excellent"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📘 Excellent - Minimal wear</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="good"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📙 Good - Light wear, no damage</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="fair"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📒 Fair - Noticeable wear</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="poor"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📑 Poor - Significant wear</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="damaged"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📕 Damaged - Visible damage</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Selected Conditions Summary -->
+          <div
+            v-if="formData.bookConditions.length > 0"
+            class="mt-3 p-3 bg-primary/10 rounded-box"
+          >
+            <div class="text-sm font-medium text-primary mb-2">
+              Selected Conditions:
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="condition in formData.bookConditions"
+                :key="condition"
+                class="badge badge-primary badge-sm"
+              >
+                {{ getConditionLabel(condition) }}
+              </span>
+            </div>
+          </div>
+
           <div class="label">
             <span class="label-text-alt text-xs text-base-content/60">
-              💡 This will be compared with the return condition to assess
-              damage
+              💡 Select all conditions that apply. This detailed assessment
+              helps track specific issues when the book is returned
             </span>
           </div>
         </div>
@@ -265,7 +350,7 @@ const formData = ref({
   studentId: "",
   bookId: "",
   dueDate: "",
-  bookCondition: "",
+  bookConditions: [] as string[],
   beforeConditionImages: [] as File[],
 });
 
@@ -327,6 +412,11 @@ const handleSubmit = async () => {
     return;
   }
 
+  if (formData.value.bookConditions.length === 0) {
+    alert("Please select at least one book condition");
+    return;
+  }
+
   loading.value = true;
   try {
     // Find the selected book to get its title
@@ -366,7 +456,7 @@ const handleSubmit = async () => {
       studentNumber: studentNumber,
       emails: [], // Backend will get from existing student data
       address: "", // Backend will get from existing student data
-      bookCondition: formData.value.bookCondition,
+      bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
     });
 
@@ -382,7 +472,7 @@ const handleSubmit = async () => {
       studentNumber: studentNumber,
       emails: [],
       address: "",
-      bookCondition: formData.value.bookCondition,
+      bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
     });
 
@@ -391,7 +481,7 @@ const handleSubmit = async () => {
       studentId: "",
       bookId: "",
       dueDate: "",
-      bookCondition: "",
+      bookConditions: [],
       beforeConditionImages: [],
     };
 
@@ -407,5 +497,18 @@ const handleSubmit = async () => {
 
 const closeModal = () => {
   emit("update:show", false);
+};
+
+// Helper function to get condition label with emoji
+const getConditionLabel = (condition: string): string => {
+  const labels = {
+    new: "📗 New",
+    excellent: "📘 Excellent",
+    good: "📙 Good",
+    fair: "📒 Fair",
+    poor: "📑 Poor",
+    damaged: "📕 Damaged",
+  };
+  return labels[condition as keyof typeof labels] || condition;
 };
 </script>

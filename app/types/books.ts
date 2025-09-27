@@ -35,6 +35,7 @@ export interface BorrowedBook {
   borrowDate: string;
   dueDate: string;
   status: "borrowed" | "returned";
+  initialConditions: string[];
   beforeConditionImages: string[];
   afterConditionImages: string[];
   returnDate?: string;
@@ -46,7 +47,7 @@ export interface BorrowBookData {
   studentNumber: number;
   emails: Email[];
   address: string;
-  bookCondition: string;
+  bookConditions: string[];
   beforeConditionImages: File[];
 }
 
