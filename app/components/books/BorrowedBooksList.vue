@@ -325,7 +325,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import type { BorrowedBook } from "~/types/books";
 
 const props = defineProps<{
@@ -342,6 +342,15 @@ const selectedBook = ref<BorrowedBook | null>(null);
 // Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
+
+// Reset to first page when books data changes (e.g., when searching)
+watch(
+  () => props.books,
+  () => {
+    currentPage.value = 1;
+  },
+  { deep: true }
+);
 
 // Computed properties for pagination
 const totalBooks = computed(() => props.books.length);

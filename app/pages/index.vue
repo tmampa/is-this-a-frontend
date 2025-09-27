@@ -9,32 +9,71 @@
       style="margin-top: 60px"
     >
       <div class="col-span-6">
-        <label class="input input-bordered flex items-center gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-5 opacity-70"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+        <div class="relative">
+          <label class="input input-bordered flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-5 opacity-70"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+              />
+            </svg>
+            <input
+              v-model="searchQuery"
+              type="search"
+              class="grow"
+              placeholder="Search books and students..."
+              title="Search by book title, student name, or any other details"
             />
-          </svg>
-          <input
-            type="search"
-            class="grow"
-            placeholder="Search books and students..."
-            title="Search by book title, student name, or any other details"
-          />
-        </label>
+            <button
+              v-if="searchQuery.trim()"
+              @click="searchQuery = ''"
+              class="btn btn-ghost btn-sm btn-circle"
+              title="Clear search"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </label>
+        </div>
         <div class="label">
-          <span class="label-text-alt text-base-content/60">
-            💡 Tip: Search by book title, student name, or borrowing details
+          <span class="label-text-alt text-xs text-base-content/60">
+            💡 Search by book title, student name, status, dates, or condition
+            notes
           </span>
+          <span
+            v-if="searchQuery.trim()"
+            class="label-text-alt text-xs text-primary"
+          >
+            {{ filteredBooks.length }} of {{ borrowedBooks.length }} records
+          </span>
+        </div>
+        <!-- Debug info -->
+        <div
+          v-if="searchQuery.trim()"
+          class="text-xs text-base-content/40 mt-1"
+        >
+          Debug: Query="{{ searchQuery }}" | Books={{ borrowedBooks.length }} |
+          Filtered={{ filteredBooks.length }}
         </div>
       </div>
 
@@ -72,7 +111,32 @@
       </div>
     </div>
 
-    <BorrowedBooksList :books="borrowedBooks" @return-book="handleReturnBook" />
+    <!-- Search Results or Empty State -->
+    <div
+      v-if="searchQuery.trim() && filteredBooks.length === 0"
+      class="mx-5 p-8 text-center bg-base-100 rounded-box border border-base-300"
+    >
+      <div class="text-4xl mb-4">🔍</div>
+      <h3 class="text-lg font-semibold text-base-content mb-2">
+        No results found
+      </h3>
+      <p class="text-base-content/60 mb-4">
+        No borrowed books match your search for "<span class="font-medium">{{
+          searchQuery
+        }}</span
+        >"
+      </p>
+      <button @click="searchQuery = ''" class="btn btn-outline btn-sm">
+        Clear search
+      </button>
+    </div>
+
+    <!-- Borrowed Books Table -->
+    <BorrowedBooksList
+      v-else
+      :books="filteredBooks"
+      @return-book="handleReturnBook"
+    />
 
     <!-- Borrow Book Modal -->
     <BorrowBookForm v-model:show="showBorrowModal" @submit="handleBorrow" />
@@ -88,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import type {
   BorrowedBook,
   Book,
@@ -109,17 +173,83 @@ const showBorrowModal = ref(false);
 const showReturnModal = ref(false);
 const selectedBook = ref<BorrowedBook | null>(null);
 const loading = ref(false);
+const searchQuery = ref("");
 
 // Data from API
 const borrowedBooks = ref<BorrowedBook[]>([]);
 const students = ref<Student[]>([]);
 const availableBooks = ref<Book[]>([]);
 
+// Computed property for filtered books based on search query
+const filteredBooks = computed(() => {
+  console.log("Computing filtered books...");
+  console.log("Search query:", searchQuery.value);
+  console.log("Total books:", borrowedBooks.value.length);
+
+  if (!searchQuery.value.trim()) {
+    console.log("No search query, returning all books");
+    return borrowedBooks.value;
+  }
+
+  const query = searchQuery.value.toLowerCase().trim();
+  console.log("Normalized query:", query);
+
+  const filtered = borrowedBooks.value.filter((book, index) => {
+    // Search primarily in book title and student name for now
+    const matchesTitle =
+      book.bookTitle && book.bookTitle.toLowerCase().includes(query);
+    const matchesStudent =
+      book.studentName && book.studentName.toLowerCase().includes(query);
+    const matchesStatus =
+      book.status && book.status.toLowerCase().includes(query);
+
+    const matches = matchesTitle || matchesStudent || matchesStatus;
+
+    if (index < 3) {
+      // Log first few books for debugging
+      console.log(`Book ${index}:`, {
+        title: book.bookTitle,
+        student: book.studentName,
+        status: book.status,
+        matchesTitle,
+        matchesStudent,
+        matchesStatus,
+        matches,
+      });
+    }
+
+    return matches;
+  });
+
+  console.log(
+    `Filtered ${filtered.length} books from ${borrowedBooks.value.length} total`
+  );
+  return filtered;
+});
+
+// Debug: Log search query changes
+watch(searchQuery, (newQuery, oldQuery) => {
+  console.log(`Search query changed from "${oldQuery}" to "${newQuery}"`);
+  console.log("Total books available:", borrowedBooks.value.length);
+});
+
+// Debug: Log filtered results
+watch(filteredBooks, (newFiltered) => {
+  console.log(
+    `Search results: ${newFiltered.length} of ${borrowedBooks.value.length} books`
+  );
+  if (searchQuery.value.trim()) {
+    console.log("Filtered books:", newFiltered);
+  }
+});
+
 // Fetch data from API
 const fetchBorrowedBooks = async () => {
   loading.value = true;
   try {
     borrowedBooks.value = await LibraryAPI.getBorrowRecords();
+    console.log("Fetched borrowed books:", borrowedBooks.value);
+    console.log("Sample book structure:", borrowedBooks.value[0]);
   } catch (error) {
     console.error("Failed to fetch borrowed books:", error);
   } finally {
