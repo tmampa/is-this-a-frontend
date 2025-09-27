@@ -1,53 +1,109 @@
 <template>
   <dialog :open="show" class="modal">
     <div class="modal-box max-w-2xl">
-      <h3 class="font-bold text-lg mb-6">
-        {{ editMode ? "Edit Student" : "Create a Student" }}
-      </h3>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="font-bold text-lg">
+            {{ editMode ? "Edit Student" : "Create a Student" }}
+          </h3>
+          <p class="text-sm text-base-content/60 mt-1">
+            {{
+              editMode
+                ? "👤 Update student information"
+                : "🎓 Register a new student in the library system"
+            }}
+          </p>
+        </div>
+        <div
+          class="tooltip tooltip-left"
+          data-tip="Complete all required fields and add at least one parent/guardian"
+        >
+          <div
+            class="w-6 h-6 bg-info/20 rounded-full flex items-center justify-center"
+          >
+            <span class="text-xs text-info">?</span>
+          </div>
+        </div>
+      </div>
 
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- Student Selection -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">First names:</span>
-          </label>
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Enter all first names (can include middle names)"
+          >
+            <label class="label">
+              <span class="label-text"
+                >First names: <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">👤 Include all first names</span>
+            </label>
+          </div>
           <input
             type="text"
             v-model="formData.firstNames"
             class="input w-full"
+            placeholder="e.g., John Michael"
             required
           />
         </div>
 
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">Last name: </span>
-          </label>
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Enter the student's family/last name"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Last name: <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">👤 Family name</span>
+            </label>
+          </div>
           <input
             type="text"
             v-model="formData.lastName"
             class="input w-full"
+            placeholder="e.g., Smith"
             required
           />
         </div>
 
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">Email: </span>
-          </label>
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Student's email address for notifications and communication"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Email: <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">📧 For notifications</span>
+            </label>
+          </div>
           <input
             type="email"
             v-model="formData.email"
             class="input w-full"
+            placeholder="e.g., john.smith@email.com"
             required
           />
         </div>
 
-        <!-- Book Selection -->
+        <!-- Address -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">Address:</span>
-          </label>
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Complete residential address for records and emergency contact"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Address: <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">🏠 Full address</span>
+            </label>
+          </div>
 
           <textarea
             class="textarea w-full"

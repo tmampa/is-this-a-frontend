@@ -28,31 +28,47 @@
             type="search"
             class="grow"
             placeholder="Search books and students..."
+            title="Search by book title, student name, or any other details"
           />
         </label>
+        <div class="label">
+          <span class="label-text-alt text-base-content/60">
+            💡 Tip: Search by book title, student name, or borrowing details
+          </span>
+        </div>
       </div>
 
       <div class="col-span-6 text-right">
-        <button
-          @click="showBorrowModal = true"
-          class="btn btn-primary normal-case px-6 gap-2"
+        <div
+          class="tooltip tooltip-left"
+          data-tip="Issue a new book to a student"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+          <button
+            @click="showBorrowModal = true"
+            class="btn btn-primary normal-case px-6 gap-2"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          Issue book
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Issue book
+          </button>
+        </div>
+        <div class="text-right mt-1">
+          <span class="text-xs text-base-content/50">
+            Click to lend a book to a student
+          </span>
+        </div>
       </div>
     </div>
 

@@ -112,47 +112,60 @@
       <div class="text-sm text-base-content/60 mb-2 sm:mb-0">
         Showing {{ startIndex + 1 }} to {{ Math.min(endIndex, totalBooks) }} of
         {{ totalBooks }} books
+        <div
+          class="tooltip tooltip-top"
+          data-tip="Use pagination controls to navigate through all borrowed books"
+        >
+          <span class="text-xs">📚 Navigate all records</span>
+        </div>
       </div>
 
       <div class="flex items-center gap-2">
         <!-- Items per page selector -->
         <div class="flex items-center gap-2 mr-4">
           <span class="text-sm text-base-content/60">Show:</span>
-          <select
-            v-model="itemsPerPage"
-            @change="currentPage = 1"
-            class="select select-sm select-bordered"
+          <div
+            class="tooltip tooltip-top"
+            data-tip="Choose how many books to display per page"
           >
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-          </select>
+            <select
+              v-model="itemsPerPage"
+              @change="currentPage = 1"
+              class="select select-sm select-bordered"
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
         </div>
 
         <!-- Pagination buttons -->
         <div class="join">
-          <button
-            @click="goToPage(currentPage - 1)"
-            :disabled="currentPage === 1"
-            class="join-item btn btn-sm"
-            :class="{ 'btn-disabled': currentPage === 1 }"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-4 h-4"
+          <div class="tooltip tooltip-top" data-tip="Go to previous page">
+            <button
+              @click="goToPage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-disabled': currentPage === 1 }"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15.75 19.5L8.25 12l7.5-7.5"
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+          </div>
 
           <button
             v-for="page in visiblePages"
@@ -160,31 +173,34 @@
             @click="goToPage(page)"
             class="join-item btn btn-sm"
             :class="{ 'btn-primary': page === currentPage }"
+            :title="`Go to page ${page}`"
           >
             {{ page }}
           </button>
 
-          <button
-            @click="goToPage(currentPage + 1)"
-            :disabled="currentPage === totalPages"
-            class="join-item btn btn-sm"
-            :class="{ 'btn-disabled': currentPage === totalPages }"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="w-4 h-4"
+          <div class="tooltip tooltip-top" data-tip="Go to next page">
+            <button
+              @click="goToPage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-disabled': currentPage === totalPages }"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M8.25 4.5l7.5 7.5-7.5 7.5"
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>

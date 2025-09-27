@@ -1,11 +1,16 @@
 <template>
   <div class="form-control">
-    <label class="label">
-      <span class="label-text">{{ label }}</span>
-      <span class="label-text-alt text-base-content/60"
-        >{{ images.length }}/{{ maxImages }} images</span
-      >
-    </label>
+    <div
+      class="tooltip tooltip-right"
+      data-tip="Upload images to document the book's condition"
+    >
+      <label class="label">
+        <span class="label-text">{{ label }}</span>
+        <span class="label-text-alt text-base-content/60">
+          {{ images.length }}/{{ maxImages }} images 📷
+        </span>
+      </label>
+    </div>
 
     <!-- File Input -->
     <input
@@ -16,7 +21,16 @@
       @change="handleFileSelect"
       class="file-input file-input-bordered w-full"
       :class="{ 'file-input-error': hasError }"
+      title="Select image files (JPEG, PNG, WebP supported)"
     />
+
+    <!-- Helpful guidance -->
+    <div class="label">
+      <span class="label-text-alt text-base-content/60">
+        💡 Tip: Take clear photos showing the book's condition from different
+        angles
+      </span>
+    </div>
 
     <!-- Error Message -->
     <div v-if="hasError" class="label">

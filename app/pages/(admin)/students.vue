@@ -11,29 +11,44 @@
           Students Management
         </h1>
         <p class="text-sm text-base-content/60 mt-1">
-          Manage student registrations and records
+          🎓 Manage student registrations and track their borrowing activity
         </p>
+        <div class="mt-2 text-xs text-base-content/50">
+          💡 Tip: Students must be registered before they can borrow books
+        </div>
       </div>
-      <button
-        @click="showAddModal = true"
-        class="btn btn-primary normal-case px-6 gap-2"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+      <div class="px-5">
+        <div
+          class="tooltip tooltip-left"
+          data-tip="Register a new student in the library system"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-        Add Student
-      </button>
+          <button
+            @click="showAddModal = true"
+            class="btn btn-primary normal-case px-6 gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Add Student
+          </button>
+        </div>
+        <div class="text-center mt-1">
+          <span class="text-xs text-base-content/50">
+            Register new students
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- Stats Cards -->
@@ -65,19 +80,40 @@
     <div class="bg-base-100 rounded-lg shadow-sm p-6">
       <div class="flex flex-col md:flex-row gap-4">
         <div class="form-control flex-1">
-          <input
-            type="text"
-            v-model="searchQuery"
-            placeholder="Search students by name, ID, or email..."
-            class="input input-bordered w-full"
-          />
+          <div
+            class="tooltip tooltip-top"
+            data-tip="Search by student name, ID number, or email address"
+          >
+            <input
+              type="text"
+              v-model="searchQuery"
+              placeholder="Search students by name, ID, or email..."
+              class="input input-bordered w-full"
+              title="Search by name, student ID, or email"
+            />
+          </div>
+          <div class="label">
+            <span class="label-text-alt text-base-content/60">
+              🔍 Search across all student information
+            </span>
+          </div>
         </div>
         <div class="form-control">
-          <select v-model="selectedFilter" class="select select-bordered">
-            <option value="">All Students</option>
-            <option value="active">Active Borrowers</option>
-            <option value="inactive">No Current Borrowings</option>
-          </select>
+          <div
+            class="tooltip tooltip-top"
+            data-tip="Filter students by their borrowing activity"
+          >
+            <select v-model="selectedFilter" class="select select-bordered">
+              <option value="">All Students</option>
+              <option value="active">Active Borrowers</option>
+              <option value="inactive">No Current Borrowings</option>
+            </select>
+          </div>
+          <div class="label">
+            <span class="label-text-alt text-base-content/60">
+              📊 Filter by activity
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -138,72 +174,87 @@
               </td>
               <td>
                 <div class="flex gap-2">
-                  <button
-                    @click="viewStudent(student)"
-                    class="btn btn-sm btn-ghost"
-                    title="View details"
+                  <div
+                    class="tooltip"
+                    data-tip="View student details and borrowing history"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                    <button
+                      @click="viewStudent(student)"
+                      class="btn btn-sm btn-ghost"
+                      title="View details"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    @click="editStudent(student)"
-                    class="btn btn-sm btn-ghost"
-                    title="Edit student"
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="tooltip" data-tip="Edit student information">
+                    <button
+                      @click="editStudent(student)"
+                      class="btn btn-sm btn-ghost"
+                      title="Edit student"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    class="tooltip"
+                    data-tip="Delete student (only if no active borrowings)"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                    <button
+                      @click="deleteStudent(student)"
+                      class="btn btn-sm btn-ghost text-error"
+                      title="Delete student"
+                      :class="{
+                        'btn-disabled': student.borrowedBooks.length > 0,
+                      }"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                  </button>
-                  <button
-                    @click="deleteStudent(student)"
-                    class="btn btn-sm btn-ghost text-error"
-                    title="Delete student"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </td>
             </tr>

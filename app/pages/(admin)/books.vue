@@ -9,29 +9,45 @@
       <div class="px-5">
         <h1 class="text-2xl font-bold text-base-content">Books Management</h1>
         <p class="text-sm text-base-content/60 mt-1">
-          Manage your library's book collection
+          📚 Manage your library's book collection - add, edit, and organize
+          books
         </p>
+        <div class="mt-2 text-xs text-base-content/50">
+          💡 Tip: Use filters to find specific books quickly
+        </div>
       </div>
-      <button
-        @click="showAddModal = true"
-        class="btn btn-primary normal-case px-6 gap-2"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+      <div class="px-5">
+        <div
+          class="tooltip tooltip-left"
+          data-tip="Add a new book to your library collection"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
-        Add Book
-      </button>
+          <button
+            @click="showAddModal = true"
+            class="btn btn-primary normal-case px-6 gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Add Book
+          </button>
+        </div>
+        <div class="text-center mt-1">
+          <span class="text-xs text-base-content/50">
+            Add books to your library
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- Stats Cards -->

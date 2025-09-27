@@ -1,14 +1,39 @@
 <template>
   <dialog :open="show" class="modal">
     <div class="modal-box max-w-2xl">
-      <h3 class="font-bold text-lg mb-6">Borrow a Book</h3>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="font-bold text-lg">Borrow a Book</h3>
+          <p class="text-sm text-base-content/60 mt-1">
+            📚 Issue a book to a student with condition tracking
+          </p>
+        </div>
+        <div
+          class="tooltip tooltip-left"
+          data-tip="Need help? Hover over labels for guidance"
+        >
+          <div
+            class="w-6 h-6 bg-info/20 rounded-full flex items-center justify-center"
+          >
+            <span class="text-xs text-info">?</span>
+          </div>
+        </div>
+      </div>
 
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- Student Selection -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">Student</span>
-          </label>
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Select the student who will borrow this book"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Student <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">👤 Required</span>
+            </label>
+          </div>
           <select
             v-model="formData.studentId"
             class="select select-bordered w-full"
@@ -23,13 +48,26 @@
               {{ student.fullName }}
             </option>
           </select>
+          <div class="label">
+            <span class="label-text-alt text-base-content/60">
+              💡 Can't find the student? Add them from the Students page first
+            </span>
+          </div>
         </div>
 
         <!-- Book Selection -->
         <div class="form-control">
-          <label class="label">
-            <span class="label-text">Book</span>
-          </label>
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Choose which book to issue - only available books are shown"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Book <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">📖 Available only</span>
+            </label>
+          </div>
           <select
             v-model="formData.bookId"
             class="select select-bordered w-full"
