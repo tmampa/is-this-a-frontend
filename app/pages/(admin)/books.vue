@@ -14,7 +14,7 @@
       </div>
       <button
         @click="showAddModal = true"
-        class="btn btn-soft btn-primary normal-case px-6 gap-2"
+        class="btn btn-primary normal-case px-6 gap-2"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +35,7 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="stats shadow-sm bg-base-100">
         <div class="stat">
           <div class="stat-title">Total Books</div>
@@ -55,13 +55,6 @@
           <div class="stat-title">Borrowed</div>
           <div class="stat-value text-warning">{{ borrowedBooks }}</div>
           <div class="stat-desc">Currently out</div>
-        </div>
-      </div>
-      <div class="stats shadow-sm bg-base-100">
-        <div class="stat">
-          <div class="stat-title">Categories</div>
-          <div class="stat-value text-info">{{ uniqueCategories }}</div>
-          <div class="stat-desc">Different genres</div>
         </div>
       </div>
     </div>
@@ -103,7 +96,7 @@
     <div class="bg-base-100 rounded-lg shadow-sm overflow-hidden px-5">
       <div class="overflow-x-auto">
         <table class="table table-zebra">
-          <thead>
+          <thead style="background-color: #458c7f; color: white">
             <tr>
               <th>Title</th>
               <th>Author</th>
@@ -114,7 +107,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="book in filteredBooks" :key="book.id">
+            <tr v-for="book in paginatedBooks" :key="book.id">
               <td>
                 <div class="font-medium">{{ book.title }}</div>
                 <div
@@ -187,6 +180,91 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div
+        class="flex flex-col sm:flex-row justify-between items-center p-4 border-t border-base-200"
+      >
+        <div class="text-sm text-base-content/60 mb-2 sm:mb-0">
+          Showing {{ startIndex + 1 }} to
+          {{ Math.min(endIndex, totalFilteredBooks) }} of
+          {{ totalFilteredBooks }} books
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Items per page selector -->
+          <div class="flex items-center gap-2 mr-4">
+            <span class="text-sm text-base-content/60">Show:</span>
+            <select
+              v-model="itemsPerPage"
+              @change="currentPage = 1"
+              class="select select-sm select-bordered"
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+
+          <!-- Pagination buttons -->
+          <div class="join">
+            <button
+              @click="goToPage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-disabled': currentPage === 1 }"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+
+            <button
+              v-for="page in visiblePages"
+              :key="page"
+              @click="goToPage(page)"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-primary': page === currentPage }"
+            >
+              {{ page }}
+            </button>
+
+            <button
+              @click="goToPage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-disabled': currentPage === totalPages }"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -388,6 +466,10 @@ const selectedStatus = ref("");
 const loading = ref(false);
 const deleteLoading = ref(false);
 
+// Pagination state
+const currentPage = ref(1);
+const itemsPerPage = ref(5);
+
 // Books data from API
 const books = ref<Book[]>([]);
 
@@ -451,7 +533,48 @@ const filteredBooks = computed(() => {
   return filtered;
 });
 
+// Pagination computed properties
+const totalFilteredBooks = computed(() => filteredBooks.value.length);
+const totalPages = computed(() =>
+  Math.ceil(totalFilteredBooks.value / itemsPerPage.value)
+);
+
+const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
+const endIndex = computed(() => startIndex.value + itemsPerPage.value);
+
+const paginatedBooks = computed(() => {
+  return filteredBooks.value.slice(startIndex.value, endIndex.value);
+});
+
+const visiblePages = computed(() => {
+  const pages = [];
+  const maxVisiblePages = 5;
+
+  let startPage = Math.max(
+    1,
+    currentPage.value - Math.floor(maxVisiblePages / 2)
+  );
+  let endPage = Math.min(totalPages.value, startPage + maxVisiblePages - 1);
+
+  // Adjust start page if we're near the end
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+
+  return pages;
+});
+
 // Methods
+const goToPage = (page: number) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+  }
+};
+
 function editBook(book: Book) {
   console.log("Edit book:", book);
   selectedBook.value = book;

@@ -16,7 +16,7 @@
       </div>
       <button
         @click="showAddModal = true"
-        class="btn btn-soft btn-primary normal-case px-6 gap-2"
+        class="btn btn-primary normal-case px-6 gap-2"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +37,7 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="stats shadow-sm bg-base-100">
         <div class="stat">
           <div class="stat-title">Total Students</div>
@@ -50,13 +50,6 @@
           <div class="stat-title">Active Borrowers</div>
           <div class="stat-value text-success">{{ activeBorrowers }}</div>
           <div class="stat-desc">With borrowed books</div>
-        </div>
-      </div>
-      <div class="stats shadow-sm bg-base-100">
-        <div class="stat">
-          <div class="stat-title">New This Month</div>
-          <div class="stat-value text-info">12</div>
-          <div class="stat-desc">Recent registrations</div>
         </div>
       </div>
       <div class="stats shadow-sm bg-base-100">
@@ -93,7 +86,7 @@
     <div class="px-5 bg-base-100 rounded-lg shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
         <table class="table table-zebra">
-          <thead>
+          <thead style="background-color: #458c7f; color: white">
             <tr>
               <th>Student</th>
               <th>Student ID</th>
