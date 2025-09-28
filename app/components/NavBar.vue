@@ -22,7 +22,9 @@
     </div>
 
     <div class="navbar-center">
-      <h1 class="text-lg font-semibold">Library Admin</h1>
+      <h1 class="text-lg font-semibold">
+        School Textbook Tracking Application
+      </h1>
     </div>
 
     <div class="navbar-end">
@@ -83,7 +85,9 @@
           </div>
         </div>
         <div>
-          <h1 class="text-lg font-bold">Library Admin</h1>
+          <h1 class="text-lg font-bold">
+            School Textbook Tracking Application
+          </h1>
           <p class="text-sm text-base-content/60">Management System</p>
         </div>
       </div>
