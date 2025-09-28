@@ -124,19 +124,6 @@
               </label>
             </div>
 
-            <!-- Remember Me -->
-            <div class="form-control">
-              <label class="label cursor-pointer justify-start gap-3">
-                <input
-                  v-model="rememberMe"
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
-                  :disabled="isLoading"
-                />
-                <span class="label-text">Remember me</span>
-              </label>
-            </div>
-
             <!-- Error Message -->
             <div v-if="loginError" class="alert alert-error">
               <svg
@@ -159,7 +146,7 @@
             <div class="form-control mt-6">
               <button
                 type="submit"
-                class="btn bg-[#458C7F] hover:bg-[#3a7268] border-[#458C7F] hover:border-[#3a7268] text-white"
+                class="btn bg-[#458C7F] hover:bg-[#3a7268] border-[#458C7F] hover:border-[#3a7268] text-white w-full"
                 :class="{ loading: isLoading }"
                 :disabled="isLoading || !isFormValid"
               >
@@ -168,21 +155,6 @@
               </button>
             </div>
           </form>
-
-          <!-- Demo Credentials -->
-          <div class="divider">Demo Credentials</div>
-          <div class="bg-base-200 p-4 rounded-lg text-sm">
-            <p class="font-medium mb-2">For testing purposes:</p>
-            <p><strong>Email:</strong> admin@library.com</p>
-            <p><strong>Password:</strong> admin123</p>
-            <button
-              @click="fillDemoCredentials"
-              class="btn btn-outline btn-sm mt-2"
-              :disabled="isLoading"
-            >
-              Use Demo Credentials
-            </button>
-          </div>
 
           <!-- Help Text -->
           <div class="text-center mt-4">
