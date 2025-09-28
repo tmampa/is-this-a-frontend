@@ -13,10 +13,10 @@
 </template>
 
 <script setup>
-// Initialize authentication on app load
-const { initializeAuth } = useAuth();
+// Initialize auth from localStorage for NavBar
+const { initAuth } = useAuth();
 
-onMounted(async () => {
-  await initializeAuth();
+onMounted(() => {
+  initAuth();
 });
 </script>

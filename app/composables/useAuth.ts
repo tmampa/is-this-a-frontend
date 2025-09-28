@@ -26,11 +26,29 @@ export const useAuth = () => {
     }
   };
 
+  // Set user data in localStorage
+  const setUser = (userData: User) => {
+    if (process.client) {
+      localStorage.setItem("auth-user", JSON.stringify(userData));
+    }
+    user.value = userData;
+  };
+
+  // Get user data from localStorage
+  const getStoredUser = (): User | null => {
+    if (process.client) {
+      const userData = localStorage.getItem("auth-user");
+      return userData ? JSON.parse(userData) : null;
+    }
+    return null;
+  };
+
   // Remove token from localStorage
   const removeToken = () => {
     if (process.client) {
       localStorage.removeItem("auth-token");
       localStorage.removeItem("auth-token-expiry");
+      localStorage.removeItem("auth-user");
     }
   };
 
@@ -57,7 +75,7 @@ export const useAuth = () => {
         body: JSON.stringify(credentials),
       });
 
-      user.value = response.user;
+      setUser(response.user);
       setToken(response.access_token, response.expiresIn);
 
       // Redirect to dashboard after successful login
@@ -119,6 +137,17 @@ export const useAuth = () => {
     }
   };
 
+  // Initialize auth from stored data
+  const initAuth = () => {
+    const token = getToken();
+    if (token && !isTokenExpired()) {
+      const storedUser = getStoredUser();
+      if (storedUser) {
+        user.value = storedUser;
+      }
+    }
+  };
+
   // Check authentication status
   const checkAuth = (): boolean => {
     const token = getToken();
@@ -132,6 +161,7 @@ export const useAuth = () => {
     login,
     logout,
     initializeAuth,
+    initAuth,
     checkAuth,
     getToken,
   };

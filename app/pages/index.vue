@@ -167,7 +167,6 @@ const { checkAuth, initializeAuth } = useAuth();
 import BorrowedBooksList from "~/components/books/BorrowedBooksList.vue";
 import BorrowBookForm from "~/components/books/BorrowBookForm.vue";
 import ReturnBookForm from "~/components/books/ReturnBookForm.vue";
-import NavBar from "~/components/NavBar.vue";
 
 // State
 const showBorrowModal = ref(false);
