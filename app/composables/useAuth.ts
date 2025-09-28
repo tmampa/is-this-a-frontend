@@ -1,157 +1,91 @@
-// Authentication composable
-import type { LoginCredentials, User, AuthResponse } from "~/types/books";
-
-const API_BASE = "http://localhost:8080/api";
+// Basic Authentication composable
 
 export const useAuth = () => {
   // Reactive state
-  const user = ref<User | null>(null);
+  const user = ref<any | null>(null);
   const isAuthenticated = computed(() => !!user.value);
   const isLoading = ref(false);
 
-  // Get stored token
-  const getToken = (): string | null => {
-    if (process.client) {
-      return localStorage.getItem("auth-token");
-    }
-    return null;
-  };
+  // Simple login - just check hardcoded credentials
+  const login = async (credentials: { username: string; password: string }) => {
+    isLoading.value = true;
 
-  // Set token in localStorage
-  const setToken = (token: string, expiresIn: number) => {
-    if (process.client) {
-      localStorage.setItem("auth-token", token);
-      const expiryTime = Date.now() + expiresIn * 1000;
-      localStorage.setItem("auth-token-expiry", expiryTime.toString());
-    }
-  };
-
-  // Set user data in localStorage
-  const setUser = (userData: User) => {
-    if (process.client) {
-      localStorage.setItem("auth-user", JSON.stringify(userData));
-    }
-    user.value = userData;
-  };
-
-  // Get user data from localStorage
-  const getStoredUser = (): User | null => {
-    if (process.client) {
-      const userData = localStorage.getItem("auth-user");
-      return userData ? JSON.parse(userData) : null;
-    }
-    return null;
-  };
-
-  // Remove token from localStorage
-  const removeToken = () => {
-    if (process.client) {
-      localStorage.removeItem("auth-token");
-      localStorage.removeItem("auth-token-expiry");
-      localStorage.removeItem("auth-user");
-    }
-  };
-
-  // Check if token is expired
-  const isTokenExpired = (): boolean => {
-    if (process.client) {
-      const expiry = localStorage.getItem("auth-token-expiry");
-      if (!expiry) return true;
-      return Date.now() > parseInt(expiry);
-    }
-    return true;
-  };
-
-  // Login function
-  const login = async (credentials: LoginCredentials): Promise<void> => {
     try {
-      isLoading.value = true;
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-      const response = await $fetch<AuthResponse>(`${API_BASE}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      });
+      // Basic hardcoded credentials check
+      if (
+        credentials.username === "admin" &&
+        credentials.password === "admin123"
+      ) {
+        const userData = {
+          id: 1,
+          username: "admin",
+          name: "Library Admin",
+        };
 
-      setUser(response.user);
-      setToken(response.access_token, response.expiresIn);
+        // Store user in localStorage and reactive state
+        if (process.client) {
+          localStorage.setItem("auth-user", JSON.stringify(userData));
+        }
+        user.value = userData;
 
-      // Redirect to dashboard after successful login
-      await navigateTo("/", { replace: true });
-    } catch (error: any) {
-      console.error("Login failed:", error);
-      throw new Error(
-        error.data?.message || "Login failed. Please check your credentials."
-      );
+        console.log("Login successful, user data stored");
+        // Navigation will be handled by the login page
+      } else {
+        throw new Error("Invalid username or password");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     } finally {
       isLoading.value = false;
     }
   };
 
   // Logout function
-  const logout = async (): Promise<void> => {
-    try {
-      // Call logout endpoint only if we have a valid token
-      const token = getToken();
-      if (token && !isTokenExpired()) {
-        await $fetch(`${API_BASE}/auth/logout`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }).catch((error) => {
-          // Ignore errors on logout endpoint - we're logging out anyway
-          console.warn("Logout endpoint error:", error);
-        });
-      }
-    } finally {
-      user.value = null;
-      removeToken();
-      await navigateTo("/login");
+  const logout = () => {
+    if (process.client) {
+      localStorage.removeItem("auth-user");
     }
+    user.value = null;
+    navigateTo("/login");
   };
 
-  // Initialize user from token
-  const initializeAuth = async (): Promise<void> => {
-    const token = getToken();
-    if (!token || isTokenExpired()) {
-      await logout();
-      return;
-    }
-
-    try {
-      const response = await $fetch<{ user: User }>(`${API_BASE}/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      user.value = response.user;
-    } catch (error: any) {
-      console.error("Failed to initialize auth:", error);
-      // Only logout if it's an authentication error (401/403)
-      if (error.status === 401 || error.status === 403) {
-        await logout();
-      }
-    }
-  };
-
-  // Initialize auth from stored data
+  // Initialize from localStorage
   const initAuth = () => {
-    const token = getToken();
-    if (token && !isTokenExpired()) {
-      const storedUser = getStoredUser();
-      if (storedUser) {
-        user.value = storedUser;
+    if (process.client) {
+      const userData = localStorage.getItem("auth-user");
+      if (userData) {
+        user.value = JSON.parse(userData);
       }
     }
   };
 
-  // Check authentication status
+  // Check if user is authenticated
   const checkAuth = (): boolean => {
-    const token = getToken();
-    return !!(token && !isTokenExpired());
+    // First check if user is already in memory
+    if (user.value) {
+      return true;
+    }
+
+    // If not, try to initialize from localStorage
+    if (process.client) {
+      const userData = localStorage.getItem("auth-user");
+      if (userData) {
+        try {
+          user.value = JSON.parse(userData);
+          return true;
+        } catch (error) {
+          console.error("Error parsing user data from localStorage:", error);
+          localStorage.removeItem("auth-user");
+          return false;
+        }
+      }
+    }
+
+    return false;
   };
 
   return {
@@ -160,9 +94,7 @@ export const useAuth = () => {
     isLoading: readonly(isLoading),
     login,
     logout,
-    initializeAuth,
     initAuth,
     checkAuth,
-    getToken,
   };
 };

@@ -2,7 +2,10 @@ import { navigateTo } from "#app";
 
 // Authentication middleware
 export default defineNuxtRouteMiddleware((to, from) => {
-  const { checkAuth } = useAuth();
+  const { checkAuth, initAuth } = useAuth();
+
+  // Initialize auth from localStorage
+  initAuth();
 
   // Skip authentication for login page
   if (to.path === "/login") {

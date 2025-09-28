@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-// Initialize auth from localStorage for NavBar
+// Initialize auth from localStorage
 const { initAuth } = useAuth();
 
 onMounted(() => {

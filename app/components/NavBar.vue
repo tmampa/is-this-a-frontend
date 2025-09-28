@@ -134,10 +134,10 @@
             <!-- Books Management -->
             <li>
               <NuxtLink
-                to="/admin/books"
+                to="/books"
                 class="flex items-center gap-3 p-3 rounded-lg transition-colors"
                 :class="{
-                  'bg-[#458C7F] text-white': $route.path === '/admin/books',
+                  'bg-[#458C7F] text-white': $route.path === '/books',
                 }"
                 active-class="bg-[#458C7F] text-white"
               >
@@ -162,10 +162,10 @@
             <!-- Students Management -->
             <li>
               <NuxtLink
-                to="/admin/students"
+                to="/students"
                 class="flex items-center gap-3 p-3 rounded-lg transition-colors"
                 :class="{
-                  'bg-[#458C7F] text-white': $route.path === '/admin/students',
+                  'bg-[#458C7F] text-white': $route.path === '/students',
                 }"
                 active-class="bg-[#458C7F] text-white"
               >

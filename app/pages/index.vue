@@ -1,5 +1,6 @@
 <template>
-  <div class="">
+  <div>
+    <NavBar />
     <book-card-stats />
 
     <div
@@ -161,7 +162,7 @@ import type {
 import { LibraryAPI } from "~/composables/useLibraryAPI";
 
 // Initialize auth will be handled by middleware or onMounted
-const { checkAuth, initializeAuth } = useAuth();
+const { checkAuth, initAuth } = useAuth();
 
 // Component imports
 import BorrowedBooksList from "~/components/books/BorrowedBooksList.vue";
@@ -276,12 +277,17 @@ const fetchBooks = async () => {
 
 // Initialize data on mount
 onMounted(async () => {
-  // Check authentication first
+  // Initialize auth state first
+  initAuth();
+
+  // Check authentication
   if (!checkAuth()) {
+    console.log("User not authenticated, redirecting to login");
     await navigateTo("/login");
     return;
   }
 
+  console.log("User authenticated, loading data");
   fetchBorrowedBooks();
   fetchStudents();
   fetchBooks();
