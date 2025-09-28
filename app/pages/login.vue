@@ -273,7 +273,7 @@ const fillDemoCredentials = () => {
 onMounted(() => {
   const { checkAuth } = useAuth();
   if (checkAuth()) {
-    navigateTo("/admin/books");
+    navigateTo("/", { replace: true });
   }
 });
 </script>

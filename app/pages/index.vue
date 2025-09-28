@@ -160,11 +160,8 @@ import type {
 } from "~/types/books";
 import { LibraryAPI } from "~/composables/useLibraryAPI";
 
-// Check authentication on page load
-const { checkAuth } = useAuth();
-if (!checkAuth()) {
-  await navigateTo("/login");
-}
+// Initialize auth will be handled by middleware or onMounted
+const { checkAuth, initializeAuth } = useAuth();
 
 // Component imports
 import BorrowedBooksList from "~/components/books/BorrowedBooksList.vue";
@@ -279,7 +276,16 @@ const fetchBooks = async () => {
 };
 
 // Initialize data on mount
-onMounted(() => {
+onMounted(async () => {
+  // Check authentication first
+  if (!checkAuth()) {
+    await navigateTo("/login");
+    return;
+  }
+
+  // Initialize auth data
+  await initializeAuth();
+
   fetchBorrowedBooks();
   fetchStudents();
   fetchBooks();

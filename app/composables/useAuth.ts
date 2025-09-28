@@ -58,10 +58,10 @@ export const useAuth = () => {
       });
 
       user.value = response.user;
-      setToken(response.token, response.expiresIn);
+      setToken(response.access_token, response.expiresIn);
 
       // Redirect to dashboard after successful login
-      await navigateTo("/admin/books");
+      await navigateTo("/", { replace: true });
     } catch (error: any) {
       console.error("Login failed:", error);
       throw new Error(
@@ -118,7 +118,7 @@ export const useAuth = () => {
   // Check authentication status
   const checkAuth = (): boolean => {
     const token = getToken();
-    return !!(token && !isTokenExpired() && user.value);
+    return !!(token && !isTokenExpired());
   };
 
   return {
