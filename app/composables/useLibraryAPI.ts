@@ -125,7 +125,7 @@ export const LibraryAPI = {
     parents: { name: string; email: string; relationship: string }[];
   }): Promise<Student> {
     try {
-      const response = await $fetch<Student>(`${API_BASE}/students`, {
+      const response = await $fetch<Student>(`${API_BASE}/create-student`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -152,7 +152,7 @@ export const LibraryAPI = {
   ): Promise<Student> {
     try {
       const response = await $fetch<Student>(
-        `${API_BASE}/students/${studentId}`,
+        `${API_BASE}/student/${studentId}`,
         {
           method: "PUT",
           headers: {
@@ -171,7 +171,7 @@ export const LibraryAPI = {
 
   async deleteStudent(studentId: string): Promise<void> {
     try {
-      await $fetch(`${API_BASE}/students/${studentId}`, {
+      await $fetch(`${API_BASE}/student/delete/${studentId}`, {
         method: "DELETE",
       });
       console.log("Student deleted:", studentId);

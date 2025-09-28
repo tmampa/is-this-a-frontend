@@ -24,6 +24,7 @@ export interface Student {
   address?: string;
   parents?: { name: string; email: string; relationship: string }[];
   borrowedBooks: string[];
+  outstandingFines?: number; // in ZAR
 }
 
 export interface BorrowedBook {
