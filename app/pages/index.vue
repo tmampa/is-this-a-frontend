@@ -4,7 +4,7 @@
     <book-card-stats />
 
     <div
-      class="grid grid-cols-12 gap-4 items-center mb-4 mx-5"
+      class="main-content grid grid-cols-12 gap-4 items-center mb-4 mx-5"
       style="margin-top: 60px"
     >
       <div class="col-span-6">
@@ -113,7 +113,7 @@
     <!-- Search Results or Empty State -->
     <div
       v-if="searchQuery.trim() && filteredBooks.length === 0"
-      class="mx-5 p-8 text-center bg-base-100 rounded-box border border-base-300"
+      class="main-content mx-5 p-8 text-center bg-base-100 rounded-box border border-base-300"
     >
       <div class="text-4xl mb-4">🔍</div>
       <h3 class="text-lg font-semibold text-base-content mb-2">
@@ -322,3 +322,11 @@ const handleReturn = async (data: ReturnBookData) => {
   }
 };
 </script>
+
+<style scoped>
+@media (min-width: 1024px) {
+  .main-content {
+    margin-left: 280px !important;
+  }
+}
+</style>

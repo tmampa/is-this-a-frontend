@@ -1,7 +1,7 @@
 <template>
   <div>
     <NavBar />
-    <div class="space-y-6">
+    <div class="main-content space-y-6">
       <!-- Page Header -->
       <div
         class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
@@ -675,3 +675,12 @@ const handleDeleteConfirm = async () => {
   }
 };
 </script>
+
+<style scoped>
+@media (min-width: 1024px) {
+  .main-content {
+    margin-left: 280px !important;
+    margin-top: 30px;
+  }
+}
+</style>

@@ -4,7 +4,7 @@
     <NavBar />
 
     <!-- Main Content -->
-    <main class="lg:ml-64 min-h-screen pt-16 lg:pt-0">
+    <main class="main-content min-h-screen pt-16 lg:pt-0">
       <div class="p-4 lg:p-8">
         <slot />
       </div>
@@ -20,3 +20,11 @@ onMounted(() => {
   initAuth();
 });
 </script>
+
+<style scoped>
+@media (min-width: 1024px) {
+  .main-content {
+    margin-left: 280px;
+  }
+}
+</style>

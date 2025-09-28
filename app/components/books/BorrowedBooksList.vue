@@ -1,5 +1,8 @@
 <template>
-  <div class="card bg-base-100 shadow-sm mx-5" style="margin-top: 15px">
+  <div
+    class="main-content card bg-base-100 shadow-sm mx-5"
+    style="margin-top: 15px"
+  >
     <div class="overflow-x-auto rounded-box">
       <table class="table table-zebra">
         <thead style="background-color: #458c7f; color: white">

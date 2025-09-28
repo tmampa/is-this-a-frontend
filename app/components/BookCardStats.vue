@@ -1,6 +1,6 @@
 <template>
   <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-15">
+  <div class="main-content grid grid-cols-1 md:grid-cols-3 gap-6 mt-15">
     <div class="stats shadow-sm bg-base-100">
       <div class="stat">
         <div class="stat-title">Total Borrowed</div>
@@ -68,3 +68,11 @@ onMounted(() => {
   fetchBorrowedBooks();
 });
 </script>
+
+<style scoped>
+@media (min-width: 1024px) {
+  .main-content {
+    margin-left: 280px !important;
+  }
+}
+</style>
