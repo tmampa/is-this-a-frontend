@@ -48,8 +48,6 @@ export const LibraryAPI = {
     title: string;
     author: string;
     isbn: string;
-    category: string;
-    description?: string;
   }): Promise<Book> {
     try {
       const response = await $fetch<Book>(`${API_BASE}/books`, {
@@ -73,12 +71,10 @@ export const LibraryAPI = {
       title: string;
       author: string;
       isbn: string;
-      category: string;
-      description?: string;
     }
   ): Promise<Book> {
     try {
-      const response = await $fetch<Book>(`${API_BASE}/books/${bookId}`, {
+      const response = await $fetch<Book>(`${API_BASE}/book/${bookId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

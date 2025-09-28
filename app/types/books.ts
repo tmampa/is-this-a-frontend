@@ -3,8 +3,12 @@ export interface Book {
   title: string;
   author: string;
   isbn: string;
-  category: string;
-  description?: string;
+  publishedYear: number;
+  publisher: string;
+  pages: number;
+  language: string;
+  price: number;
+  grade: number;
   status: "available" | "borrowed";
 }
 
