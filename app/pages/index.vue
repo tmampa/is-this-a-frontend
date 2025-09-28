@@ -283,15 +283,10 @@ onMounted(async () => {
     return;
   }
 
-  // Initialize auth data
-  await initializeAuth();
-
   fetchBorrowedBooks();
   fetchStudents();
   fetchBooks();
-});
-
-// Handlers
+}); // Handlers
 const handleBorrow = async (data: BorrowBookData) => {
   try {
     // Refresh the borrowed books list after successful borrow

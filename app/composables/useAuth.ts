@@ -75,16 +75,17 @@ export const useAuth = () => {
   // Logout function
   const logout = async (): Promise<void> => {
     try {
-      // Call logout endpoint if it exists
+      // Call logout endpoint only if we have a valid token
       const token = getToken();
-      if (token) {
+      if (token && !isTokenExpired()) {
         await $fetch(`${API_BASE}/auth/logout`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }).catch(() => {
-          // Ignore errors on logout endpoint
+        }).catch((error) => {
+          // Ignore errors on logout endpoint - we're logging out anyway
+          console.warn("Logout endpoint error:", error);
         });
       }
     } finally {
@@ -109,9 +110,12 @@ export const useAuth = () => {
         },
       });
       user.value = response.user;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to initialize auth:", error);
-      await logout();
+      // Only logout if it's an authentication error (401/403)
+      if (error.status === 401 || error.status === 403) {
+        await logout();
+      }
     }
   };
 
