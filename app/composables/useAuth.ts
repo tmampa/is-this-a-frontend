@@ -1,56 +1,177 @@
-// Basic Authentication composable
+// Authentication composable with API integration
+
+// Type definitions
+interface LoginResponse {
+  user?: {
+    id: number;
+    username: string;
+    name: string;
+    email: string;
+  };
+  access_token?: string;
+  message?: string;
+  role: string;
+}
+
+interface User {
+  id: number;
+  username: string;
+  name: string;
+  email: string;
+  access_token?: string;
+  role: string;
+}
 
 export const useAuth = () => {
   // Reactive state
-  const user = ref<any | null>(null);
+  const user = ref<User | null>(null);
   const isAuthenticated = computed(() => !!user.value);
   const isLoading = ref(false);
 
-  // Simple login - just check hardcoded credentials
-  const login = async (credentials: { username: string; password: string }) => {
+  const basePath: string = "http://localhost:8080/api/auth";
+
+  // Login with API call
+  const login = async (credentials: { email: string; password: string }) => {
     isLoading.value = true;
 
     try {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Make API call to your backend
+      const response = await $fetch<LoginResponse>(`${basePath}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          ...credentials,
+        },
+      });
 
-      // Basic hardcoded credentials check
-      if (
-        credentials.username === "admin" &&
-        credentials.password === "admin123"
-      ) {
-        const userData = {
-          id: 1,
-          username: "admin",
-          name: "Library Admin",
-        };
+      console.log("Login response:", response);
 
-        // Store user in localStorage and reactive state
-        if (process.client) {
-          localStorage.setItem("auth-user", JSON.stringify(userData));
+      // If API call is successful, store user data
+      const userData: User = {
+        id: response.user?.id || 1,
+        username: response.user?.username || credentials.email,
+        name: response.user?.name || credentials.email,
+        email: response.user?.email || credentials.email,
+        access_token: response.access_token || undefined,
+        role: response.role,
+      };
+
+      // Store user in localStorage and reactive state
+      if (process.client) {
+        localStorage.setItem("auth-user", JSON.stringify(userData));
+        // Store token separately for API calls
+        if (userData.access_token) {
+          localStorage.setItem("auth-token", userData.access_token);
         }
-        user.value = userData;
-
-        console.log("Login successful, user data stored");
-        // Navigation will be handled by the login page
-      } else {
-        throw new Error("Invalid username or password");
       }
-    } catch (error) {
+      user.value = userData;
+
+      console.log("Login successful, user data stored");
+      return { success: true, user: userData };
+    } catch (error: any) {
       console.error("Login error:", error);
-      throw error;
+
+      // Handle different error scenarios
+      if (error.status === 401) {
+        throw new Error("Invalid username or password");
+      } else if (error.status === 500) {
+        throw new Error("Server error. Please try again later.");
+      } else {
+        throw new Error(
+          "Login failed. Please check your connection and try again."
+        );
+      }
     } finally {
       isLoading.value = false;
     }
   };
 
-  // Logout function
-  const logout = () => {
-    if (process.client) {
-      localStorage.removeItem("auth-user");
+  // Logout function with API call
+  const logout = async () => {
+    isLoading.value = true;
+
+    try {
+      // Get token for logout API call
+      const token = process.client ? localStorage.getItem("auth-token") : null;
+
+      // Call logout endpoint if token exists
+      if (token) {
+        try {
+          await $fetch(`${basePath}/logout`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+        } catch (error) {
+          console.warn(
+            "Logout API call failed, but continuing with local logout:",
+            error
+          );
+        }
+      }
+
+      // Clear local storage and state
+      if (process.client) {
+        localStorage.removeItem("auth-user");
+        localStorage.removeItem("auth-token");
+      }
+      user.value = null;
+
+      console.log("Logout successful");
+      navigateTo("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Force local logout even if API fails
+      if (process.client) {
+        localStorage.removeItem("auth-user");
+        localStorage.removeItem("auth-token");
+      }
+      user.value = null;
+      navigateTo("/login");
+    } finally {
+      isLoading.value = false;
     }
-    user.value = null;
-    navigateTo("/login");
+  };
+
+  // Get auth token for API calls
+  const getAuthToken = (): string | null => {
+    if (process.client) {
+      return localStorage.getItem("auth-token");
+    }
+    return null;
+  };
+
+  // Create authenticated fetch wrapper
+  const authenticatedFetch = async (url: string, options: any = {}) => {
+    const token = getAuthToken();
+
+    const headers = {
+      "Content-Type": "application/json",
+      ...options.headers,
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    try {
+      const response = await $fetch(url, {
+        ...options,
+        headers,
+      });
+      return response;
+    } catch (error: any) {
+      // If unauthorized, logout user
+      if (error.status === 401) {
+        console.warn("Authentication expired, logging out");
+        await logout();
+      }
+      throw error;
+    }
   };
 
   // Initialize from localStorage
@@ -58,7 +179,13 @@ export const useAuth = () => {
     if (process.client) {
       const userData = localStorage.getItem("auth-user");
       if (userData) {
-        user.value = JSON.parse(userData);
+        try {
+          user.value = JSON.parse(userData) as User;
+        } catch (error) {
+          console.error("Error parsing user data from localStorage:", error);
+          localStorage.removeItem("auth-user");
+          localStorage.removeItem("auth-token");
+        }
       }
     }
   };
@@ -75,17 +202,37 @@ export const useAuth = () => {
       const userData = localStorage.getItem("auth-user");
       if (userData) {
         try {
-          user.value = JSON.parse(userData);
+          user.value = JSON.parse(userData) as User;
           return true;
         } catch (error) {
           console.error("Error parsing user data from localStorage:", error);
           localStorage.removeItem("auth-user");
+          localStorage.removeItem("auth-token");
           return false;
         }
       }
     }
 
     return false;
+  };
+
+  // Refresh user profile from API
+  const refreshUser = async () => {
+    try {
+      const response = await authenticatedFetch(`${basePath}/profile`);
+      if (response && typeof response === "object" && "user" in response) {
+        const apiResponse = response as { user: User };
+        user.value = apiResponse.user;
+
+        if (process.client) {
+          localStorage.setItem("auth-user", JSON.stringify(apiResponse.user));
+        }
+        return apiResponse.user;
+      }
+    } catch (error) {
+      console.error("Failed to refresh user profile:", error);
+      throw error;
+    }
   };
 
   return {
@@ -96,5 +243,8 @@ export const useAuth = () => {
     logout,
     initAuth,
     checkAuth,
+    getAuthToken,
+    authenticatedFetch,
+    refreshUser,
   };
 };

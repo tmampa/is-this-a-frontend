@@ -10,9 +10,9 @@
               <span class="label-text">Username</span>
             </label>
             <input
-              v-model="credentials.username"
+              v-model="credentials.email"
               type="text"
-              placeholder="Username"
+              placeholder="Email"
               class="input input-bordered"
               required
             />
@@ -59,7 +59,7 @@ definePageMeta({
 const { login, isLoading, checkAuth, initAuth } = useAuth();
 
 const credentials = ref({
-  username: "",
+  email: "",
   password: "",
 });
 
@@ -77,10 +77,7 @@ onMounted(() => {
 const handleLogin = async () => {
   error.value = "";
   try {
-    console.log(
-      "Attempting login with credentials:",
-      credentials.value.username
-    );
+    console.log("Attempting login with credentials:", credentials.value.email);
     await login(credentials.value);
     console.log("Login function completed successfully");
 
