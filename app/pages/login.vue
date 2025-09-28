@@ -2,7 +2,9 @@
   <div class="min-h-screen bg-base-200 flex items-center justify-center">
     <div class="card w-96 bg-base-100 shadow-xl">
       <div class="card-body">
-        <h2 class="card-title justify-center mb-4">📚 Library Login</h2>
+        <h4 class="card-title justify-center mb-4">
+          📚 School Textbook Tracking Application
+        </h4>
 
         <form @submit.prevent="handleLogin">
           <div class="form-control mb-3">
