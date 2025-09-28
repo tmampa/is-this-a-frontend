@@ -10,7 +10,7 @@ interface LoginResponse {
   };
   access_token?: string;
   message?: string;
-  role: string;
+  userType: string;
 }
 
 interface User {
@@ -48,24 +48,28 @@ export const useAuth = () => {
 
       console.log("Login response:", response);
 
+      // Store user in localStorage and reactive state
+      if (process.client) {
+        localStorage.setItem("auth-user", JSON.stringify(response));
+        // Store token separately for API calls
+        if (response.access_token) {
+          localStorage.setItem("auth-token", response.access_token);
+        }
+      }
+
+      // get user data after sucessful login
+      const userResponse: any = await authenticatedFetch(`${basePath}/details`);
+
       // If API call is successful, store user data
       const userData: User = {
-        id: response.user?.id || 1,
-        username: response.user?.username || credentials.email,
+        id: userResponse.id || 1,
+        username: userResponse.username || credentials.email,
         name: response.user?.name || credentials.email,
         email: response.user?.email || credentials.email,
         access_token: response.access_token || undefined,
-        role: response.role,
+        role: response.userType,
       };
 
-      // Store user in localStorage and reactive state
-      if (process.client) {
-        localStorage.setItem("auth-user", JSON.stringify(userData));
-        // Store token separately for API calls
-        if (userData.access_token) {
-          localStorage.setItem("auth-token", userData.access_token);
-        }
-      }
       user.value = userData;
 
       console.log("Login successful, user data stored");
@@ -219,7 +223,7 @@ export const useAuth = () => {
   // Refresh user profile from API
   const refreshUser = async () => {
     try {
-      const response = await authenticatedFetch(`${basePath}/profile`);
+      const response = await authenticatedFetch(`${basePath}/details`);
       if (response && typeof response === "object" && "user" in response) {
         const apiResponse = response as { user: User };
         user.value = apiResponse.user;
