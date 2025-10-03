@@ -63,6 +63,80 @@
           </div>
         </div>
 
+        <!-- Outstanding Fines Section -->
+        <div
+          v-if="student.outstandingFines && student.outstandingFines > 0"
+          class="p-4 bg-error/10 border border-error/30 rounded-lg"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0">
+                <svg
+                  class="w-6 h-6 text-error"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-semibold text-error text-lg">
+                  Outstanding Fines
+                </h4>
+                <p class="text-sm text-error/80">
+                  Payment required for library services
+                </p>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-2xl font-bold text-error">
+                R{{ formatCurrency(student.outstandingFines) }}
+              </div>
+              <div class="text-xs text-error/70 uppercase tracking-wide">
+                ZAR
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Fines Message -->
+        <div
+          v-else
+          class="p-4 bg-success/10 border border-success/30 rounded-lg"
+        >
+          <div class="flex items-center gap-3">
+            <div class="flex-shrink-0">
+              <svg
+                class="w-6 h-6 text-success"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-semibold text-success text-lg">
+                No Outstanding Fines
+              </h4>
+              <p class="text-sm text-success/80">
+                All library fees are up to date
+              </p>
+            </div>
+          </div>
+        </div>
+
         <!-- Personal Information -->
         <div class="grid md:grid-cols-2 gap-8">
           <!-- Student Details -->
@@ -454,6 +528,13 @@ function getDaysOverdue(dueDate: string): number {
   const diffTime = now.getTime() - due.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays > 0 ? diffDays : 0;
+}
+
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("en-ZA", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 }
 
 function editStudent() {

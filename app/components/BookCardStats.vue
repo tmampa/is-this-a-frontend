@@ -1,23 +1,13 @@
 <template>
   <!-- Stats Cards -->
-  <div class="container-fluid">
-    <div class="row g-4 mb-5" style="margin-top: 60px">
-      <div class="col-lg-4 col-md-6">
-        <div class="stats-card stats-card-primary">
-          <div class="card-body">
-            <!-- <div class="stats-icon bg-primary">
-              <i class="bi bi-book-fill"></i>
-            </div> -->
-            <div class="stats-content">
-              <h6 class="stats-label">Total Borrowed</h6>
-              <h2 class="stats-value" style="color: #f25c05">
-                {{ borrowedBooks.length }}
-              </h2>
-              <p class="stats-description">Active borrowings</p>
-            </div>
-          </div>
-        </div>
+  <div class="main-content grid grid-cols-1 md:grid-cols-3 gap-6 mt-15">
+    <div class="stats shadow-sm bg-base-100">
+      <div class="stat">
+        <div class="stat-title">Total Borrowed</div>
+        <div class="stat-value text-primary">{{ borrowedBooks.length }}</div>
+        <div class="stat-desc">Active borrowings</div>
       </div>
+    </div>
 
       <div class="col-lg-4 col-md-6">
         <div class="stats-card stats-card-danger">
@@ -93,126 +83,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Minimal Modern Card Styling */
-.stats-card {
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  height: 100%;
-}
-
-.card-body {
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-/* Icon Styling */
-.stats-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: white;
-  flex-shrink: 0;
-}
-
-.bg-primary {
-  background-color: #3b82f6;
-}
-
-.bg-danger {
-  background-color: #ef4444;
-}
-
-.bg-warning {
-  background-color: #f59e0b;
-}
-
-/* Content Styling */
-.stats-content {
-  flex: 1;
-}
-
-.stats-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6b7280;
-  margin: 0 0 0.25rem 0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.stats-value {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 0 0.25rem 0;
-  line-height: 1;
-}
-
-.stats-description {
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0;
-}
-
-/* Color variations */
-.text-primary {
-  color: #3b82f6 !important;
-}
-
-.text-danger {
-  color: #ef4444 !important;
-}
-
-.text-warning {
-  color: #f59e0b !important;
-}
-
-/* Responsive Design */
-@media (max-width: 767.98px) {
-  .card-body {
-    padding: 1.25rem;
-  }
-
-  .stats-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
-  }
-
-  .stats-value {
-    font-size: 1.75rem;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .card-body {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.75rem;
-  }
-
-  .stats-value {
-    font-size: 1.5rem;
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  .stats-card {
-    background: #1f2937;
-    border-color: #374151;
-  }
-
-  .stats-label,
-  .stats-description {
-    color: #9ca3af;
+@media (min-width: 1024px) {
+  .main-content {
+    margin-left: 280px !important;
   }
 }
 </style>

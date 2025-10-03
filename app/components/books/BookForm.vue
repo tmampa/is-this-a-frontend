@@ -69,49 +69,141 @@
                 />
               </div>
 
-              <!-- Category -->
-              <div class="col-12">
-                <label for="bookCategory" class="form-label">
-                  Category <span class="text-danger">*</span>
-                </label>
-                <select
-                  id="bookCategory"
-                  v-model="formData.category"
-                  class="form-select"
-                  required
-                >
-                  <option value="" disabled>Select a category</option>
-                  <option value="Fiction">Fiction</option>
-                  <option value="Non-Fiction">Non-Fiction</option>
-                  <option value="Science">Science</option>
-                  <option value="Technology">Technology</option>
-                  <option value="History">History</option>
-                  <option value="Biography">Biography</option>
-                  <option value="Mystery">Mystery</option>
-                  <option value="Romance">Romance</option>
-                  <option value="Fantasy">Fantasy</option>
-                  <option value="Self-Help">Self-Help</option>
-                  <option value="Educational">Educational</option>
-                  <option value="Children">Children</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
+        <!-- Two Column Layout for Year and Publisher -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Published Year -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text"
+                >Published Year <span class="text-error">*</span></span
+              >
+            </label>
+            <input
+              type="number"
+              v-model.number="formData.publishedYear"
+              class="input input-bordered w-full"
+              placeholder="e.g., 2023"
+              min="1000"
+              max="2030"
+              required
+            />
+          </div>
 
-              <!-- Description -->
-              <div class="col-12">
-                <label for="bookDescription" class="form-label"
-                  >Description</label
-                >
-                <textarea
-                  id="bookDescription"
-                  v-model="formData.description"
-                  class="form-control"
-                  placeholder="Enter book description (optional)"
-                  rows="4"
-                ></textarea>
-              </div>
+          <!-- Publisher -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text"
+                >Publisher <span class="text-error">*</span></span
+              >
+            </label>
+            <input
+              type="text"
+              v-model="formData.publisher"
+              class="input input-bordered w-full"
+              placeholder="Enter publisher name"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Two Column Layout for Pages and Language -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Pages -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text"
+                >Pages <span class="text-error">*</span></span
+              >
+            </label>
+            <input
+              type="number"
+              v-model.number="formData.pages"
+              class="input input-bordered w-full"
+              placeholder="e.g., 250"
+              min="1"
+              required
+            />
+          </div>
+
+          <!-- Language -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text"
+                >Language <span class="text-error">*</span></span
+              >
+            </label>
+            <select
+              v-model="formData.language"
+              class="select select-bordered w-full"
+              required
+            >
+              <option value="" disabled>Select language</option>
+              <option value="English">English</option>
+              <option value="Afrikaans">Afrikaans</option>
+              <option value="Zulu">Zulu</option>
+              <option value="Xhosa">Xhosa</option>
+              <option value="French">French</option>
+              <option value="Spanish">Spanish</option>
+              <option value="German">German</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Two Column Layout for Price and Grade -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Price -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text"
+                >Price (ZAR) <span class="text-error">*</span></span
+              >
+            </label>
+            <div class="relative">
+              <span
+                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/70"
+                >R</span
+              >
+              <input
+                type="number"
+                v-model.number="formData.price"
+                class="input input-bordered w-full pl-8"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                required
+              />
             </div>
           </div>
+
+          <!-- Grade -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text"
+                >Grade Level <span class="text-error">*</span></span
+              >
+            </label>
+            <select
+              v-model.number="formData.grade"
+              class="select select-bordered w-full"
+              required
+            >
+              <option value="" disabled>Select grade</option>
+              <option :value="1">Grade 1</option>
+              <option :value="2">Grade 2</option>
+              <option :value="3">Grade 3</option>
+              <option :value="4">Grade 4</option>
+              <option :value="5">Grade 5</option>
+              <option :value="6">Grade 6</option>
+              <option :value="7">Grade 7</option>
+              <option :value="8">Grade 8</option>
+              <option :value="9">Grade 9</option>
+              <option :value="10">Grade 10</option>
+              <option :value="11">Grade 11</option>
+              <option :value="12">Grade 12</option>
+            </select>
+          </div>
+        </div>
 
           <div class="modal-footer">
             <button
@@ -156,8 +248,12 @@ type BookFormData = {
   title: string;
   author: string;
   isbn: string;
-  category: string;
-  description?: string;
+  publishedYear: number;
+  publisher: string;
+  pages: number;
+  language: string;
+  price: number;
+  grade: number;
 };
 
 const props = defineProps<{
@@ -180,8 +276,12 @@ const formData = ref<BookFormData>({
   title: "",
   author: "",
   isbn: "",
-  category: "",
-  description: "",
+  publishedYear: new Date().getFullYear(),
+  publisher: "",
+  pages: 1,
+  language: "",
+  price: 0,
+  grade: 1,
 });
 
 // Watch for book prop changes to populate form when editing
@@ -193,8 +293,12 @@ watch(
         title: newBook.title || "",
         author: newBook.author || "",
         isbn: newBook.isbn || "",
-        category: newBook.category || "",
-        description: newBook.description || "",
+        publishedYear: newBook.publishedYear || new Date().getFullYear(),
+        publisher: newBook.publisher || "",
+        pages: newBook.pages || 1,
+        language: newBook.language || "",
+        price: newBook.price || 0,
+        grade: newBook.grade || 1,
       };
     } else {
       // Reset form for create mode
@@ -202,8 +306,12 @@ watch(
         title: "",
         author: "",
         isbn: "",
-        category: "",
-        description: "",
+        publishedYear: new Date().getFullYear(),
+        publisher: "",
+        pages: 1,
+        language: "",
+        price: 0,
+        grade: 1,
       };
     }
   },
@@ -225,8 +333,32 @@ const handleSubmit = async () => {
     alert("Please enter an ISBN");
     return;
   }
-  if (!formData.value.category.trim()) {
-    alert("Please select a category");
+  if (!formData.value.publishedYear || formData.value.publishedYear < 1000) {
+    alert("Please enter a valid published year");
+    return;
+  }
+  if (!formData.value.publisher.trim()) {
+    alert("Please enter a publisher");
+    return;
+  }
+  if (!formData.value.pages || formData.value.pages < 1) {
+    alert("Please enter a valid number of pages");
+    return;
+  }
+  if (!formData.value.language) {
+    alert("Please select a language");
+    return;
+  }
+  if (formData.value.price < 0) {
+    alert("Please enter a valid price");
+    return;
+  }
+  if (
+    !formData.value.grade ||
+    formData.value.grade < 1 ||
+    formData.value.grade > 12
+  ) {
+    alert("Please select a valid grade level");
     return;
   }
 
@@ -237,8 +369,12 @@ const handleSubmit = async () => {
       title: formData.value.title.trim(),
       author: formData.value.author.trim(),
       isbn: formData.value.isbn.trim(),
-      category: formData.value.category.trim(),
-      description: formData.value.description?.trim() || "",
+      publishedYear: formData.value.publishedYear,
+      publisher: formData.value.publisher.trim(),
+      pages: formData.value.pages,
+      language: formData.value.language,
+      price: formData.value.price,
+      grade: formData.value.grade,
     };
 
     console.log(editMode.value ? "Updating book:" : "Creating book:", bookData);
@@ -259,8 +395,12 @@ const handleSubmit = async () => {
       title: "",
       author: "",
       isbn: "",
-      category: "",
-      description: "",
+      publishedYear: new Date().getFullYear(),
+      publisher: "",
+      pages: 1,
+      language: "",
+      price: 0,
+      grade: 1,
     };
 
     // Close modal

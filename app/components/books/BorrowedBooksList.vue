@@ -1,42 +1,26 @@
 <template>
-  <div class="modern-table-container">
-    <div class="table-responsive">
-      <table class="table modern-table mb-0">
-        <thead class="modern-thead">
+  <div
+    class="main-content card bg-base-100 shadow-sm mx-5"
+    style="margin-top: 15px"
+  >
+    <div class="overflow-x-auto rounded-box">
+      <table class="table table-zebra">
+        <thead style="background-color: #458c7f; color: white">
           <tr>
-            <th class="fw-semibold"><i class="bi bi-book me-2"></i>Book</th>
-            <th class="fw-semibold">
-              <i class="bi bi-person me-2"></i>Student
-            </th>
-            <th class="fw-semibold">
-              <i class="bi bi-calendar-check me-2"></i>Borrowed
-            </th>
-            <th class="fw-semibold">
-              <i class="bi bi-calendar-x me-2"></i>Due Date
-            </th>
-            <th class="fw-semibold text-center">
-              <i class="bi bi-gear me-2"></i>Actions
-            </th>
+            <th class="font-medium">Book</th>
+            <th class="font-medium">Student</th>
+            <th class="font-medium">Borrow date</th>
+            <th class="font-medium">Expected return date</th>
+            <th class="font-medium text-right"></th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="book in paginatedBooks" :key="book.id" class="modern-row">
-            <td class="book-title">
-              <div class="fw-medium text-dark">{{ book.bookTitle }}</div>
-            </td>
-            <td class="student-name">
-              <div class="d-flex align-items-center">
-                <div class="student-avatar me-2">
-                  {{ book.studentName.charAt(0).toUpperCase() }}
-                </div>
-                <span class="fw-medium">{{ book.studentName }}</span>
-              </div>
-            </td>
-            <td class="borrow-date">
-              <span class="date-badge">{{ formatDate(book.borrowDate) }}</span>
-            </td>
-            <td class="due-date">
-              <span :class="getDueDateClass(book.dueDate)" class="date-badge">
+          <tr v-for="book in paginatedBooks" :key="book.id" class="hover">
+            <td>{{ book.bookTitle }}</td>
+            <td>{{ book.studentName }}</td>
+            <td>{{ formatDate(book.borrowDate) }}</td>
+            <td>
+              <span :class="isOverdue(book.dueDate) ? 'text-error' : ''">
                 {{ formatDate(book.dueDate) }}
                 <i
                   v-if="isOverdue(book.dueDate)"
@@ -48,22 +32,83 @@
                 ></i>
               </span>
             </td>
-            <td class="text-center actions-cell">
-              <div class="btn-group" role="group">
-                <button
-                  @click="showDetails(book)"
-                  class="btn btn-sm btn-outline-primary action-btn"
-                  title="View Details"
+
+            <td>
+              <div class="dropdown dropdown-end">
+                <div
+                  tabindex="0"
+                  role="button"
+                  class="btn btn-sm btn-ghost btn-square"
                 >
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button
-                  @click="$emit('return-book', book)"
-                  class="btn btn-sm btn-outline-success action-btn"
-                  title="Return Book"
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="w-4 h-4"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
+                    />
+                  </svg>
+                </div>
+                <ul
+                  tabindex="0"
+                  class="dropdown-content menu bg-base-100 rounded-box z-50 w-48 p-2 shadow-lg border border-base-200"
                 >
-                  <i class="bi bi-arrow-return-left"></i>
-                </button>
+                  <li>
+                    <a
+                      @click="showDetails(book)"
+                      class="flex items-center gap-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-4 h-4"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                      View Details
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      @click="$emit('return-book', book)"
+                      class="flex items-center gap-2"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-4 h-4"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"
+                        />
+                      </svg>
+                      Return Book
+                    </a>
+                  </li>
+                </ul>
               </div>
             </td>
           </tr>
@@ -71,211 +116,227 @@
       </table>
     </div>
 
-    <!-- Empty State -->
-    <div v-if="books.length === 0" class="empty-state">
-      <div class="text-center py-5">
-        <i class="bi bi-book display-1 text-muted opacity-25"></i>
-        <h5 class="text-muted mt-3">No borrowed books</h5>
-        <p class="text-muted">
-          There are currently no active loans in the system.
-        </p>
-      </div>
-    </div>
-
     <!-- Pagination Controls -->
-    <div v-if="books.length > itemsPerPage" class="pagination-container">
-      <nav aria-label="Table pagination">
-        <div class="d-flex justify-content-between align-items-center">
-          <!-- Pagination Info -->
-          <div class="pagination-info">
-            <small class="text-muted">
-              Showing {{ startIndex + 1 }} to {{ endIndex }} of
-              {{ books.length }} entries
-            </small>
-          </div>
+    <div
+      class="flex flex-col sm:flex-row justify-between items-center p-4 border-t border-base-200"
+    >
+      <div class="text-sm text-base-content/60 mb-2 sm:mb-0">
+        Showing {{ startIndex + 1 }} to {{ Math.min(endIndex, totalBooks) }} of
+        {{ totalBooks }} books
+        <div
+          class="tooltip tooltip-top"
+          data-tip="Use pagination controls to navigate through all borrowed books"
+        >
+          <span class="text-xs">📚 Navigate all records</span>
+        </div>
+      </div>
 
-          <!-- Pagination Controls -->
-          <div class="pagination-controls">
+      <div class="flex items-center gap-2">
+        <!-- Items per page selector -->
+        <div class="flex items-center gap-2 mr-4">
+          <span class="text-sm text-base-content/60">Show:</span>
+          <div
+            class="tooltip tooltip-top"
+            data-tip="Choose how many books to display per page"
+          >
+            <select
+              v-model="itemsPerPage"
+              @change="currentPage = 1"
+              class="select select-sm select-bordered"
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Pagination buttons -->
+        <div class="join">
+          <div class="tooltip tooltip-top" data-tip="Go to previous page">
             <button
               @click="goToPage(currentPage - 1)"
               :disabled="currentPage === 1"
-              class="btn btn-sm btn-outline-secondary me-2"
-              title="Previous Page"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-disabled': currentPage === 1 }"
             >
-              <i class="bi bi-chevron-left"></i>
-            </button>
-
-            <span class="pagination-numbers">
-              <button
-                v-for="page in visiblePages"
-                :key="page"
-                @click="goToPage(page)"
-                :class="{
-                  'btn-primary': page === currentPage,
-                  'btn-outline-secondary': page !== currentPage,
-                }"
-                class="btn btn-sm me-1"
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
               >
-                {{ page }}
-              </button>
-            </span>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+          </div>
 
+          <button
+            v-for="page in visiblePages"
+            :key="page"
+            @click="goToPage(page)"
+            class="join-item btn btn-sm"
+            :class="{ 'btn-primary': page === currentPage }"
+            :title="`Go to page ${page}`"
+          >
+            {{ page }}
+          </button>
+
+          <div class="tooltip tooltip-top" data-tip="Go to next page">
             <button
               @click="goToPage(currentPage + 1)"
               :disabled="currentPage === totalPages"
-              class="btn btn-sm btn-outline-secondary ms-2"
-              title="Next Page"
+              class="join-item btn btn-sm"
+              :class="{ 'btn-disabled': currentPage === totalPages }"
             >
-              <i class="bi bi-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-      </nav>
-    </div>
-
-    <!-- Details Modal -->
-    <div
-      class="modal fade"
-      id="bookDetailsModal"
-      tabindex="-1"
-      aria-labelledby="bookDetailsModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="bookDetailsModalLabel">
-              Borrow Details
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-
-          <div class="modal-body" v-if="selectedBook">
-            <div class="row g-4">
-              <div class="col-md-6">
-                <div class="card bg-light">
-                  <div class="card-body">
-                    <h6 class="card-title">Book Information</h6>
-                    <div class="row mb-2">
-                      <div class="col-3 text-muted small">Title:</div>
-                      <div class="col-9 fw-medium">
-                        {{ selectedBook.bookTitle }}
-                      </div>
-                    </div>
-                    <div class="row mb-2">
-                      <div class="col-3 text-muted small">Student:</div>
-                      <div class="col-9 fw-medium">
-                        {{ selectedBook.studentName }}
-                      </div>
-                    </div>
-                    <div class="row mb-2">
-                      <div class="col-3 text-muted small">Borrow Date:</div>
-                      <div class="col-9">
-                        {{ formatDate(selectedBook.borrowDate) }}
-                      </div>
-                    </div>
-                    <div class="row mb-2">
-                      <div class="col-3 text-muted small">Due Date:</div>
-                      <div
-                        class="col-9"
-                        :class="
-                          isOverdue(selectedBook.dueDate) ? 'text-danger' : ''
-                        "
-                      >
-                        {{ formatDate(selectedBook.dueDate) }}
-                      </div>
-                    </div>
-                    <div v-if="selectedBook.returnDate" class="row mb-2">
-                      <div class="col-3 text-muted small">Return Date:</div>
-                      <div class="col-9 text-success">
-                        {{ formatDate(selectedBook.returnDate) }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-6">
-                <h6 class="fw-medium mb-3">Condition Images</h6>
-                <div class="row g-3">
-                  <div class="col-6">
-                    <p class="text-muted small mb-2">Before Condition Images</p>
-                    <div class="row g-2">
-                      <div
-                        v-for="(
-                          image, index
-                        ) in selectedBook.beforeConditionImages"
-                        :key="`before-${index}`"
-                        class="col-6"
-                      >
-                        <img
-                          :src="image"
-                          :alt="`Before condition ${index + 1}`"
-                          class="img-fluid rounded"
-                          style="aspect-ratio: 4/3; object-fit: cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div
-                    v-if="selectedBook.afterConditionImages?.length > 0"
-                    class="col-6"
-                  >
-                    <p class="text-muted small mb-2">After Condition Images</p>
-                    <div class="row g-2">
-                      <div
-                        v-for="(
-                          image, index
-                        ) in selectedBook.afterConditionImages"
-                        :key="`after-${index}`"
-                        class="col-6"
-                      >
-                        <img
-                          :src="image"
-                          :alt="`After condition ${index + 1}`"
-                          class="img-fluid rounded"
-                          style="aspect-ratio: 4/3; object-fit: cover"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div
-              v-if="selectedBook.conditionNotes"
-              class="mt-4 pt-3 border-top"
-            >
-              <h6 class="fw-medium mb-2">Condition Notes</h6>
-              <p class="text-muted small">
-                {{ selectedBook.conditionNotes }}
-              </p>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-4 h-4"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                />
+              </svg>
             </button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Details Modal -->
+    <dialog id="book_details_modal" class="modal">
+      <div class="modal-box max-w-3xl bg-base-100">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-lg font-semibold">Borrow Details</h3>
+          <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost">✕</button>
+          </form>
+        </div>
+
+        <div v-if="selectedBook" class="space-y-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="card bg-base-200">
+              <div class="card-body">
+                <h4 class="card-title text-base">Book Information</h4>
+                <div class="space-y-3">
+                  <div class="grid grid-cols-[100px_1fr] gap-2 items-baseline">
+                    <span class="text-sm text-base-content/60">Title</span>
+                    <span class="font-medium">{{
+                      selectedBook.bookTitle
+                    }}</span>
+                  </div>
+                  <div class="grid grid-cols-[100px_1fr] gap-2 items-baseline">
+                    <span class="text-sm text-base-content/60">Student</span>
+                    <span class="font-medium">{{
+                      selectedBook.studentName
+                    }}</span>
+                  </div>
+                  <div class="grid grid-cols-[100px_1fr] gap-2 items-baseline">
+                    <span class="text-sm text-base-content/60"
+                      >Borrow Date</span
+                    >
+                    <span>{{ formatDate(selectedBook.borrowDate) }}</span>
+                  </div>
+                  <div class="grid grid-cols-[100px_1fr] gap-2 items-baseline">
+                    <span class="text-sm text-base-content/60">Due Date</span>
+                    <span
+                      :class="
+                        isOverdue(selectedBook.dueDate) ? 'text-error' : ''
+                      "
+                    >
+                      {{ formatDate(selectedBook.dueDate) }}
+                    </span>
+                  </div>
+                  <div
+                    v-if="selectedBook.returnDate"
+                    class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
+                  >
+                    <span class="text-sm text-base-content/60"
+                      >Return Date</span
+                    >
+                    <span class="text-success">{{
+                      formatDate(selectedBook.returnDate)
+                    }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-medium mb-2">Condition Images</h4>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <p class="text-sm text-base-content/60 mb-2">
+                    Before Condition Images
+                  </p>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <img
+                      v-for="(
+                        image, index
+                      ) in selectedBook.beforeConditionImages"
+                      :key="`before-${index}`"
+                      :src="image"
+                      :alt="`Before condition ${index + 1}`"
+                      class="rounded-lg w-full object-cover aspect-4/3"
+                    />
+                  </div>
+                </div>
+                <div v-if="selectedBook.afterConditionImages?.length > 0">
+                  <p class="text-sm text-base-content/60 mb-2">
+                    After Condition Images
+                  </p>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <img
+                      v-for="(
+                        image, index
+                      ) in selectedBook.afterConditionImages"
+                      :key="`after-${index}`"
+                      :src="image"
+                      :alt="`After condition ${index + 1}`"
+                      class="rounded-lg w-full object-cover aspect-4/3"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="selectedBook.conditionNotes" class="pt-4 border-t">
+            <h4 class="font-medium mb-2">Condition Notes</h4>
+            <p class="text-sm text-base-content/75">
+              {{ selectedBook.conditionNotes }}
+            </p>
+          </div>
+        </div>
+
+        <div class="modal-action">
+          <form method="dialog">
+            <button class="btn">Close</button>
+          </form>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+      </form>
+    </dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import type { BorrowedBook } from "~/types/books";
 
 const props = defineProps<{
@@ -288,22 +349,28 @@ defineEmits<{
 
 // State
 const selectedBook = ref<BorrowedBook | null>(null);
+
+// Pagination state
 const currentPage = ref(1);
 const itemsPerPage = ref(5);
 
-// Pagination Computed Properties
-const totalPages = computed(() => {
-  return Math.ceil(props.books.length / itemsPerPage.value);
-});
+// Reset to first page when books data changes (e.g., when searching)
+watch(
+  () => props.books,
+  () => {
+    currentPage.value = 1;
+  },
+  { deep: true }
+);
 
-const startIndex = computed(() => {
-  return (currentPage.value - 1) * itemsPerPage.value;
-});
+// Computed properties for pagination
+const totalBooks = computed(() => props.books.length);
+const totalPages = computed(() =>
+  Math.ceil(totalBooks.value / itemsPerPage.value)
+);
 
-const endIndex = computed(() => {
-  const end = startIndex.value + itemsPerPage.value;
-  return Math.min(end, props.books.length);
-});
+const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage.value);
+const endIndex = computed(() => startIndex.value + itemsPerPage.value);
 
 const paginatedBooks = computed(() => {
   return props.books.slice(startIndex.value, endIndex.value);
@@ -311,23 +378,27 @@ const paginatedBooks = computed(() => {
 
 const visiblePages = computed(() => {
   const pages = [];
-  const maxVisible = 5;
-  let start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2));
-  let end = Math.min(totalPages.value, start + maxVisible - 1);
+  const maxVisiblePages = 5;
 
-  // Adjust start if we're near the end
-  if (end - start < maxVisible - 1) {
-    start = Math.max(1, end - maxVisible + 1);
+  let startPage = Math.max(
+    1,
+    currentPage.value - Math.floor(maxVisiblePages / 2)
+  );
+  let endPage = Math.min(totalPages.value, startPage + maxVisiblePages - 1);
+
+  // Adjust start page if we're near the end
+  if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
   }
 
-  for (let i = start; i <= end; i++) {
+  for (let i = startPage; i <= endPage; i++) {
     pages.push(i);
   }
 
   return pages;
 });
 
-// Pagination Methods
+// Pagination methods
 const goToPage = (page: number) => {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;

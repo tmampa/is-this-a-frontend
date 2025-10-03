@@ -48,44 +48,23 @@
               </div>
             </div>
 
-            <div class="row g-4">
-              <!-- Return Date -->
-              <div class="col-12">
-                <label for="returnDate" class="form-label"
-                  >Return Date <span class="text-danger">*</span></label
-                >
-                <input
-                  type="date"
-                  id="returnDate"
-                  v-model="formData.returnDate"
-                  class="form-control"
-                  required
-                />
-              </div>
+        <!-- Return Conditions -->
+        <MultiSelectWithCreate
+          label="Return Condition Assessment"
+          :options="defaultReturnConditions"
+          v-model="formData.returnConditions"
+          :required="true"
+          tooltip="Select all conditions that apply to the book upon return - this helps track any changes from initial lending"
+          helper-text="Select existing conditions or add custom ones to accurately describe the book's current state"
+        />
 
-              <!-- Book Condition Images -->
-              <div class="col-12">
-                <ImageUploader
-                  label="Current Book Condition Images"
-                  :multiple="true"
-                  :max-images="5"
-                  @update:images="handleImagesUpdate"
-                />
-              </div>
-
-              <!-- Condition Notes -->
-              <div class="col-12">
-                <label for="conditionNotes" class="form-label"
-                  >Condition Notes</label
-                >
-                <textarea
-                  id="conditionNotes"
-                  v-model="formData.conditionNotes"
-                  class="form-control"
-                  rows="3"
-                  placeholder="Enter any notes about the book's condition..."
-                ></textarea>
-              </div>
+        <!-- Book Condition Images -->
+        <ImageUploader
+          label="Current Book Condition Images"
+          :multiple="true"
+          :max-images="5"
+          @update:images="handleImagesUpdate"
+        />
 
               <!-- Compare Images -->
               <div class="col-12">
@@ -164,6 +143,7 @@
 import { ref } from "vue";
 import type { BorrowedBook, ReturnBookData } from "~/types/books";
 import ImageUploader from "~/components/layout/ImageUploader.vue";
+import MultiSelectWithCreate from "~/components/layout/MultiSelectWithCreate.vue";
 
 const props = defineProps<{
   show: boolean;
@@ -175,9 +155,27 @@ const emit = defineEmits<{
   (e: "submit", data: ReturnBookData): void;
 }>();
 
+// Default return condition options
+const defaultReturnConditions = [
+  "📗 Same as borrowed - No changes",
+  "📘 Excellent - Minimal wear",
+  "📙 Good - Light wear, no damage",
+  "📚 Fair - Noticeable wear",
+  "📜 Poor - Significant wear",
+  "📝 Damaged - New damage present",
+  "📄 Pages missing",
+  "📖 Cover damaged",
+  "📝 Writing/markings added",
+  "💧 Water damage",
+  "🍂 Stains present",
+  "🔍 Binding loose/broken",
+  "🔖 Lost",
+  "📕 Torn pages",
+];
+
 // Form state
 const formData = ref({
-  returnDate: new Date().toISOString().split("T")[0],
+  returnConditions: [] as string[],
   afterConditionImages: [] as File[],
   conditionNotes: "",
 });
@@ -208,18 +206,23 @@ const handleSubmit = () => {
     return;
   }
 
+  if (formData.value.returnConditions.length === 0) {
+    alert("Please select at least one return condition");
+    return;
+  }
+
   emit("submit", {
     borrowedBookId: props.book.id,
-    returnDate: formData.value.returnDate,
+    returnConditions: formData.value.returnConditions,
     afterConditionImages: formData.value.afterConditionImages,
     ...(formData.value.conditionNotes
       ? { conditionNotes: formData.value.conditionNotes }
       : {}),
-  } as ReturnBookData);
+  } as unknown as ReturnBookData);
 
   // Reset form
   formData.value = {
-    returnDate: new Date().toISOString().split("T")[0],
+    returnConditions: [],
     afterConditionImages: [],
     conditionNotes: "",
   };

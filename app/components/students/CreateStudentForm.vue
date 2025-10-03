@@ -1,75 +1,117 @@
 <template>
-  <div
-    class="modal fade"
-    :class="{ show: show }"
-    :style="{ display: show ? 'block' : 'none' }"
-    tabindex="-1"
-    aria-labelledby="createStudentModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="createStudentModalLabel">
+  <dialog :open="show" class="modal">
+    <div class="modal-box max-w-2xl">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="font-bold text-lg">
             {{ editMode ? "Edit Student" : "Create a Student" }}
-          </h5>
-          <button
-            type="button"
-            class="btn-close"
-            @click="closeModal"
-            aria-label="Close"
-          ></button>
+          </h3>
+          <p class="text-sm text-base-content/60 mt-1">
+            {{
+              editMode
+                ? "👤 Update student information"
+                : "🎓 Register a new student in the library system"
+            }}
+          </p>
+        </div>
+        <div
+          class="tooltip tooltip-left"
+          data-tip="Complete all required fields and add at least one parent/guardian"
+        >
+          <div
+            class="w-6 h-6 bg-info/20 rounded-full flex items-center justify-center"
+          >
+            <span class="text-xs text-info">?</span>
+          </div>
+        </div>
+      </div>
+
+      <form @submit.prevent="handleSubmit" class="space-y-6">
+        <!-- Student Selection -->
+        <div class="form-control">
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Enter all first names (can include middle names)"
+          >
+            <label class="label">
+              <span class="label-text"
+                >First names: <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">👤 Include all first names</span>
+            </label>
+          </div>
+          <input
+            type="text"
+            v-model="formData.firstNames"
+            class="input w-full"
+            placeholder="e.g., John Michael"
+            required
+          />
         </div>
 
-        <form @submit.prevent="handleSubmit">
-          <div class="modal-body">
-            <div class="row g-3">
-              <!-- Student Information -->
-              <div class="col-md-6">
-                <label for="firstNames" class="form-label">First names:</label>
-                <input
-                  type="text"
-                  id="firstNames"
-                  v-model="formData.firstNames"
-                  class="form-control"
-                  required
-                />
-              </div>
+        <div class="form-control">
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Enter the student's family/last name"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Last name: <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">👤 Family name</span>
+            </label>
+          </div>
+          <input
+            type="text"
+            v-model="formData.lastName"
+            class="input w-full"
+            placeholder="e.g., Smith"
+            required
+          />
+        </div>
 
-              <div class="col-md-6">
-                <label for="lastName" class="form-label">Last name:</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  v-model="formData.lastName"
-                  class="form-control"
-                  required
-                />
-              </div>
+        <div class="form-control">
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Student's email address for notifications and communication"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Email: <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">📧 For notifications</span>
+            </label>
+          </div>
+          <input
+            type="email"
+            v-model="formData.email"
+            class="input w-full"
+            placeholder="e.g., john.smith@email.com"
+            required
+          />
+        </div>
 
-              <div class="col-12">
-                <label for="email" class="form-label">Email:</label>
-                <input
-                  type="email"
-                  id="email"
-                  v-model="formData.email"
-                  class="form-control"
-                  required
-                />
-              </div>
+        <!-- Address -->
+        <div class="form-control">
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Complete residential address for records and emergency contact"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Address: <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">🏠 Full address</span>
+            </label>
+          </div>
 
-              <!-- Address -->
-              <div class="col-12">
-                <label for="address" class="form-label">Address:</label>
-                <textarea
-                  id="address"
-                  class="form-control"
-                  rows="3"
-                  placeholder="Address"
-                  v-model="formData.address"
-                  required
-                ></textarea>
-              </div>
+          <textarea
+            class="textarea w-full"
+            placeholder="Address"
+            v-model="formData.address"
+            required
+          ></textarea>
+        </div>
 
               <!-- Parents/Guardians -->
               <div class="col-12">

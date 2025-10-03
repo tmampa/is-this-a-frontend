@@ -7,13 +7,27 @@ import type {
   ReturnBookData,
 } from "~/types/books";
 
-const API_BASE = "http://localhost:8080/api/admin";
+const API_BASE = "http://52.188.184.166:8080/api/admin";
+
+// Helper function to get auth headers
+const getAuthHeaders = (): Record<string, string> => {
+  const token = process.client ? localStorage.getItem("auth-token") : null;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  return headers;
+};
 
 export const LibraryAPI = {
   // Books API
   async getBooks(): Promise<Book[]> {
     try {
-      return await $fetch<Book[]>(`${API_BASE}/books`);
+      return await $fetch<Book[]>(`${API_BASE}/books`, {
+        headers: getAuthHeaders(),
+      });
     } catch (error) {
       console.error("Failed to fetch books:", error);
       throw error;
@@ -34,8 +48,6 @@ export const LibraryAPI = {
     title: string;
     author: string;
     isbn: string;
-    category: string;
-    description?: string;
   }): Promise<Book> {
     try {
       const response = await $fetch<Book>(`${API_BASE}/books`, {
@@ -59,12 +71,10 @@ export const LibraryAPI = {
       title: string;
       author: string;
       isbn: string;
-      category: string;
-      description?: string;
     }
   ): Promise<Book> {
     try {
-      const response = await $fetch<Book>(`${API_BASE}/books/${bookId}`, {
+      const response = await $fetch<Book>(`${API_BASE}/book/${bookId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +121,7 @@ export const LibraryAPI = {
     parents: { name: string; email: string; relationship: string }[];
   }): Promise<Student> {
     try {
-      const response = await $fetch<Student>(`${API_BASE}/students`, {
+      const response = await $fetch<Student>(`${API_BASE}/create-student`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,7 +148,7 @@ export const LibraryAPI = {
   ): Promise<Student> {
     try {
       const response = await $fetch<Student>(
-        `${API_BASE}/students/${studentId}`,
+        `${API_BASE}/student/${studentId}`,
         {
           method: "PUT",
           headers: {
@@ -157,7 +167,7 @@ export const LibraryAPI = {
 
   async deleteStudent(studentId: string): Promise<void> {
     try {
-      await $fetch(`${API_BASE}/students/${studentId}`, {
+      await $fetch(`${API_BASE}/student/delete/${studentId}`, {
         method: "DELETE",
       });
       console.log("Student deleted:", studentId);
@@ -188,7 +198,7 @@ export const LibraryAPI = {
         studentNumber: data.studentNumber,
         emails: data.emails,
         address: data.address,
-        bookCondition: data.bookCondition,
+        bookConditions: data.bookConditions,
       };
 
       const response = await $fetch<{ id: number }>(
@@ -235,12 +245,9 @@ export const LibraryAPI = {
       // This endpoint may need to be created on the backend
       await $fetch(`${API_BASE}/books/return/${data.borrowedBookId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
-          returnDate: data.returnDate,
-          conditionNotes: data.conditionNotes,
+          returnConditions: data.returnConditions,
           afterConditionImages: data.afterConditionImages.map(
             (file) => file.name
           ),

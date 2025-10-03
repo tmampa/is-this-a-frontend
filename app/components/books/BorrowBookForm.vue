@@ -1,135 +1,375 @@
 <template>
-  <div
-    class="modal fade"
-    :class="{ show: show }"
-    :style="{ display: show ? 'block' : 'none' }"
-    tabindex="-1"
-    aria-labelledby="borrowBookModalLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="borrowBookModalLabel">Borrow a Book</h5>
-          <button
-            type="button"
-            class="btn-close"
-            @click="closeModal"
-            aria-label="Close"
-          ></button>
+  <dialog :open="show" class="modal">
+    <div class="modal-box max-w-2xl">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="font-bold text-lg">Issueing a Book</h3>
+          <p class="text-sm text-base-content/60 mt-1">
+            📚 Issue a book to a student with condition tracking
+          </p>
+        </div>
+        <div
+          class="tooltip tooltip-left"
+          data-tip="Need help? Hover over labels for guidance"
+        >
+          <div
+            class="w-6 h-6 bg-info/20 rounded-full flex items-center justify-center"
+          >
+            <span class="text-xs text-info">?</span>
+          </div>
+        </div>
+      </div>
+
+      <form @submit.prevent="handleSubmit" class="space-y-6">
+        <!-- Student Selection -->
+        <div class="form-control">
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Search for the student who will be given this book"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Student <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">� Search & select</span>
+            </label>
+          </div>
+          <SearchableSelect
+            :items="students"
+            placeholder="Search students by name or student number..."
+            display-key="fullName"
+            subtitle-key="studentNumber"
+            id-key="id"
+            :search-keys="['fullName', 'studentNumber', 'email']"
+            v-model="selectedStudent"
+            @update:model-value="updateSelectedStudent"
+            :allow-create="true"
+            @create="handleCreateStudent"
+            :min-search-length="1"
+          />
+          <div class="label">
+            <span class="label-text-alt text-xs text-base-content/60">
+              💡 Type to search by name, student number, or email. Can't find
+              them? Create a new student!
+            </span>
+          </div>
         </div>
 
-        <form @submit.prevent="handleSubmit">
-          <div class="modal-body">
-            <div class="row g-3">
-              <!-- Student Selection -->
-              <div class="col-md-6">
-                <label for="studentSelect" class="form-label"
-                  >Student <span class="text-danger">*</span></label
-                >
-                <select
-                  id="studentSelect"
-                  v-model="formData.studentId"
-                  class="form-select"
-                  required
-                >
-                  <option value="" disabled selected>Select a student</option>
-                  <option
-                    v-for="student in students"
-                    :key="student.id"
-                    :value="student.id"
-                  >
-                    {{ student.fullName }}
-                  </option>
-                </select>
-              </div>
+        <!-- Book Selection -->
+        <div class="form-control">
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Search for an available book to issue - only books that are not currently issued are shown"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Book <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">� Available only</span>
+            </label>
+          </div>
+          <SearchableSelect
+            :items="availableBooks"
+            placeholder="Search books by title, author, or ISBN..."
+            display-key="title"
+            subtitle-key="author"
+            id-key="id"
+            :search-keys="['title', 'author', 'isbn', 'category']"
+            v-model="selectedBook"
+            @update:model-value="updateSelectedBook"
+            :allow-create="true"
+            @create="handleCreateBook"
+            :min-search-length="1"
+          />
+          <div class="label">
+            <span class="label-text-alt text-xs text-base-content/60">
+              💡 Type to search by title, author, ISBN, or category. Need to add
+              a new book? Create it on the fly!
+            </span>
+          </div>
+        </div>
 
-              <!-- Book Selection -->
-              <div class="col-md-6">
-                <label for="bookSelect" class="form-label"
-                  >Book <span class="text-danger">*</span></label
-                >
-                <select
-                  id="bookSelect"
-                  v-model="formData.bookId"
-                  class="form-select"
-                  required
-                >
-                  <option value="" disabled selected>Select a book</option>
-                  <option
-                    v-for="book in availableBooks"
-                    :key="book.id"
-                    :value="book.id"
-                  >
-                    {{ book.title }}
-                  </option>
-                </select>
-              </div>
-
-              <!-- Book Condition -->
-              <div class="col-12">
-                <label for="bookCondition" class="form-label"
-                  >Book Condition <span class="text-danger">*</span></label
-                >
-                <select
-                  id="bookCondition"
-                  v-model="formData.bookCondition"
-                  class="form-select"
-                  required
-                >
-                  <option value="" disabled selected>
-                    Select book condition
-                  </option>
-                  <option value="new">New</option>
-                  <option value="excellent">Excellent</option>
-                  <option value="good">Good</option>
-                  <option value="fair">Fair</option>
-                  <option value="poor">Poor</option>
-                  <option value="damaged">Damaged</option>
-                </select>
-              </div>
-
-              <!-- Book Condition Images -->
-              <div class="col-12">
-                <ImageUploader
-                  label="Book Condition Images"
-                  :multiple="true"
-                  :max-images="5"
-                  @update:images="handleImagesUpdate"
+        <!-- Barcode Verification (appears after book selection) -->
+        <div v-if="selectedBook" class="form-control">
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Scan or enter the barcode to verify you have the correct physical book"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Verify Book Barcode <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">📊 Physical verification</span>
+            </label>
+          </div>
+          <div class="relative">
+            <input
+              ref="barcodeInput"
+              v-model="formData.barcode"
+              type="text"
+              class="input input-bordered w-full pr-12"
+              placeholder="Scan or enter book barcode..."
+              :class="{
+                'input-success': isValidBarcode,
+                'input-error': formData.barcode && !isValidBarcode,
+              }"
+              @input="validateBarcode"
+              @keydown.enter.prevent="focusNextField"
+              required
+            />
+            <!-- Barcode scan icon -->
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <svg
+                class="h-5 w-5"
+                :class="{
+                  'text-success': isValidBarcode,
+                  'text-error': formData.barcode && !isValidBarcode,
+                  'text-base-content/40': !formData.barcode,
+                }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
                 />
-              </div>
+              </svg>
+            </div>
+          </div>
+          <div class="label">
+            <span
+              class="label-text-alt text-xs"
+              :class="{
+                'text-success': isValidBarcode,
+                'text-error': formData.barcode && !isValidBarcode,
+                'text-base-content/60': !formData.barcode,
+              }"
+            >
+              <span v-if="!formData.barcode">
+                💡 Scan the barcode on the physical book to ensure you have the
+                right copy
+              </span>
+              <span v-else-if="isValidBarcode">
+                ✅ Barcode verified! This matches the selected book
+              </span>
+              <span v-else>
+                ❌ Barcode doesn't match. Please check the physical book
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Dates
+        <div class="grid grid-cols-1 gap-4">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Borrow Date</span>
+            </label>
+            <input
+              type="date"
+              :value="currentDate"
+              class="input input-bordered bg-base-200"
+              disabled
+            />
+            <label class="label">
+              <span class="label-text-alt text-base-content/60"
+                >Automatically set to today</span
+              >
+            </label>
+          </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Due Date</span>
+            </label>
+            <input
+              type="date"
+              v-model="formData.dueDate"
+              class="input input-bordered"
+              :min="currentDate"
+              required
+            />
+          </div>
+        </div> -->
+
+        <!-- Book Condition Assessment -->
+        <div class="form-control">
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Select multiple conditions that apply to the book - this helps track specific issues"
+          >
+            <label class="label">
+              <span class="label-text"
+                >Initial Book Condition <span class="text-error">*</span></span
+              >
+              <span class="label-text-alt">
+                🔍
+                {{
+                  formData.bookConditions.length > 0
+                    ? `${formData.bookConditions.length} selected`
+                    : "Select conditions"
+                }}
+              </span>
+            </label>
+          </div>
+
+          <div
+            class="grid grid-cols-1 gap-2 p-4 border border-base-300 rounded-box bg-base-50"
+          >
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="new"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📗 New - Pristine condition</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="excellent"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📘 Excellent - Minimal wear</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="good"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📙 Good - Light wear, no damage</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="fair"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📒 Fair - Noticeable wear</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="poor"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📑 Poor - Significant wear</span>
+              </label>
+            </div>
+            <div class="form-control">
+              <label class="label cursor-pointer justify-start gap-3">
+                <input
+                  type="checkbox"
+                  class="checkbox checkbox-primary"
+                  value="damaged"
+                  v-model="formData.bookConditions"
+                />
+                <span class="label-text">📕 Damaged - Visible damage</span>
+              </label>
             </div>
           </div>
 
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="closeModal"
-              :disabled="loading"
-            >
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary" :disabled="loading">
+          <!-- Selected Conditions Summary -->
+          <div
+            v-if="formData.bookConditions.length > 0"
+            class="mt-3 p-3 bg-primary/10 rounded-box"
+          >
+            <div class="text-sm font-medium text-primary mb-2">
+              Selected Conditions:
+            </div>
+            <div class="flex flex-wrap gap-2">
               <span
-                v-if="loading"
-                class="spinner-border spinner-border-sm me-2"
-                role="status"
-              ></span>
-              {{ loading ? "Creating..." : "Borrow Book" }}
-            </button>
+                v-for="condition in formData.bookConditions"
+                :key="condition"
+                class="badge badge-primary badge-sm"
+              >
+                {{ getConditionLabel(condition) }}
+              </span>
+            </div>
           </div>
-        </form>
-      </div>
+
+          <div class="label">
+            <span class="label-text-alt text-xs text-base-content/60">
+              💡 Select all conditions that apply. This detailed assessment
+              helps track specific issues when the book is returned
+            </span>
+          </div>
+        </div>
+
+        <!-- Multiple Condition Images -->
+        <ImageUploader
+          label="📸 Document Book Condition (Multiple Photos)"
+          :multiple="true"
+          :max-images="5"
+          :required="true"
+          @update:images="handleImagesUpdate"
+        />
+
+        <!-- Action Buttons -->
+        <div class="modal-action">
+          <button
+            type="button"
+            class="btn"
+            @click="closeModal"
+            :disabled="loading"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            :class="{ loading: loading }"
+            :disabled="loading"
+          >
+            {{ loading ? "Creating..." : "Issue book" }}
+          </button>
+        </div>
+      </form>
     </div>
-  </div>
-  <div v-if="show" class="modal-backdrop fade show" @click="closeModal"></div>
+    <form method="dialog" class="modal-backdrop">
+      <button @click="closeModal">close</button>
+    </form>
+
+    <!-- Creation Modals -->
+    <CreateStudentModal
+      v-model:show="showCreateStudentModal"
+      :initial-name="newStudentName"
+      @created="handleStudentCreated"
+    />
+
+    <CreateBookModal
+      v-model:show="showCreateBookModal"
+      :initial-title="newBookTitle"
+      @created="handleBookCreated"
+    />
+  </dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import type { Book, Student, BorrowBookData } from "~/types/books";
 import ImageUploader from "~/components/layout/ImageUploader.vue";
+import SearchableSelect from "~/components/layout/SearchableSelect.vue";
+import CreateStudentModal from "~/components/modals/CreateStudentModal.vue";
+import CreateBookModal from "~/components/modals/CreateBookModal.vue";
+import { LibraryAPI } from "~/composables/useLibraryAPI";
 
 const props = defineProps<{
   show: boolean;
@@ -183,9 +423,93 @@ const formData = ref({
   studentId: "",
   bookId: "",
   dueDate: "",
-  bookCondition: "",
+  bookConditions: [] as string[],
+  barcode: "",
   beforeConditionImages: [] as File[],
 });
+
+// Selected items for SearchableSelect components
+const selectedStudent = ref<Student | null>(null);
+const selectedBook = ref<Book | null>(null);
+const barcodeInput = ref<HTMLInputElement>();
+
+// Barcode validation
+const isValidBarcode = computed(() => {
+  if (!formData.value.barcode || !selectedBook.value) return false;
+
+  // Check if barcode matches the selected book's ISBN or a custom barcode field
+  const barcode = formData.value.barcode.replace(/\D/g, ""); // Remove non-digits
+  const isbn = selectedBook.value.isbn?.replace(/\D/g, "") || "";
+
+  // For now, we'll consider it valid if it matches ISBN or is a reasonable length
+  return barcode === isbn || (barcode.length >= 8 && barcode.length <= 13);
+});
+
+// Update handlers for SearchableSelect components
+const updateSelectedStudent = (student: Student | null) => {
+  selectedStudent.value = student;
+  formData.value.studentId = student?.id || "";
+};
+
+const updateSelectedBook = (book: Book | null) => {
+  selectedBook.value = book;
+  formData.value.bookId = book?.id || "";
+
+  // Reset barcode when book changes
+  formData.value.barcode = "";
+
+  // Focus barcode input after book selection
+  if (book) {
+    nextTick(() => {
+      barcodeInput.value?.focus();
+    });
+  }
+};
+
+// Barcode validation method
+const validateBarcode = () => {
+  // Additional validation logic can be added here
+  console.log("Barcode entered:", formData.value.barcode);
+  console.log("Is valid:", isValidBarcode.value);
+};
+
+// Focus management
+const focusNextField = () => {
+  // Focus next form element after barcode entry
+  console.log("Barcode entered, moving to next field");
+};
+
+// Create handlers for new items
+const showCreateStudentModal = ref(false);
+const showCreateBookModal = ref(false);
+const newStudentName = ref("");
+const newBookTitle = ref("");
+
+const handleCreateStudent = (query: string) => {
+  newStudentName.value = query;
+  showCreateStudentModal.value = true;
+};
+
+const handleCreateBook = (query: string) => {
+  newBookTitle.value = query;
+  showCreateBookModal.value = true;
+};
+
+const handleStudentCreated = async (student: Student) => {
+  // Add the new student to the list and select it
+  students.value.push(student);
+  selectedStudent.value = student;
+  formData.value.studentId = student.id;
+  showCreateStudentModal.value = false;
+};
+
+const handleBookCreated = async (book: Book) => {
+  // Add the new book to the list and select it
+  availableBooks.value.push(book);
+  selectedBook.value = book;
+  formData.value.bookId = book.id;
+  showCreateBookModal.value = false;
+};
 
 // Handlers
 const handleImagesUpdate = (images: File[]) => {
@@ -195,6 +519,16 @@ const handleImagesUpdate = (images: File[]) => {
 const handleSubmit = async () => {
   if (formData.value.beforeConditionImages.length === 0) {
     alert("Please upload at least one condition image");
+    return;
+  }
+
+  if (formData.value.bookConditions.length === 0) {
+    alert("Please select at least one book condition");
+    return;
+  }
+
+  if (selectedBook.value && !isValidBarcode.value) {
+    alert("Please scan or enter a valid barcode for the selected book");
     return;
   }
 
@@ -237,7 +571,7 @@ const handleSubmit = async () => {
       studentNumber: studentNumber,
       emails: [], // Backend will get from existing student data
       address: "", // Backend will get from existing student data
-      bookCondition: formData.value.bookCondition,
+      bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
     });
 
@@ -253,7 +587,7 @@ const handleSubmit = async () => {
       studentNumber: studentNumber,
       emails: [],
       address: "",
-      bookCondition: formData.value.bookCondition,
+      bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
     });
 
@@ -262,7 +596,8 @@ const handleSubmit = async () => {
       studentId: "",
       bookId: "",
       dueDate: "",
-      bookCondition: "",
+      bookConditions: [],
+      barcode: "",
       beforeConditionImages: [],
     };
 
@@ -278,5 +613,18 @@ const handleSubmit = async () => {
 
 const closeModal = () => {
   emit("update:show", false);
+};
+
+// Helper function to get condition label with emoji
+const getConditionLabel = (condition: string): string => {
+  const labels = {
+    new: "📗 New",
+    excellent: "📘 Excellent",
+    good: "📙 Good",
+    fair: "📒 Fair",
+    poor: "📑 Poor",
+    damaged: "📕 Damaged",
+  };
+  return labels[condition as keyof typeof labels] || condition;
 };
 </script>

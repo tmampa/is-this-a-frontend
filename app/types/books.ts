@@ -3,8 +3,12 @@ export interface Book {
   title: string;
   author: string;
   isbn: string;
-  category: string;
-  description?: string;
+  publishedYear: number;
+  publisher: string;
+  pages: number;
+  language: string;
+  price: number;
+  grade: number;
   status: "available" | "borrowed";
 }
 
@@ -24,6 +28,7 @@ export interface Student {
   address?: string;
   parents?: { name: string; email: string; relationship: string }[];
   borrowedBooks: string[];
+  outstandingFines?: number; // in ZAR
 }
 
 export interface BorrowedBook {
@@ -35,9 +40,11 @@ export interface BorrowedBook {
   borrowDate: string;
   dueDate: string;
   status: "borrowed" | "returned";
+  initialConditions: string[];
   beforeConditionImages: string[];
   afterConditionImages: string[];
   returnDate?: string;
+  returnConditions?: string[];
   conditionNotes?: string;
 }
 
@@ -46,13 +53,31 @@ export interface BorrowBookData {
   studentNumber: number;
   emails: Email[];
   address: string;
-  bookCondition: string;
+  bookConditions: string[];
   beforeConditionImages: File[];
 }
 
 export interface ReturnBookData {
-  borrowedBookId: string;
-  returnDate: string;
+  borrowedBookId: number;
+  returnConditions: string[];
   afterConditionImages: File[];
-  conditionNotes?: string;
+}
+
+// Authentication Types
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: "admin" | "librarian";
+}
+
+export interface AuthResponse {
+  user: User;
+  access_token: string;
+  expiresIn: number;
 }
