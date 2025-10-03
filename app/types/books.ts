@@ -10,6 +10,8 @@ export interface Book {
   price: number;
   grade: number;
   status: "available" | "borrowed";
+  category: string;
+  description?: string;
 }
 
 export interface Email {
