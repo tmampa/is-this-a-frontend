@@ -42,7 +42,9 @@ const borrowedBooks = ref<BorrowedBook[]>([]);
 const fetchBorrowedBooks = async () => {
   loading.value = true;
   try {
-    borrowedBooks.value = await LibraryAPI.getBorrowRecords();
+    const allRecords = await LibraryAPI.getBorrowRecords();
+    // Filter out returned books (books with returnDate are already returned)
+    borrowedBooks.value = allRecords.filter((book) => !book.returnDate);
   } catch (error) {
     console.error("Failed to fetch borrowed books:", error);
   } finally {

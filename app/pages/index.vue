@@ -248,8 +248,14 @@ watch(filteredBooks, (newFiltered) => {
 const fetchBorrowedBooks = async () => {
   loading.value = true;
   try {
-    borrowedBooks.value = await LibraryAPI.getBorrowRecords();
-    console.log("Fetched borrowed books:", borrowedBooks.value);
+    const allRecords = await LibraryAPI.getBorrowRecords();
+    // Filter out returned books (books with returnDate are already returned)
+    borrowedBooks.value = allRecords.filter((book) => !book.returnDate);
+    console.log("Fetched all records:", allRecords.length);
+    console.log(
+      "Currently borrowed books (no returnDate):",
+      borrowedBooks.value.length
+    );
     console.log("Sample book structure:", borrowedBooks.value[0]);
   } catch (error) {
     console.error("Failed to fetch borrowed books:", error);
