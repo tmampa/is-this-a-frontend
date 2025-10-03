@@ -142,11 +142,15 @@
                   <span
                     class="badge"
                     :class="{
-                      'badge-success': book.status === 'available',
-                      'badge-warning': book.status === 'borrowed',
+                      'badge-success': getBookStatus(book) === 'available',
+                      'badge-warning': getBookStatus(book) === 'borrowed',
                     }"
                   >
-                    {{ book.status === "available" ? "Available" : "Borrowed" }}
+                    {{
+                      getBookStatus(book) === "available"
+                        ? "Available"
+                        : "Borrowed"
+                    }}
                   </span>
                 </td>
                 <td>
@@ -174,7 +178,15 @@
                     <button
                       @click="deleteBook(book)"
                       class="btn btn-sm btn-ghost text-error"
-                      title="Delete book"
+                      :class="{
+                        'btn-disabled': getBookStatus(book) === 'borrowed',
+                      }"
+                      :disabled="getBookStatus(book) === 'borrowed'"
+                      :title="
+                        getBookStatus(book) === 'borrowed'
+                          ? 'Cannot delete borrowed book'
+                          : 'Delete book'
+                      "
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -383,12 +395,14 @@
               <div
                 class="badge"
                 :class="{
-                  'badge-success': selectedBook.status === 'available',
-                  'badge-warning': selectedBook.status === 'borrowed',
+                  'badge-success': getBookStatus(selectedBook) === 'available',
+                  'badge-warning': getBookStatus(selectedBook) === 'borrowed',
                 }"
               >
                 {{
-                  selectedBook.status === "available" ? "Available" : "Borrowed"
+                  getBookStatus(selectedBook) === "available"
+                    ? "Available"
+                    : "Borrowed"
                 }}
               </div>
             </div>
@@ -415,7 +429,7 @@
                   Deleting this book will permanently remove it from your
                   library collection.
                   <span
-                    v-if="selectedBook.status === 'borrowed'"
+                    v-if="getBookStatus(selectedBook) === 'borrowed'"
                     class="font-medium text-error block mt-1"
                   >
                     This book is currently borrowed and cannot be deleted until
@@ -444,10 +458,18 @@
             class="btn btn-error"
             @click="handleDeleteConfirm"
             :class="{ loading: deleteLoading }"
-            :disabled="deleteLoading || selectedBook?.status === 'borrowed'"
+            :disabled="
+              deleteLoading ||
+              (selectedBook
+                ? getBookStatus(selectedBook) === 'borrowed'
+                : false)
+            "
           >
             <span v-if="deleteLoading">Deleting...</span>
-            <span v-else-if="selectedBook?.status === 'borrowed'"
+            <span
+              v-else-if="
+                selectedBook && getBookStatus(selectedBook) === 'borrowed'
+              "
               >Cannot Delete - Currently Borrowed</span
             >
             <span v-else>Delete Book</span>
@@ -470,7 +492,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import type { Book } from "~/types/books";
+import type { Book, BorrowedBook } from "~/types/books";
 import { LibraryAPI } from "~/composables/useLibraryAPI";
 import BookForm from "~/components/books/BookForm.vue";
 
@@ -494,6 +516,7 @@ const itemsPerPage = ref(5);
 
 // Books data from API
 const books = ref<Book[]>([]);
+const currentBorrowRecords = ref<BorrowedBook[]>([]);
 
 // Fetch books from API
 const fetchBooks = async () => {
@@ -505,6 +528,31 @@ const fetchBooks = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+// Fetch current borrow records
+const fetchBorrowRecords = async () => {
+  try {
+    const allBorrowRecords = await LibraryAPI.getBorrowRecords();
+    // Only keep currently borrowed books (no return date)
+    currentBorrowRecords.value = allBorrowRecords.filter(
+      (record: BorrowedBook) => !record.returnDate
+    );
+  } catch (error) {
+    console.error("Failed to fetch borrow records:", error);
+  }
+};
+
+// Helper function to check if a book is currently borrowed
+const isBookBorrowed = (bookTitle: string): boolean => {
+  return currentBorrowRecords.value.some(
+    (record) => record.bookTitle === bookTitle
+  );
+};
+
+// Helper function to get actual book status
+const getBookStatus = (book: Book): "available" | "borrowed" => {
+  return isBookBorrowed(book.title) ? "borrowed" : "available";
 };
 
 // Initialize data on mount
@@ -519,8 +567,8 @@ onMounted(async () => {
     return;
   }
 
-  console.log("User authenticated, loading books");
-  fetchBooks();
+  console.log("User authenticated, loading books and borrow records");
+  await Promise.all([fetchBooks(), fetchBorrowRecords()]);
 });
 
 // Computed properties
@@ -529,11 +577,13 @@ const categories = computed(() => {
 });
 
 const availableBooks = computed(() => {
-  return books.value.filter((book) => book.status === "available").length;
+  return books.value.filter((book) => getBookStatus(book) === "available")
+    .length;
 });
 
 const borrowedBooks = computed(() => {
-  return books.value.filter((book) => book.status === "borrowed").length;
+  return books.value.filter((book) => getBookStatus(book) === "borrowed")
+    .length;
 });
 
 const uniqueCategories = computed(() => {
@@ -560,7 +610,9 @@ const filteredBooks = computed(() => {
   }
 
   if (selectedStatus.value) {
-    filtered = filtered.filter((book) => book.status === selectedStatus.value);
+    filtered = filtered.filter(
+      (book) => getBookStatus(book) === selectedStatus.value
+    );
   }
 
   return filtered;
@@ -647,7 +699,7 @@ const handleDeleteConfirm = async () => {
   if (!selectedBook.value) return;
 
   // Additional safety check - prevent deletion if book is borrowed
-  if (selectedBook.value.status === "borrowed") {
+  if (getBookStatus(selectedBook.value) === "borrowed") {
     alert(
       "Cannot delete a book that is currently borrowed. Please wait for it to be returned first."
     );
