@@ -61,6 +61,7 @@ export interface ReturnBookData {
   borrowedBookId: number;
   returnConditions: string[];
   afterConditionImages: File[];
+  bookTitle: string;
 }
 
 // Authentication Types

@@ -186,14 +186,13 @@ const handleSubmit = () => {
 
   emit("submit", {
     borrowedBookId: props.book.id,
+    bookTitle: props.book.bookTitle,
     returnConditions: formData.value.returnConditions,
     afterConditionImages: formData.value.afterConditionImages,
     ...(formData.value.conditionNotes
       ? { conditionNotes: formData.value.conditionNotes }
       : {}),
-  } as unknown as ReturnBookData);
-
-  // Reset form
+  } as unknown as ReturnBookData); // Reset form
   formData.value = {
     returnConditions: [],
     afterConditionImages: [],

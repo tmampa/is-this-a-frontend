@@ -253,14 +253,19 @@ export const LibraryAPI = {
     }
   },
 
-  // Return Book (if API exists)
+  // Return Book
   async returnBook(data: ReturnBookData): Promise<void> {
     try {
-      // This endpoint may need to be created on the backend
-      await $fetch(`${API_BASE}/books/return/${data.borrowedBookId}`, {
+      const url = `${API_BASE}/books/return/${encodeURIComponent(
+        data.bookTitle
+      )}`;
+
+      // This endpoint uses book title in the URL path
+      await $fetch(url, {
         method: "POST",
         headers: getAuthHeaders(),
         body: JSON.stringify({
+          borrowedBookId: data.borrowedBookId,
           returnConditions: data.returnConditions,
           afterConditionImages: data.afterConditionImages.map(
             (file) => file.name
