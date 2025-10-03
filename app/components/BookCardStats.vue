@@ -9,38 +9,35 @@
       </div>
     </div>
 
-      <div class="col-lg-4 col-md-6">
-        <div class="stats-card stats-card-danger">
-          <div class="card-body">
-            <!-- <div class="stats-icon bg-danger">
+    <div class="col-lg-4 col-md-6">
+      <div class="stats-card stats-card-danger">
+        <div class="card-body">
+          <!-- <div class="stats-icon bg-danger">
               <i class="bi bi-exclamation-triangle-fill"></i>
             </div> -->
-            <div class="stats-content">
-              <h6 class="stats-label">Overdue Books</h6>
-              <h2 class="stats-value" style="color: #f25c05">
-                {{ borrowedBooks.filter((b) => isOverdue(b.dueDate)).length }}
-              </h2>
-              <p class="stats-description">Need attention</p>
-            </div>
+          <div class="stats-content">
+            <h6 class="stats-label">Overdue Books</h6>
+            <h2 class="stats-value" style="color: #f25c05">
+              {{ borrowedBooks.filter((b) => isOverdue(b.dueDate)).length }}
+            </h2>
+            <p class="stats-description">Need attention</p>
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="col-lg-4 col-md-6">
-        <div class="stats-card stats-card-warning">
-          <div class="card-body">
-            <!-- <div class="stats-icon bg-warning">
+    <div class="col-lg-4 col-md-6">
+      <div class="stats-card stats-card-warning">
+        <div class="card-body">
+          <!-- <div class="stats-icon bg-warning">
               <i class="bi bi-clock-fill"></i>
             </div> -->
-            <div class="stats-content">
-              <h6 class="stats-label">Due This Week</h6>
-              <h2 class="stats-value" style="color: #f25c05">
-                {{
-                  borrowedBooks.filter((b) => isDueThisWeek(b.dueDate)).length
-                }}
-              </h2>
-              <p class="stats-description">Coming up</p>
-            </div>
+          <div class="stats-content">
+            <h6 class="stats-label">Due This Week</h6>
+            <h2 class="stats-value" style="color: #f25c05">
+              {{ borrowedBooks.filter((b) => isDueThisWeek(b.dueDate)).length }}
+            </h2>
+            <p class="stats-description">Coming up</p>
           </div>
         </div>
       </div>

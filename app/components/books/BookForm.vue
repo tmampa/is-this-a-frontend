@@ -68,142 +68,144 @@
                   required
                 />
               </div>
-
-        <!-- Two Column Layout for Year and Publisher -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Published Year -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text"
-                >Published Year <span class="text-error">*</span></span
-              >
-            </label>
-            <input
-              type="number"
-              v-model.number="formData.publishedYear"
-              class="input input-bordered w-full"
-              placeholder="e.g., 2023"
-              min="1000"
-              max="2030"
-              required
-            />
+            </div>
           </div>
 
-          <!-- Publisher -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text"
-                >Publisher <span class="text-error">*</span></span
-              >
-            </label>
-            <input
-              type="text"
-              v-model="formData.publisher"
-              class="input input-bordered w-full"
-              placeholder="Enter publisher name"
-              required
-            />
-          </div>
-        </div>
-
-        <!-- Two Column Layout for Pages and Language -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Pages -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text"
-                >Pages <span class="text-error">*</span></span
-              >
-            </label>
-            <input
-              type="number"
-              v-model.number="formData.pages"
-              class="input input-bordered w-full"
-              placeholder="e.g., 250"
-              min="1"
-              required
-            />
-          </div>
-
-          <!-- Language -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text"
-                >Language <span class="text-error">*</span></span
-              >
-            </label>
-            <select
-              v-model="formData.language"
-              class="select select-bordered w-full"
-              required
-            >
-              <option value="" disabled>Select language</option>
-              <option value="English">English</option>
-              <option value="Afrikaans">Afrikaans</option>
-              <option value="Zulu">Zulu</option>
-              <option value="Xhosa">Xhosa</option>
-              <option value="French">French</option>
-              <option value="Spanish">Spanish</option>
-              <option value="German">German</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Two Column Layout for Price and Grade -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Price -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text"
-                >Price (ZAR) <span class="text-error">*</span></span
-              >
-            </label>
-            <div class="relative">
-              <span
-                class="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/70"
-                >R</span
-              >
+          <!-- Two Column Layout for Year and Publisher -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Published Year -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text"
+                  >Published Year <span class="text-error">*</span></span
+                >
+              </label>
               <input
                 type="number"
-                v-model.number="formData.price"
-                class="input input-bordered w-full pl-8"
-                placeholder="0.00"
-                min="0"
-                step="0.01"
+                v-model.number="formData.publishedYear"
+                class="input input-bordered w-full"
+                placeholder="e.g., 2023"
+                min="1000"
+                max="2030"
+                required
+              />
+            </div>
+
+            <!-- Publisher -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text"
+                  >Publisher <span class="text-error">*</span></span
+                >
+              </label>
+              <input
+                type="text"
+                v-model="formData.publisher"
+                class="input input-bordered w-full"
+                placeholder="Enter publisher name"
                 required
               />
             </div>
           </div>
 
-          <!-- Grade -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text"
-                >Grade Level <span class="text-error">*</span></span
+          <!-- Two Column Layout for Pages and Language -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Pages -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text"
+                  >Pages <span class="text-error">*</span></span
+                >
+              </label>
+              <input
+                type="number"
+                v-model.number="formData.pages"
+                class="input input-bordered w-full"
+                placeholder="e.g., 250"
+                min="1"
+                required
+              />
+            </div>
+
+            <!-- Language -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text"
+                  >Language <span class="text-error">*</span></span
+                >
+              </label>
+              <select
+                v-model="formData.language"
+                class="select select-bordered w-full"
+                required
               >
-            </label>
-            <select
-              v-model.number="formData.grade"
-              class="select select-bordered w-full"
-              required
-            >
-              <option value="" disabled>Select grade</option>
-              <option :value="1">Grade 1</option>
-              <option :value="2">Grade 2</option>
-              <option :value="3">Grade 3</option>
-              <option :value="4">Grade 4</option>
-              <option :value="5">Grade 5</option>
-              <option :value="6">Grade 6</option>
-              <option :value="7">Grade 7</option>
-              <option :value="8">Grade 8</option>
-              <option :value="9">Grade 9</option>
-              <option :value="10">Grade 10</option>
-              <option :value="11">Grade 11</option>
-              <option :value="12">Grade 12</option>
-            </select>
+                <option value="" disabled>Select language</option>
+                <option value="English">English</option>
+                <option value="Afrikaans">Afrikaans</option>
+                <option value="Zulu">Zulu</option>
+                <option value="Xhosa">Xhosa</option>
+                <option value="French">French</option>
+                <option value="Spanish">Spanish</option>
+                <option value="German">German</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
           </div>
-        </div>
+
+          <!-- Two Column Layout for Price and Grade -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Price -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text"
+                  >Price (ZAR) <span class="text-error">*</span></span
+                >
+              </label>
+              <div class="relative">
+                <span
+                  class="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/70"
+                  >R</span
+                >
+                <input
+                  type="number"
+                  v-model.number="formData.price"
+                  class="input input-bordered w-full pl-8"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Grade -->
+            <div class="form-control">
+              <label class="label">
+                <span class="label-text"
+                  >Grade Level <span class="text-error">*</span></span
+                >
+              </label>
+              <select
+                v-model.number="formData.grade"
+                class="select select-bordered w-full"
+                required
+              >
+                <option value="" disabled>Select grade</option>
+                <option :value="1">Grade 1</option>
+                <option :value="2">Grade 2</option>
+                <option :value="3">Grade 3</option>
+                <option :value="4">Grade 4</option>
+                <option :value="5">Grade 5</option>
+                <option :value="6">Grade 6</option>
+                <option :value="7">Grade 7</option>
+                <option :value="8">Grade 8</option>
+                <option :value="9">Grade 9</option>
+                <option :value="10">Grade 10</option>
+                <option :value="11">Grade 11</option>
+                <option :value="12">Grade 12</option>
+              </select>
+            </div>
+          </div>
 
           <div class="modal-footer">
             <button

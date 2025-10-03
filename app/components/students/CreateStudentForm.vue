@@ -113,123 +113,115 @@
           ></textarea>
         </div>
 
-              <!-- Parents/Guardians -->
+        <!-- Parents/Guardians -->
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <label class="form-label mb-0">Parents/Guardians:</label>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-primary"
+              @click="addParent"
+            >
+              <i class="bi bi-plus-lg me-1"></i>Add Parent/Guardian
+            </button>
+          </div>
+
+          <div
+            v-for="(parent, index) in formData.parents"
+            :key="index"
+            class="border rounded p-3 mb-3 position-relative"
+          >
+            <button
+              v-if="formData.parents.length > 1"
+              type="button"
+              class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2"
+              @click="removeParent(index)"
+            >
+              <i class="bi bi-x"></i>
+            </button>
+
+            <div class="row g-2">
               <div class="col-12">
-                <div
-                  class="d-flex justify-content-between align-items-center mb-3"
+                <label :for="`parentName${index}`" class="form-label small"
+                  >Name:</label
                 >
-                  <label class="form-label mb-0">Parents/Guardians:</label>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-outline-primary"
-                    @click="addParent"
-                  >
-                    <i class="bi bi-plus-lg me-1"></i>Add Parent/Guardian
-                  </button>
-                </div>
-
-                <div
-                  v-for="(parent, index) in formData.parents"
-                  :key="index"
-                  class="border rounded p-3 mb-3 position-relative"
+                <input
+                  :id="`parentName${index}`"
+                  type="text"
+                  v-model="parent.name"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label :for="`parentEmail${index}`" class="form-label small"
+                  >Email:</label
                 >
-                  <button
-                    v-if="formData.parents.length > 1"
-                    type="button"
-                    class="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-2"
-                    @click="removeParent(index)"
-                  >
-                    <i class="bi bi-x"></i>
-                  </button>
-
-                  <div class="row g-2">
-                    <div class="col-12">
-                      <label
-                        :for="`parentName${index}`"
-                        class="form-label small"
-                        >Name:</label
-                      >
-                      <input
-                        :id="`parentName${index}`"
-                        type="text"
-                        v-model="parent.name"
-                        class="form-control"
-                        required
-                      />
-                    </div>
-                    <div class="col-md-6">
-                      <label
-                        :for="`parentEmail${index}`"
-                        class="form-label small"
-                        >Email:</label
-                      >
-                      <input
-                        :id="`parentEmail${index}`"
-                        type="email"
-                        v-model="parent.email"
-                        class="form-control"
-                        required
-                      />
-                    </div>
-                    <div class="col-md-6">
-                      <label
-                        :for="`parentRelationship${index}`"
-                        class="form-label small"
-                        >Relationship:</label
-                      >
-                      <input
-                        :id="`parentRelationship${index}`"
-                        type="text"
-                        v-model="parent.relationship"
-                        class="form-control"
-                        placeholder="e.g., Mother, Father, Guardian"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  v-if="formData.parents.length === 0"
-                  class="text-muted text-center py-4"
+                <input
+                  :id="`parentEmail${index}`"
+                  type="email"
+                  v-model="parent.email"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label
+                  :for="`parentRelationship${index}`"
+                  class="form-label small"
+                  >Relationship:</label
                 >
-                  No parents/guardians added yet. Click "Add Parent/Guardian" to
-                  add one.
-                </div>
+                <input
+                  :id="`parentRelationship${index}`"
+                  type="text"
+                  v-model="parent.relationship"
+                  class="form-control"
+                  placeholder="e.g., Mother, Father, Guardian"
+                  required
+                />
               </div>
             </div>
           </div>
 
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="closeModal"
-              :disabled="loading"
-            >
-              Cancel
-            </button>
-            <button type="submit" class="btn btn-primary" :disabled="loading">
-              <span
-                v-if="loading"
-                class="spinner-border spinner-border-sm me-2"
-                role="status"
-              ></span>
-              {{
-                loading
-                  ? editMode
-                    ? "Updating..."
-                    : "Creating..."
-                  : editMode
-                  ? "Update Student"
-                  : "Create Student"
-              }}
-            </button>
+          <div
+            v-if="formData.parents.length === 0"
+            class="text-muted text-center py-4"
+          >
+            No parents/guardians added yet. Click "Add Parent/Guardian" to add
+            one.
           </div>
-        </form>
-      </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="closeModal"
+            :disabled="loading"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" :disabled="loading">
+            <span
+              v-if="loading"
+              class="spinner-border spinner-border-sm me-2"
+              role="status"
+            ></span>
+            {{
+              loading
+                ? editMode
+                  ? "Updating..."
+                  : "Creating..."
+                : editMode
+                ? "Update Student"
+                : "Create Student"
+            }}
+          </button>
+        </div>
+      </form>
     </div>
-  </div>
+  </dialog>
+
   <div v-if="show" class="modal-backdrop fade show" @click="closeModal"></div>
 </template>
 

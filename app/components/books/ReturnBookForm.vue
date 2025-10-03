@@ -48,75 +48,72 @@
               </div>
             </div>
 
-        <!-- Return Conditions -->
-        <MultiSelectWithCreate
-          label="Return Condition Assessment"
-          :options="defaultReturnConditions"
-          v-model="formData.returnConditions"
-          :required="true"
-          tooltip="Select all conditions that apply to the book upon return - this helps track any changes from initial lending"
-          helper-text="Select existing conditions or add custom ones to accurately describe the book's current state"
-        />
+            <!-- Return Conditions -->
+            <MultiSelectWithCreate
+              label="Return Condition Assessment"
+              :options="defaultReturnConditions"
+              v-model="formData.returnConditions"
+              :required="true"
+              tooltip="Select all conditions that apply to the book upon return - this helps track any changes from initial lending"
+              helper-text="Select existing conditions or add custom ones to accurately describe the book's current state"
+            />
 
-        <!-- Book Condition Images -->
-        <ImageUploader
-          label="Current Book Condition Images"
-          :multiple="true"
-          :max-images="5"
-          @update:images="handleImagesUpdate"
-        />
+            <!-- Book Condition Images -->
+            <ImageUploader
+              label="Current Book Condition Images"
+              :multiple="true"
+              :max-images="5"
+              @update:images="handleImagesUpdate"
+            />
 
-              <!-- Compare Images -->
-              <div class="col-12">
-                <div class="row g-4">
-                  <!-- Before Images -->
-                  <div class="col-lg-6">
-                    <h6 class="text-muted mb-3">Before Condition Images</h6>
-                    <div class="row g-2">
-                      <div
-                        v-for="(image, index) in book.beforeConditionImages"
-                        :key="`before-${index}`"
-                        class="col-4"
-                      >
-                        <div class="ratio ratio-1x1">
-                          <img
-                            :src="image"
-                            alt="Before condition"
-                            class="img-fluid rounded object-fit-cover"
-                          />
-                        </div>
+            <!-- Compare Images -->
+            <div class="col-12">
+              <div class="row g-4">
+                <!-- Before Images -->
+                <div class="col-lg-6">
+                  <h6 class="text-muted mb-3">Before Condition Images</h6>
+                  <div class="row g-2">
+                    <div
+                      v-for="(image, index) in book.beforeConditionImages"
+                      :key="`before-${index}`"
+                      class="col-4"
+                    >
+                      <div class="ratio ratio-1x1">
+                        <img
+                          :src="image"
+                          alt="Before condition"
+                          class="img-fluid rounded object-fit-cover"
+                        />
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <!-- After Images -->
-                  <div class="col-lg-6">
-                    <h6 class="text-muted mb-3">After Condition Images</h6>
-                    <div v-if="imagePreviews.length > 0" class="row g-2">
-                      <div
-                        v-for="(image, index) in imagePreviews"
-                        :key="`after-${index}`"
-                        class="col-4"
-                      >
-                        <div class="ratio ratio-1x1">
-                          <img
-                            :src="image"
-                            alt="After condition"
-                            class="img-fluid rounded object-fit-cover"
-                          />
-                        </div>
+                <!-- After Images -->
+                <div class="col-lg-6">
+                  <h6 class="text-muted mb-3">After Condition Images</h6>
+                  <div v-if="imagePreviews.length > 0" class="row g-2">
+                    <div
+                      v-for="(image, index) in imagePreviews"
+                      :key="`after-${index}`"
+                      class="col-4"
+                    >
+                      <div class="ratio ratio-1x1">
+                        <img
+                          :src="image"
+                          alt="After condition"
+                          class="img-fluid rounded object-fit-cover"
+                        />
                       </div>
                     </div>
-                    <div
-                      v-else
-                      class="text-center p-4 border border-2 border-dashed rounded"
-                    >
-                      <div class="text-muted">
-                        <i class="bi bi-camera display-6 mb-2"></i>
-                        <p class="mb-0">
-                          No after condition images uploaded yet
-                        </p>
-                      </div>
+                  </div>
+                  <div
+                    v-else
+                    class="text-center p-4 border border-dashed rounded"
+                  >
+                    <div class="text-muted">
+                      <i class="bi bi-camera display-6 mb-2"></i>
+                      <p class="mb-0">No after condition images uploaded yet</p>
                     </div>
                   </div>
                 </div>
