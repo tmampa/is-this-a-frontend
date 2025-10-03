@@ -7,7 +7,7 @@ import type {
   ReturnBookData,
 } from "~/types/books";
 
-const API_BASE = "http://localhost:8080/api/admin";
+const API_BASE = "http://http://52.188.184.166:8080/api/admin";
 
 // Helper function to get auth headers
 const getAuthHeaders = (): Record<string, string> => {
