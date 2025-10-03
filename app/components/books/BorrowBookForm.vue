@@ -575,10 +575,11 @@ const handleSubmit = async () => {
       beforeConditionImages: formData.value.beforeConditionImages,
     });
 
-    // Step 2: Upload images using the returned recordId
+    // Step 2: Upload images using the returned recordId and pass bookConditions as knownTags
     await LibraryAPI.uploadImages(
       recordId,
-      formData.value.beforeConditionImages
+      formData.value.beforeConditionImages,
+      formData.value.bookConditions
     );
 
     // Emit success event

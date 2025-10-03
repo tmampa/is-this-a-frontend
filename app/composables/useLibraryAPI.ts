@@ -7,7 +7,7 @@ import type {
   ReturnBookData,
 } from "~/types/books";
 
-const API_BASE = "http://52.188.184.166:8080/api/admin";
+const API_BASE = "http://localhost:8080/api/admin";
 
 // Helper function to get auth headers
 const getAuthHeaders = (): Record<string, string> => {
@@ -222,14 +222,28 @@ export const LibraryAPI = {
   },
 
   // Upload Images for Borrow Record
-  async uploadImages(recordId: number, images: File[]): Promise<void> {
+  async uploadImages(
+    recordId: number,
+    images: File[],
+    bookConditions: string[] = []
+  ): Promise<void> {
     try {
       const formData = new FormData();
       images.forEach((image, index) => {
         formData.append("images", image);
       });
 
-      await $fetch(`${API_BASE}/books/upload-images/${recordId}`, {
+      // Build query parameters for knownTags (bookConditions)
+      const queryParams = new URLSearchParams();
+      bookConditions.forEach((condition) => {
+        queryParams.append("knownTags", condition);
+      });
+
+      const url = `${API_BASE}/books/upload-images/${recordId}${
+        queryParams.toString() ? "?" + queryParams.toString() : ""
+      }`;
+
+      await $fetch(url, {
         method: "POST",
         body: formData,
       });
@@ -239,19 +253,43 @@ export const LibraryAPI = {
     }
   },
 
-  // Return Book (if API exists)
+  // Return Book
   async returnBook(data: ReturnBookData): Promise<void> {
     try {
-      // This endpoint may need to be created on the backend
-      await $fetch(`${API_BASE}/books/return/${data.borrowedBookId}`, {
+      // Backend expects: /books/return/{studentNumber}/{bookTitle}
+      const url = `${API_BASE}/books/return/${
+        data.studentNumber
+      }/${encodeURIComponent(data.bookTitle)}`;
+
+      console.log("Return book - URL:", url);
+      console.log("Return book - Student Number:", data.studentNumber);
+      console.log("Return book - Book Title:", data.bookTitle);
+
+      // Create FormData for multipart request (needed for file uploads)
+      const formData = new FormData();
+
+      // Add non-file data
+      formData.append("borrowedBookId", data.borrowedBookId.toString());
+
+      // Add return conditions as knownTags (what backend expects)
+      data.returnConditions.forEach((condition) => {
+        formData.append("knownTags", condition);
+      });
+
+      // Add image files
+      data.afterConditionImages.forEach((file, index) => {
+        formData.append("images", file);
+      });
+
+      // Get auth headers but exclude Content-Type (let browser set it for multipart)
+      const authHeaders = getAuthHeaders();
+      delete authHeaders["Content-Type"];
+
+      // This endpoint uses studentNumber and bookTitle in the URL path
+      await $fetch(url, {
         method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          returnConditions: data.returnConditions,
-          afterConditionImages: data.afterConditionImages.map(
-            (file) => file.name
-          ),
-        }),
+        headers: authHeaders,
+        body: formData,
       });
     } catch (error) {
       console.error("Failed to return book:", error);

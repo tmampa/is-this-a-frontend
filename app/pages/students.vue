@@ -156,8 +156,8 @@
                 <td>{{ student.email }}</td>
                 <td>
                   <span class="badge badge-outline">
-                    {{ student.borrowedBooks.length }} book{{
-                      student.borrowedBooks.length !== 1 ? "s" : ""
+                    {{ getCurrentBorrowedBooksCount(student.id) }} book{{
+                      getCurrentBorrowedBooksCount(student.id) !== 1 ? "s" : ""
                     }}
                   </span>
                 </td>
@@ -165,13 +165,11 @@
                   <span
                     class="badge"
                     :class="{
-                      'badge-success': student.borrowedBooks.length > 0,
-                      'badge-ghost': student.borrowedBooks.length === 0,
+                      'badge-success': hasActiveBorrows(student.id),
+                      'badge-ghost': !hasActiveBorrows(student.id),
                     }"
                   >
-                    {{
-                      student.borrowedBooks.length > 0 ? "Active" : "Inactive"
-                    }}
+                    {{ hasActiveBorrows(student.id) ? "Active" : "Inactive" }}
                   </span>
                 </td>
                 <td>
@@ -238,7 +236,7 @@
                         class="btn btn-sm btn-ghost text-error"
                         title="Delete student"
                         :class="{
-                          'btn-disabled': student.borrowedBooks.length > 0,
+                          'btn-disabled': hasActiveBorrows(student.id),
                         }"
                       >
                         <svg
@@ -468,12 +466,18 @@
                   Deleting this student will permanently remove all their
                   information, including borrowing history.
                   <span
-                    v-if="(selectedStudent?.borrowedBooks?.length || 0) > 0"
+                    v-if="
+                      selectedStudent && hasActiveBorrows(selectedStudent.id)
+                    "
                     class="font-medium text-error"
                   >
                     This student currently has
-                    {{ selectedStudent?.borrowedBooks?.length || 0 }} borrowed
-                    book(s).
+                    {{
+                      selectedStudent
+                        ? getCurrentBorrowedBooksCount(selectedStudent.id)
+                        : 0
+                    }}
+                    borrowed book(s).
                   </span>
                 </p>
               </div>
@@ -499,11 +503,15 @@
             @click="handleDeleteConfirm"
             :class="{ loading: deleteLoading }"
             :disabled="
-              deleteLoading || (selectedStudent?.borrowedBooks?.length || 0) > 0
+              deleteLoading ||
+              !!(selectedStudent && hasActiveBorrows(selectedStudent.id))
             "
           >
             <span v-if="deleteLoading">Deleting...</span>
-            <span v-else-if="(selectedStudent?.borrowedBooks?.length || 0) > 0"
+            <span
+              v-else-if="
+                selectedStudent && hasActiveBorrows(selectedStudent.id)
+              "
               >Cannot Delete - Has Borrowed Books</span
             >
             <span v-else>Delete Student</span>
@@ -526,7 +534,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import type { Student } from "~/types/books";
+import type { Student, BorrowedBook } from "~/types/books";
 import { LibraryAPI } from "~/composables/useLibraryAPI";
 import AddStudentForm from "~/components/students/CreateStudentForm.vue";
 import ViewStudentModal from "~/components/students/ViewStudentModal.vue";
@@ -551,6 +559,7 @@ const itemsPerPage = ref(5);
 
 // Students data from API
 const students = ref<Student[]>([]);
+const currentBorrowRecords = ref<BorrowedBook[]>([]);
 
 // Fetch students from API
 const fetchStudents = async () => {
@@ -561,6 +570,17 @@ const fetchStudents = async () => {
     console.error("Failed to fetch students:", error);
   } finally {
     loading.value = false;
+  }
+};
+
+// Fetch current borrow records (only non-returned books)
+const fetchBorrowRecords = async () => {
+  try {
+    const allRecords = await LibraryAPI.getBorrowRecords();
+    // Filter out returned books (books with returnDate are already returned)
+    currentBorrowRecords.value = allRecords.filter((book) => !book.returnDate);
+  } catch (error) {
+    console.error("Failed to fetch borrow records:", error);
   }
 };
 
@@ -578,19 +598,33 @@ onMounted(async () => {
 
   console.log("User authenticated, loading students");
   fetchStudents();
+  fetchBorrowRecords();
 });
+
+// Helper function to get current borrowed books count for a student
+const getCurrentBorrowedBooksCount = (studentId: string): number => {
+  return currentBorrowRecords.value.filter(
+    (record) => record.studentId === studentId
+  ).length;
+};
+
+// Helper function to check if student has active borrows
+const hasActiveBorrows = (studentId: string): boolean => {
+  return getCurrentBorrowedBooksCount(studentId) > 0;
+};
 
 // Computed properties
 const activeBorrowers = computed(() => {
-  return students.value.filter((student) => student.borrowedBooks.length > 0)
-    .length;
+  // Count students who have books currently borrowed (not returned)
+  const studentsWithCurrentBorrows = new Set(
+    currentBorrowRecords.value.map((record) => record.studentId)
+  );
+  return studentsWithCurrentBorrows.size;
 });
 
 const totalBorrowedBooks = computed(() => {
-  return students.value.reduce(
-    (total, student) => total + student.borrowedBooks.length,
-    0
-  );
+  // Count only currently borrowed books (not returned)
+  return currentBorrowRecords.value.length;
 });
 
 const filteredStudents = computed(() => {
@@ -687,8 +721,8 @@ function deleteStudent(student: Student) {
 const handleDeleteConfirm = async () => {
   if (!selectedStudent.value) return;
 
-  // Additional safety check - prevent deletion if student has borrowed books
-  if ((selectedStudent.value?.borrowedBooks?.length || 0) > 0) {
+  // Additional safety check - prevent deletion if student has active borrowed books
+  if (selectedStudent.value && hasActiveBorrows(selectedStudent.value.id)) {
     alert(
       "Cannot delete student with active borrowed books. Please ensure all books are returned first."
     );
