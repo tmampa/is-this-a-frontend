@@ -7,7 +7,7 @@ import type {
   ReturnBookData,
 } from "~/types/books";
 
-const API_BASE = "http://52.188.184.166:8080/api/admin";
+const API_BASE = "http://localhost:8080/api/admin";
 
 // Helper function to get auth headers
 const getAuthHeaders = (): Record<string, string> => {
@@ -222,14 +222,28 @@ export const LibraryAPI = {
   },
 
   // Upload Images for Borrow Record
-  async uploadImages(recordId: number, images: File[]): Promise<void> {
+  async uploadImages(
+    recordId: number,
+    images: File[],
+    bookConditions: string[] = []
+  ): Promise<void> {
     try {
       const formData = new FormData();
       images.forEach((image, index) => {
         formData.append("images", image);
       });
 
-      await $fetch(`${API_BASE}/books/upload-images/${recordId}`, {
+      // Build query parameters for knownTags (bookConditions)
+      const queryParams = new URLSearchParams();
+      bookConditions.forEach((condition) => {
+        queryParams.append("knownTags", condition);
+      });
+
+      const url = `${API_BASE}/books/upload-images/${recordId}${
+        queryParams.toString() ? "?" + queryParams.toString() : ""
+      }`;
+
+      await $fetch(url, {
         method: "POST",
         body: formData,
       });
