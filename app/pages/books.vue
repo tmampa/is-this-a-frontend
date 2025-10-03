@@ -146,7 +146,11 @@
                       'badge-warning': getBookStatus(book) === 'borrowed',
                     }"
                   >
-                    {{ getBookStatus(book) === "available" ? "Available" : "Borrowed" }}
+                    {{
+                      getBookStatus(book) === "available"
+                        ? "Available"
+                        : "Borrowed"
+                    }}
                   </span>
                 </td>
                 <td>
@@ -174,9 +178,15 @@
                     <button
                       @click="deleteBook(book)"
                       class="btn btn-sm btn-ghost text-error"
-                      :class="{ 'btn-disabled': getBookStatus(book) === 'borrowed' }"
+                      :class="{
+                        'btn-disabled': getBookStatus(book) === 'borrowed',
+                      }"
                       :disabled="getBookStatus(book) === 'borrowed'"
-                      :title="getBookStatus(book) === 'borrowed' ? 'Cannot delete borrowed book' : 'Delete book'"
+                      :title="
+                        getBookStatus(book) === 'borrowed'
+                          ? 'Cannot delete borrowed book'
+                          : 'Delete book'
+                      "
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -390,7 +400,9 @@
                 }"
               >
                 {{
-                  getBookStatus(selectedBook) === "available" ? "Available" : "Borrowed"
+                  getBookStatus(selectedBook) === "available"
+                    ? "Available"
+                    : "Borrowed"
                 }}
               </div>
             </div>
@@ -446,10 +458,18 @@
             class="btn btn-error"
             @click="handleDeleteConfirm"
             :class="{ loading: deleteLoading }"
-            :disabled="deleteLoading || (selectedBook ? getBookStatus(selectedBook) === 'borrowed' : false)"
+            :disabled="
+              deleteLoading ||
+              (selectedBook
+                ? getBookStatus(selectedBook) === 'borrowed'
+                : false)
+            "
           >
             <span v-if="deleteLoading">Deleting...</span>
-            <span v-else-if="selectedBook && getBookStatus(selectedBook) === 'borrowed'"
+            <span
+              v-else-if="
+                selectedBook && getBookStatus(selectedBook) === 'borrowed'
+              "
               >Cannot Delete - Currently Borrowed</span
             >
             <span v-else>Delete Book</span>
@@ -515,7 +535,9 @@ const fetchBorrowRecords = async () => {
   try {
     const allBorrowRecords = await LibraryAPI.getBorrowRecords();
     // Only keep currently borrowed books (no return date)
-    currentBorrowRecords.value = allBorrowRecords.filter((record: BorrowedBook) => !record.returnDate);
+    currentBorrowRecords.value = allBorrowRecords.filter(
+      (record: BorrowedBook) => !record.returnDate
+    );
   } catch (error) {
     console.error("Failed to fetch borrow records:", error);
   }
@@ -523,7 +545,9 @@ const fetchBorrowRecords = async () => {
 
 // Helper function to check if a book is currently borrowed
 const isBookBorrowed = (bookTitle: string): boolean => {
-  return currentBorrowRecords.value.some(record => record.bookTitle === bookTitle);
+  return currentBorrowRecords.value.some(
+    (record) => record.bookTitle === bookTitle
+  );
 };
 
 // Helper function to get actual book status
@@ -553,11 +577,13 @@ const categories = computed(() => {
 });
 
 const availableBooks = computed(() => {
-  return books.value.filter((book) => getBookStatus(book) === "available").length;
+  return books.value.filter((book) => getBookStatus(book) === "available")
+    .length;
 });
 
 const borrowedBooks = computed(() => {
-  return books.value.filter((book) => getBookStatus(book) === "borrowed").length;
+  return books.value.filter((book) => getBookStatus(book) === "borrowed")
+    .length;
 });
 
 const uniqueCategories = computed(() => {
@@ -584,7 +610,9 @@ const filteredBooks = computed(() => {
   }
 
   if (selectedStatus.value) {
-    filtered = filtered.filter((book) => getBookStatus(book) === selectedStatus.value);
+    filtered = filtered.filter(
+      (book) => getBookStatus(book) === selectedStatus.value
+    );
   }
 
   return filtered;
