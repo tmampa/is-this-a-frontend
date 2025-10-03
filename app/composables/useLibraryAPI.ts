@@ -256,21 +256,40 @@ export const LibraryAPI = {
   // Return Book
   async returnBook(data: ReturnBookData): Promise<void> {
     try {
-      const url = `${API_BASE}/books/return/${encodeURIComponent(
-        data.bookTitle
-      )}`;
+      // Backend expects: /books/return/{studentNumber}/{bookTitle}
+      const url = `${API_BASE}/books/return/${
+        data.studentNumber
+      }/${encodeURIComponent(data.bookTitle)}`;
 
-      // This endpoint uses book title in the URL path
+      console.log("Return book - URL:", url);
+      console.log("Return book - Student Number:", data.studentNumber);
+      console.log("Return book - Book Title:", data.bookTitle);
+
+      // Create FormData for multipart request (needed for file uploads)
+      const formData = new FormData();
+
+      // Add non-file data
+      formData.append("borrowedBookId", data.borrowedBookId.toString());
+
+      // Add return conditions as knownTags (what backend expects)
+      data.returnConditions.forEach((condition) => {
+        formData.append("knownTags", condition);
+      });
+
+      // Add image files
+      data.afterConditionImages.forEach((file, index) => {
+        formData.append("images", file);
+      });
+
+      // Get auth headers but exclude Content-Type (let browser set it for multipart)
+      const authHeaders = getAuthHeaders();
+      delete authHeaders["Content-Type"];
+
+      // This endpoint uses studentNumber and bookTitle in the URL path
       await $fetch(url, {
         method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          borrowedBookId: data.borrowedBookId,
-          returnConditions: data.returnConditions,
-          afterConditionImages: data.afterConditionImages.map(
-            (file) => file.name
-          ),
-        }),
+        headers: authHeaders,
+        body: formData,
       });
     } catch (error) {
       console.error("Failed to return book:", error);

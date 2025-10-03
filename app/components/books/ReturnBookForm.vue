@@ -186,6 +186,7 @@ const handleSubmit = () => {
 
   emit("submit", {
     borrowedBookId: props.book.id,
+    studentNumber: props.book.studentNumber,
     bookTitle: props.book.bookTitle,
     returnConditions: formData.value.returnConditions,
     afterConditionImages: formData.value.afterConditionImages,

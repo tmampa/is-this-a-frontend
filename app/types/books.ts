@@ -35,6 +35,7 @@ export interface BorrowedBook {
   id: string;
   bookId: string;
   studentId: string;
+  studentNumber: number;
   bookTitle: string;
   studentName: string;
   borrowDate: string;
@@ -59,6 +60,7 @@ export interface BorrowBookData {
 
 export interface ReturnBookData {
   borrowedBookId: number;
+  studentNumber: number;
   returnConditions: string[];
   afterConditionImages: File[];
   bookTitle: string;
