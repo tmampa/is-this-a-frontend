@@ -1,4 +1,23 @@
 <template>
+  <!-- Toast Notification -->
+  <div v-if="showToast" class="toast toast-top toast-center z-50">
+    <div class="alert alert-success">
+      <svg
+        class="stroke-current shrink-0 h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <span>{{ toastMessage }}</span>
+    </div>
+  </div>
+
   <dialog :open="show" class="modal">
     <div class="modal-box max-w-2xl">
       <div class="flex items-center justify-between mb-6">
@@ -359,6 +378,44 @@
       :initial-title="newBookTitle"
       @created="handleBookCreated"
     />
+
+    <!-- Success Modal -->
+    <dialog :open="showSuccessModal" class="modal">
+      <div class="modal-box text-center">
+        <h3 class="font-bold text-lg text-success mb-4">{{ successTitle }}</h3>
+        <div class="py-4">
+          <div
+            class="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <svg
+              class="w-8 h-8 text-success"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7"
+              ></path>
+            </svg>
+          </div>
+          <p class="text-base-content/80">{{ successMessage }}</p>
+        </div>
+        <div class="modal-action justify-center">
+          <button
+            class="btn btn-success btn-wide"
+            @click="showSuccessModal = false"
+          >
+            ✨ Awesome!
+          </button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button @click="showSuccessModal = false">close</button>
+      </form>
+    </dialog>
   </dialog>
 </template>
 
@@ -485,6 +542,13 @@ const showCreateBookModal = ref(false);
 const newStudentName = ref("");
 const newBookTitle = ref("");
 
+// Success notification states
+const showSuccessModal = ref(false);
+const successMessage = ref("");
+const successTitle = ref("");
+const showToast = ref(false);
+const toastMessage = ref("");
+
 const handleCreateStudent = (query: string) => {
   newStudentName.value = query;
   showCreateStudentModal.value = true;
@@ -501,6 +565,12 @@ const handleStudentCreated = async (student: Student) => {
   selectedStudent.value = student;
   formData.value.studentId = student.id;
   showCreateStudentModal.value = false;
+
+  // Show success notification
+  successTitle.value = "👤 Student Created Successfully!";
+  successMessage.value = `${student.fullName} has been added to the system and is now selected for book issuing.`;
+  showSuccessModal.value = true;
+  showToastNotification(`✅ Student ${student.fullName} created and selected!`);
 };
 
 const handleBookCreated = async (book: Book) => {
@@ -509,6 +579,12 @@ const handleBookCreated = async (book: Book) => {
   selectedBook.value = book;
   formData.value.bookId = book.id;
   showCreateBookModal.value = false;
+
+  // Show success notification
+  successTitle.value = "📖 Book Created Successfully!";
+  successMessage.value = `"${book.title}" by ${book.author} has been added to the library and is now selected for issuing.`;
+  showSuccessModal.value = true;
+  showToastNotification(`✅ Book "${book.title}" created and selected!`);
 };
 
 // Handlers
@@ -582,6 +658,14 @@ const handleSubmit = async () => {
       formData.value.bookConditions
     );
 
+    // Show success notification
+    successTitle.value = "📚 Book Issued Successfully!";
+    successMessage.value = `"${selectedBook.title}" has been issued to ${selectedStudent.fullName} (Student #${studentNumber}). The borrow record has been created with condition tracking.`;
+    showSuccessModal.value = true;
+    showToastNotification(
+      `🎉 Book issued to ${selectedStudent.fullName} successfully!`
+    );
+
     // Emit success event
     emit("submit", {
       fullName: `${selectedStudent.fullName}`,
@@ -602,8 +686,10 @@ const handleSubmit = async () => {
       beforeConditionImages: [],
     };
 
-    // Close modal
-    closeModal();
+    // Close modal after a brief delay to show success
+    setTimeout(() => {
+      closeModal();
+    }, 100);
   } catch (error) {
     console.error("Failed to create borrow record:", error);
     alert("Failed to borrow book. Please try again.");
@@ -614,6 +700,17 @@ const handleSubmit = async () => {
 
 const closeModal = () => {
   emit("update:show", false);
+};
+
+// Toast notification helper
+const showToastNotification = (message: string) => {
+  toastMessage.value = message;
+  showToast.value = true;
+
+  // Auto-hide toast after 4 seconds
+  setTimeout(() => {
+    showToast.value = false;
+  }, 4000);
 };
 
 // Helper function to get condition label with emoji
