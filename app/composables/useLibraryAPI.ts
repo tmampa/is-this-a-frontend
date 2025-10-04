@@ -91,8 +91,9 @@ export const LibraryAPI = {
 
   async deleteBook(bookId: string): Promise<void> {
     try {
-      await $fetch(`${API_BASE}/books/${bookId}`, {
+      await $fetch(`${API_BASE}/book/delete/${bookId}`, {
         method: "DELETE",
+        headers: getAuthHeaders(),
       });
       console.log("Book deleted:", bookId);
     } catch (error) {
