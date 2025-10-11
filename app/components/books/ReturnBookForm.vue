@@ -130,18 +130,11 @@ const emit = defineEmits<{
 
 // Default return condition options
 const defaultReturnConditions = [
-  "📗 Same as borrowed - No changes",
-  "📘 Excellent - Minimal wear",
   "📙 Good - Light wear, no damage",
-  "📚 Fair - Noticeable wear",
-  "📜 Poor - Significant wear",
-  "📝 Damaged - New damage present",
   "📄 Pages missing",
-  "📖 Cover damaged",
   "📝 Writing/markings added",
   "💧 Water damage",
   "🍂 Stains present",
-  "🔍 Binding loose/broken",
   "🔖 Lost",
   "📕 Torn pages",
 ];

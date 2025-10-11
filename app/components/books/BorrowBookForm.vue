@@ -729,10 +729,7 @@ const showToastNotification = (message: string) => {
 const getConditionLabel = (condition: string): string => {
   const labels = {
     new: "📗 New",
-    excellent: "📘 Excellent",
     good: "📙 Good",
-    fair: "📒 Fair",
-    poor: "📑 Poor",
     damaged: "📕 Damaged",
   };
   return labels[condition as keyof typeof labels] || condition;
