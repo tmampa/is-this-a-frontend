@@ -181,37 +181,32 @@
           </div>
         </div>
 
-        <!-- Dates
-        <div class="grid grid-cols-1 gap-4">
-          <div class="form-control">
+        <!-- Return Date -->
+        <div class="form-control">
+          <div
+            class="tooltip tooltip-right"
+            data-tip="Set the expected return date for this book"
+          >
             <label class="label">
-              <span class="label-text">Borrow Date</span>
-            </label>
-            <input
-              type="date"
-              :value="currentDate"
-              class="input input-bordered bg-base-200"
-              disabled
-            />
-            <label class="label">
-              <span class="label-text-alt text-base-content/60"
-                >Automatically set to today</span
+              <span class="label-text"
+                >Expected Return Date <span class="text-error">*</span></span
               >
+              <span class="label-text-alt">📅 When should it be returned?</span>
             </label>
           </div>
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text">Due Date</span>
-            </label>
-            <input
-              type="date"
-              v-model="formData.dueDate"
-              class="input input-bordered"
-              :min="currentDate"
-              required
-            />
+          <input
+            type="date"
+            v-model="formData.returnDate"
+            class="input input-bordered"
+            :min="currentDate"
+            required
+          />
+          <div class="label">
+            <span class="label-text-alt text-xs text-base-content/60">
+              💡 Set a realistic return date to help track book loans
+            </span>
           </div>
-        </div> -->
+        </div>
 
         <!-- Book Condition Assessment -->
         <div class="form-control">
@@ -480,6 +475,7 @@ const formData = ref({
   studentId: "",
   bookId: "",
   dueDate: "",
+  returnDate: "",
   bookConditions: [] as string[],
   barcode: "",
   beforeConditionImages: [] as File[],
@@ -608,6 +604,19 @@ const handleSubmit = async () => {
     return;
   }
 
+  if (!formData.value.returnDate) {
+    alert("Please select an expected return date");
+    return;
+  }
+
+  if (
+    formData.value.returnDate &&
+    new Date(formData.value.returnDate) < new Date()
+  ) {
+    alert("Return date cannot be in the past");
+    return;
+  }
+
   loading.value = true;
   try {
     // Find the selected book to get its title
@@ -649,6 +658,7 @@ const handleSubmit = async () => {
       address: "", // Backend will get from existing student data
       bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
+      returnDate: formData.value.returnDate,
     });
 
     // Step 2: Upload images using the returned recordId and pass bookConditions as knownTags
@@ -674,6 +684,7 @@ const handleSubmit = async () => {
       address: "",
       bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
+      returnDate: formData.value.returnDate,
     });
 
     // Reset form
@@ -681,6 +692,7 @@ const handleSubmit = async () => {
       studentId: "",
       bookId: "",
       dueDate: "",
+      returnDate: "",
       bookConditions: [],
       barcode: "",
       beforeConditionImages: [],

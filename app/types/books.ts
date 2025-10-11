@@ -58,6 +58,7 @@ export interface BorrowBookData {
   address: string;
   bookConditions: string[];
   beforeConditionImages: File[];
+  returnDate: string;
 }
 
 export interface ReturnBookData {
