@@ -70,7 +70,7 @@
           />
         </div>
 
-        <div class="form-control">
+        <!-- <div class="form-control">
           <div
             class="tooltip tooltip-right"
             data-tip="Student's email address for notifications and communication"
@@ -89,7 +89,7 @@
             placeholder="e.g., john.smith@email.com"
             required
           />
-        </div>
+        </div> -->
 
         <!-- Address -->
         <div class="form-control">
@@ -226,7 +226,6 @@ import type { Student } from "~/types/books";
 type CreateStudentData = {
   firstNames: string;
   lastName: string;
-  email: string;
   address: string;
   parents: { name: string; email: string; relationship: string }[];
 };
@@ -251,7 +250,6 @@ const loading = ref(false);
 const formData = ref({
   firstNames: "",
   lastName: "",
-  email: "",
   address: "",
   parents: [{ name: "", email: "", relationship: "" }] as {
     name: string;
@@ -273,7 +271,6 @@ watch(
       formData.value = {
         firstNames,
         lastName,
-        email: newStudent.email || "",
         address: (newStudent as any).address || "",
         parents:
           (newStudent as any).parents && (newStudent as any).parents.length > 0
@@ -285,7 +282,6 @@ watch(
       formData.value = {
         firstNames: "",
         lastName: "",
-        email: "",
         address: "",
         parents: [{ name: "", email: "", relationship: "" }],
       };
@@ -316,10 +312,6 @@ const handleSubmit = async () => {
     alert("Please enter last name");
     return;
   }
-  if (!formData.value.email.trim()) {
-    alert("Please enter email");
-    return;
-  }
   if (!formData.value.address.trim()) {
     alert("Please enter address");
     return;
@@ -341,7 +333,6 @@ const handleSubmit = async () => {
     const studentData = {
       firstNames: formData.value.firstNames.trim(),
       lastName: formData.value.lastName.trim(),
-      email: formData.value.email.trim(),
       address: formData.value.address.trim(),
       parents: validParents,
     };
@@ -366,7 +357,6 @@ const handleSubmit = async () => {
     formData.value = {
       firstNames: "",
       lastName: "",
-      email: "",
       address: "",
       parents: [{ name: "", email: "", relationship: "" }],
     };

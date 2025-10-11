@@ -248,17 +248,6 @@
                 <input
                   type="checkbox"
                   class="checkbox checkbox-primary"
-                  value="excellent"
-                  v-model="formData.bookConditions"
-                />
-                <span class="label-text">📘 Excellent - Minimal wear</span>
-              </label>
-            </div>
-            <div class="form-control">
-              <label class="label cursor-pointer justify-start gap-3">
-                <input
-                  type="checkbox"
-                  class="checkbox checkbox-primary"
                   value="good"
                   v-model="formData.bookConditions"
                 />

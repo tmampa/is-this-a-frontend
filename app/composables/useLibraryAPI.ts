@@ -117,7 +117,6 @@ export const LibraryAPI = {
   async createStudent(studentData: {
     firstNames: string;
     lastName: string;
-    email: string;
     address: string;
     parents: { name: string; email: string; relationship: string }[];
   }): Promise<Student> {
@@ -142,7 +141,6 @@ export const LibraryAPI = {
     studentData: {
       firstNames: string;
       lastName: string;
-      email: string;
       address: string;
       parents: { name: string; email: string; relationship: string }[];
     }
