@@ -26,20 +26,30 @@
                 {{ formatDate(book.dueDate) }}
               </p>
             </div>
+            <div>
+              <p class="text-base-content/60">Recorded Barcode</p>
+              <p class="font-mono text-xs">
+                {{ book.barcode || "Not recorded" }}
+              </p>
+            </div>
           </div>
         </div>
 
         <!-- Barcode Verification -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text">Verify Book Barcode/ISBN *</span>
+            <span class="label-text">Verify Book Barcode *</span>
             <span class="label-text-alt text-info">
-              {{ book.bookTitle ? "Expected: " + (bookISBN || "N/A") : "" }}
+              {{
+                book.barcode
+                  ? "Expected: " + book.barcode
+                  : "No barcode recorded during borrowing"
+              }}
             </span>
           </label>
           <input
             type="text"
-            placeholder="Scan or enter book barcode/ISBN"
+            placeholder="Scan or enter the book barcode"
             class="input input-bordered"
             :class="{
               'input-success': barcodeVerified === true,
@@ -48,6 +58,7 @@
             }"
             v-model="formData.barcodeInput"
             @input="handleBarcodeInput"
+            :disabled="!book.barcode"
             required
           />
           <label class="label">
@@ -55,7 +66,12 @@
               class="label-text-alt text-success"
               v-if="barcodeVerified === true"
             >
-              ✓ Barcode verified successfully
+              ✓ Barcode verified successfully - matches the barcode scanned
+              during borrowing
+            </span>
+            <span class="label-text-alt text-error" v-else-if="!book.barcode">
+              ⚠ No barcode was recorded when this book was issued - verification
+              not possible
             </span>
             <span
               class="label-text-alt text-error"
@@ -63,11 +79,11 @@
                 barcodeVerified === false && formData.barcodeInput.length > 0
               "
             >
-              ✗ Barcode does not match book record
+              ✗ Barcode does not match the one recorded during borrowing
             </span>
             <span class="label-text-alt text-base-content/60" v-else>
-              Please scan or manually enter the book's barcode/ISBN to verify
-              you have the correct book
+              Scan the barcode to verify this is the same book that was issued
+              to {{ book.studentName }}
             </span>
           </label>
         </div>
@@ -199,9 +215,8 @@ watch(
   () => props.book,
   (newBook) => {
     if (newBook) {
-      // In a real implementation, you would fetch the actual ISBN/barcode from the book details
-      // For now, we'll use the book ID or title as a placeholder
-      bookISBN.value = newBook.id || newBook.bookTitle;
+      // Use the barcode that was saved when the book was issued to the student
+      bookISBN.value = newBook.barcode || newBook.id || "No barcode recorded";
 
       // Reset barcode verification when book changes
       barcodeVerified.value = null;
@@ -237,27 +252,40 @@ const handleBarcodeInput = () => {
     return;
   }
 
-  // For now, we'll compare against a mock ISBN/barcode
-  // In a real implementation, you would fetch the book details and compare
-  // For this example, let's assume we're comparing against the book title or a stored ISBN
-  const expectedBarcode = bookISBN.value || props.book.bookTitle;
+  // Compare the scanned barcode with the barcode that was saved when the book was issued
+  const expectedBarcode = props.book.barcode;
 
-  // Simple verification - in real app, this would be more sophisticated
-  barcodeVerified.value =
-    input.toLowerCase() === expectedBarcode.toLowerCase() ||
-    input === props.book.id ||
-    input.includes(props.book.bookTitle.toLowerCase().replace(/\s+/g, ""));
-};
-
-const handleSubmit = () => {
-  if (formData.value.barcodeInput.trim() === "") {
-    alert("Please enter the book barcode/ISBN to verify the correct book");
+  if (!expectedBarcode) {
+    // If no barcode was recorded during borrowing, we can't verify
+    barcodeVerified.value = false;
     return;
   }
 
-  if (barcodeVerified.value !== true) {
-    alert("Please verify the barcode matches the book before returning");
-    return;
+  // Exact match required - the barcode must match exactly what was scanned during borrowing
+  barcodeVerified.value = input === expectedBarcode;
+};
+
+const handleSubmit = () => {
+  // If no barcode was recorded during borrowing, we can still proceed but warn the user
+  if (!props.book.barcode) {
+    const proceed = confirm(
+      "Warning: No barcode was recorded when this book was issued. " +
+        "Are you sure you want to proceed with returning this book without barcode verification?"
+    );
+    if (!proceed) return;
+  } else {
+    // If barcode exists, require verification
+    if (formData.value.barcodeInput.trim() === "") {
+      alert("Please scan the book barcode to verify you have the correct book");
+      return;
+    }
+
+    if (barcodeVerified.value !== true) {
+      alert(
+        "The barcode does not match the one recorded during borrowing. Please verify you have the correct book."
+      );
+      return;
+    }
   }
 
   if (formData.value.afterConditionImages.length === 0) {

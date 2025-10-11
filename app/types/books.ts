@@ -49,6 +49,7 @@ export interface BorrowedBook {
   returnDate?: string;
   returnConditions?: string[];
   conditionNotes?: string;
+  barcode?: string; // Barcode scanned when book was issued to student
 }
 
 export interface BorrowBookData {
@@ -59,6 +60,7 @@ export interface BorrowBookData {
   bookConditions: string[];
   beforeConditionImages: File[];
   returnDate: string;
+  barcode: string; // Barcode scanned during book borrowing
 }
 
 export interface ReturnBookData {

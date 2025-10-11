@@ -659,6 +659,7 @@ const handleSubmit = async () => {
       bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
       returnDate: formData.value.returnDate,
+      barcode: formData.value.barcode,
     });
 
     // Step 2: Upload images using the returned recordId and pass bookConditions as knownTags
@@ -685,6 +686,7 @@ const handleSubmit = async () => {
       bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
       returnDate: formData.value.returnDate,
+      barcode: formData.value.barcode,
     });
 
     // Reset form
