@@ -10,15 +10,17 @@
           <h1 class="text-2xl font-bold text-base-content">
             Library Statistics
           </h1>
-        <div class="bg-base-100 rounded-lg shadow-sm">
-          <div class="p-6 border-b border-base-300">
-            <h3 class="text-lg font-semibold flex items-center gap-2">
-              🔍 Lost Books Report
-              <span class="badge badge-accent">{{ lostBooks.length }}</span>
-            </h3>
+          <div class="bg-base-100 rounded-lg shadow-sm">
+            <div class="p-6 border-b border-base-300">
+              <h3 class="text-lg font-semibold flex items-center gap-2">
+                🔍 Lost Books Report
+                <span class="badge badge-accent">{{ lostBooks.length }}</span>
+              </h3>
+            </div>
           </div>
-        </div>   <p class="text-sm text-base-content/60 mt-1">
-            📊 Comprehensive overview of library operations and borrowing analytics
+          <p class="text-sm text-base-content/60 mt-1">
+            📊 Comprehensive overview of library operations and borrowing
+            analytics
           </p>
           <div class="mt-2 text-xs text-base-content/50">
             💡 Tip: Export data to Excel for detailed analysis
@@ -52,10 +54,7 @@
               <span v-else>Exporting...</span>
             </button>
           </div>
-          <div
-            class="tooltip tooltip-left"
-            data-tip="Print statistics report"
-          >
+          <div class="tooltip tooltip-left" data-tip="Print statistics report">
             <button
               @click="printReport"
               class="btn btn-outline normal-case px-6 gap-2"
@@ -110,7 +109,11 @@
             <label class="label">
               <span class="label-text">Quick Select</span>
             </label>
-            <select v-model="selectedPeriod" @change="applyQuickPeriod" class="select select-bordered">
+            <select
+              v-model="selectedPeriod"
+              @change="applyQuickPeriod"
+              class="select select-bordered"
+            >
               <option value="">Custom Range</option>
               <option value="today">Today</option>
               <option value="week">This Week</option>
@@ -124,11 +127,11 @@
             <label class="label">
               <span class="label-text">Auto Refresh</span>
             </label>
-            <button 
+            <button
               @click="toggleAutoRefresh"
               :class="['btn', autoRefresh ? 'btn-success' : 'btn-outline']"
             >
-              {{ autoRefresh ? 'ON' : 'OFF' }}
+              {{ autoRefresh ? "ON" : "OFF" }}
             </button>
           </div>
         </div>
@@ -156,7 +159,9 @@
               </svg>
             </div>
             <div class="stat-title">Currently Borrowed</div>
-            <div class="stat-value text-warning">{{ currentlyBorrowedCount }}</div>
+            <div class="stat-value text-warning">
+              {{ currentlyBorrowedCount }}
+            </div>
             <div class="stat-desc">Books out on loan</div>
           </div>
         </div>
@@ -181,7 +186,9 @@
               </svg>
             </div>
             <div class="stat-title">Total Amount Owed</div>
-            <div class="stat-value text-error">R{{ totalAmountOwed.toFixed(2) }}</div>
+            <div class="stat-value text-error">
+              R{{ totalAmountOwed.toFixed(2) }}
+            </div>
             <div class="stat-desc">Outstanding fines</div>
           </div>
         </div>
@@ -252,7 +259,9 @@
         <div class="stats shadow-sm bg-base-100">
           <div class="stat">
             <div class="stat-title">Avg. Loan Duration</div>
-            <div class="stat-value text-primary">{{ averageLoanDuration }} days</div>
+            <div class="stat-value text-primary">
+              {{ averageLoanDuration }} days
+            </div>
             <div class="stat-desc">Per book</div>
           </div>
         </div>
@@ -274,7 +283,9 @@
           <div class="p-6 border-b border-base-300">
             <h3 class="text-lg font-semibold flex items-center gap-2">
               📚 Currently Borrowed Books
-              <span class="badge badge-warning">{{ currentlyBorrowedBooks.length }}</span>
+              <span class="badge badge-warning">{{
+                currentlyBorrowedBooks.length
+              }}</span>
             </h3>
           </div>
           <div class="overflow-x-auto max-h-96">
@@ -292,26 +303,32 @@
                   <td class="font-medium">{{ book.bookTitle }}</td>
                   <td>{{ book.studentName }}</td>
                   <td>
-                    <span 
-                      :class="{ 
+                    <span
+                      :class="{
                         'text-error font-semibold': isOverdue(book.dueDate),
-                        'text-warning': isNearDue(book.dueDate)
+                        'text-warning': isNearDue(book.dueDate),
                       }"
                     >
                       {{ formatDate(book.dueDate) }}
                     </span>
                   </td>
                   <td>
-                    <div 
+                    <div
                       :class="[
                         'badge',
-                        isOverdue(book.dueDate) ? 'badge-error' : 
-                        isNearDue(book.dueDate) ? 'badge-warning' : 'badge-success'
+                        isOverdue(book.dueDate)
+                          ? 'badge-error'
+                          : isNearDue(book.dueDate)
+                          ? 'badge-warning'
+                          : 'badge-success',
                       ]"
                     >
-                      {{ 
-                        isOverdue(book.dueDate) ? 'Overdue' :
-                        isNearDue(book.dueDate) ? 'Due Soon' : 'Active'
+                      {{
+                        isOverdue(book.dueDate)
+                          ? "Overdue"
+                          : isNearDue(book.dueDate)
+                          ? "Due Soon"
+                          : "Active"
                       }}
                     </div>
                   </td>
@@ -326,7 +343,9 @@
           <div class="p-6 border-b border-base-300">
             <h3 class="text-lg font-semibold flex items-center gap-2">
               💰 Outstanding Fines
-              <span class="badge badge-error">{{ studentsWithFines.length }}</span>
+              <span class="badge badge-error">{{
+                studentsWithFines.length
+              }}</span>
             </h3>
           </div>
           <div class="overflow-x-auto max-h-96">
@@ -343,9 +362,13 @@
                 <tr v-for="student in studentsWithFines" :key="student.id">
                   <td class="font-medium">{{ student.fullName }}</td>
                   <td>{{ student.studentNumber }}</td>
-                  <td class="text-error font-semibold">R{{ (student.outstandingFines || 0).toFixed(2) }}</td>
+                  <td class="text-error font-semibold">
+                    R{{ (student.outstandingFines || 0).toFixed(2) }}
+                  </td>
                   <td>
-                    <div class="badge badge-neutral">{{ student.borrowedBooks.length }}</div>
+                    <div class="badge badge-neutral">
+                      {{ student.borrowedBooks.length }}
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -380,8 +403,12 @@
                 <td>{{ book.studentName }}</td>
                 <td>{{ formatDate(book.borrowDate) }}</td>
                 <td>{{ formatDate(book.dueDate) }}</td>
-                <td class="text-accent font-semibold">{{ daysMissing(book.dueDate) }}</td>
-                <td class="text-error">R{{ getBookPrice(book.bookId).toFixed(2) }}</td>
+                <td class="text-accent font-semibold">
+                  {{ daysMissing(book.dueDate) }}
+                </td>
+                <td class="text-error">
+                  R{{ getBookPrice(book.bookId).toFixed(2) }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -393,7 +420,9 @@
         <!-- Borrowing Trends Chart Placeholder -->
         <div class="bg-base-100 rounded-lg shadow-sm p-6">
           <h3 class="text-lg font-semibold mb-4">📈 Borrowing Trends</h3>
-          <div class="h-64 bg-base-200 rounded-lg flex items-center justify-center">
+          <div
+            class="h-64 bg-base-200 rounded-lg flex items-center justify-center"
+          >
             <div class="text-center text-base-content/60">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -418,7 +447,9 @@
         <!-- Category Distribution Chart Placeholder -->
         <div class="bg-base-100 rounded-lg shadow-sm p-6">
           <h3 class="text-lg font-semibold mb-4">📊 Popular Categories</h3>
-          <div class="h-64 bg-base-200 rounded-lg flex items-center justify-center">
+          <div
+            class="h-64 bg-base-200 rounded-lg flex items-center justify-center"
+          >
             <div class="text-center text-base-content/60">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -476,9 +507,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import type { Book, Student, BorrowedBook } from '~/types/books';
-import NavBar from '~/components/NavBar.vue';
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import type { Book, Student, BorrowedBook } from "~/types/books";
+import NavBar from "~/components/NavBar.vue";
 
 // Mock data - In real app, these would come from API
 const books = ref<Book[]>([]);
@@ -489,54 +520,72 @@ const borrowedBooks = ref<BorrowedBook[]>([]);
 const isExporting = ref(false);
 const autoRefresh = ref(false);
 const refreshInterval = ref<NodeJS.Timeout | null>(null);
-const selectedPeriod = ref('');
+const selectedPeriod = ref("");
 const dateRange = ref({
-  from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days ago
-  to: new Date().toISOString().split('T')[0] // today
+  from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0], // 30 days ago
+  to: new Date().toISOString().split("T")[0], // today
 });
 
 // Computed statistics
-const currentlyBorrowedBooks = computed(() => 
-  borrowedBooks.value.filter(book => book.status === 'borrowed')
+const currentlyBorrowedBooks = computed(() =>
+  borrowedBooks.value.filter((book) => book.status === "borrowed")
 );
 
-const currentlyBorrowedCount = computed(() => currentlyBorrowedBooks.value.length);
-
-const totalAmountOwed = computed(() => 
-  students.value.reduce((sum, student) => sum + (student.outstandingFines || 0), 0)
+const currentlyBorrowedCount = computed(
+  () => currentlyBorrowedBooks.value.length
 );
 
-const lostBooks = computed(() => 
-  borrowedBooks.value.filter(book => 
-    book.returnConditions?.includes('🔖 Lost') || 
-    (book.status === 'borrowed' && daysMissing(book.dueDate) > 30)
+const totalAmountOwed = computed(() =>
+  students.value.reduce(
+    (sum, student) => sum + (student.outstandingFines || 0),
+    0
+  )
+);
+
+const lostBooks = computed(() =>
+  borrowedBooks.value.filter(
+    (book) =>
+      book.returnConditions?.includes("🔖 Lost") ||
+      (book.status === "borrowed" && daysMissing(book.dueDate) > 30)
   )
 );
 
 const lostBooksCount = computed(() => lostBooks.value.length);
 
-const overdueCount = computed(() => 
-  currentlyBorrowedBooks.value.filter(book => isOverdue(book.dueDate)).length
+const overdueCount = computed(
+  () =>
+    currentlyBorrowedBooks.value.filter((book) => isOverdue(book.dueDate))
+      .length
 );
 
-const activeStudentsCount = computed(() => 
-  students.value.filter(student => student.borrowedBooks.length > 0).length
+const activeStudentsCount = computed(
+  () =>
+    students.value.filter((student) => student.borrowedBooks.length > 0).length
 );
 
-const studentsWithFines = computed(() => 
-  students.value.filter(student => (student.outstandingFines || 0) > 0)
+const studentsWithFines = computed(() =>
+  students.value.filter((student) => (student.outstandingFines || 0) > 0)
 );
 
 const averageLoanDuration = computed(() => {
-  const returnedBooks = borrowedBooks.value.filter(book => book.status === 'returned' && book.returnDate);
+  const returnedBooks = borrowedBooks.value.filter(
+    (book) => book.status === "returned" && book.returnDate
+  );
   if (returnedBooks.length === 0) return 0;
-  
+
   const totalDays = returnedBooks.reduce((sum, book) => {
     const borrowDate = new Date(book.borrowDate);
     const returnDate = new Date(book.returnDate!);
-    return sum + Math.ceil((returnDate.getTime() - borrowDate.getTime()) / (1000 * 60 * 60 * 24));
+    return (
+      sum +
+      Math.ceil(
+        (returnDate.getTime() - borrowDate.getTime()) / (1000 * 60 * 60 * 24)
+      )
+    );
   }, 0);
-  
+
   return Math.round(totalDays / returnedBooks.length);
 });
 
@@ -547,24 +596,30 @@ const usageRate = computed(() => {
 
 const actionItems = computed(() => {
   const items: string[] = [];
-  
+
   if (overdueCount.value > 0) {
     items.push(`${overdueCount.value} overdue books require follow-up`);
   }
-  
+
   if (lostBooksCount.value > 0) {
-    items.push(`${lostBooksCount.value} books reported as lost need investigation`);
+    items.push(
+      `${lostBooksCount.value} books reported as lost need investigation`
+    );
   }
-  
+
   if (studentsWithFines.value.length > 0) {
-    items.push(`${studentsWithFines.value.length} students have outstanding fines`);
+    items.push(
+      `${studentsWithFines.value.length} students have outstanding fines`
+    );
   }
-  
-  const nearDueCount = currentlyBorrowedBooks.value.filter(book => isNearDue(book.dueDate)).length;
+
+  const nearDueCount = currentlyBorrowedBooks.value.filter((book) =>
+    isNearDue(book.dueDate)
+  ).length;
   if (nearDueCount > 0) {
     items.push(`${nearDueCount} books due within 3 days`);
   }
-  
+
   return items;
 });
 
@@ -580,18 +635,23 @@ const isOverdue = (dueDate: string) => {
 const isNearDue = (dueDate: string) => {
   const due = new Date(dueDate);
   const today = new Date();
-  const diffDays = Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const diffDays = Math.ceil(
+    (due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+  );
   return diffDays >= 0 && diffDays <= 3;
 };
 
 const daysMissing = (dueDate: string) => {
   const due = new Date(dueDate);
   const today = new Date();
-  return Math.max(0, Math.ceil((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24)));
+  return Math.max(
+    0,
+    Math.ceil((today.getTime() - due.getTime()) / (1000 * 60 * 60 * 24))
+  );
 };
 
 const getBookPrice = (bookId: string) => {
-  const book = books.value.find(b => b.id === bookId);
+  const book = books.value.find((b) => b.id === bookId);
   return book?.price || 0;
 };
 
@@ -599,35 +659,41 @@ const getBookPrice = (bookId: string) => {
 const applyQuickPeriod = () => {
   const today = new Date();
   const period = selectedPeriod.value;
-  
+
   switch (period) {
-    case 'today':
-      dateRange.value.from = dateRange.value.to = today.toISOString().split('T')[0];
+    case "today":
+      dateRange.value.from = dateRange.value.to = today
+        .toISOString()
+        .split("T")[0];
       break;
-    case 'week':
+    case "week":
       const weekStart = new Date(today);
       weekStart.setDate(today.getDate() - today.getDay());
-      dateRange.value.from = weekStart.toISOString().split('T')[0];
-      dateRange.value.to = today.toISOString().split('T')[0];
+      dateRange.value.from = weekStart.toISOString().split("T")[0];
+      dateRange.value.to = today.toISOString().split("T")[0];
       break;
-    case 'month':
+    case "month":
       const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-      dateRange.value.from = monthStart.toISOString().split('T')[0];
-      dateRange.value.to = today.toISOString().split('T')[0];
+      dateRange.value.from = monthStart.toISOString().split("T")[0];
+      dateRange.value.to = today.toISOString().split("T")[0];
       break;
-    case 'quarter':
-      const quarterStart = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1);
-      dateRange.value.from = quarterStart.toISOString().split('T')[0];
-      dateRange.value.to = today.toISOString().split('T')[0];
+    case "quarter":
+      const quarterStart = new Date(
+        today.getFullYear(),
+        Math.floor(today.getMonth() / 3) * 3,
+        1
+      );
+      dateRange.value.from = quarterStart.toISOString().split("T")[0];
+      dateRange.value.to = today.toISOString().split("T")[0];
       break;
-    case 'year':
+    case "year":
       const yearStart = new Date(today.getFullYear(), 0, 1);
-      dateRange.value.from = yearStart.toISOString().split('T')[0];
-      dateRange.value.to = today.toISOString().split('T')[0];
+      dateRange.value.from = yearStart.toISOString().split("T")[0];
+      dateRange.value.to = today.toISOString().split("T")[0];
       break;
-    case 'all':
-      dateRange.value.from = '2020-01-01'; // Arbitrary start date
-      dateRange.value.to = today.toISOString().split('T')[0];
+    case "all":
+      dateRange.value.from = "2020-01-01"; // Arbitrary start date
+      dateRange.value.to = today.toISOString().split("T")[0];
       break;
   }
   updateStatistics();
@@ -635,7 +701,7 @@ const applyQuickPeriod = () => {
 
 const toggleAutoRefresh = () => {
   autoRefresh.value = !autoRefresh.value;
-  
+
   if (autoRefresh.value) {
     refreshInterval.value = setInterval(() => {
       updateStatistics();
@@ -654,80 +720,101 @@ const updateStatistics = () => {
 // Export functions
 const exportToExcel = async () => {
   isExporting.value = true;
-  
+
   try {
     // Create workbook data
     const workbookData = {
-      'Summary Statistics': [
-        ['Metric', 'Value'],
-        ['Currently Borrowed Books', currentlyBorrowedCount.value],
-        ['Total Amount Owed', `R${totalAmountOwed.value.toFixed(2)}`],
-        ['Lost Books', lostBooksCount.value],
-        ['Overdue Books', overdueCount.value],
-        ['Active Students', activeStudentsCount.value],
-        ['Average Loan Duration', `${averageLoanDuration.value} days`],
-        ['Collection Usage Rate', `${usageRate.value}%`],
+      "Summary Statistics": [
+        ["Metric", "Value"],
+        ["Currently Borrowed Books", currentlyBorrowedCount.value],
+        ["Total Amount Owed", `R${totalAmountOwed.value.toFixed(2)}`],
+        ["Lost Books", lostBooksCount.value],
+        ["Overdue Books", overdueCount.value],
+        ["Active Students", activeStudentsCount.value],
+        ["Average Loan Duration", `${averageLoanDuration.value} days`],
+        ["Collection Usage Rate", `${usageRate.value}%`],
       ],
-      'Currently Borrowed': [
-        ['Book Title', 'Student Name', 'Student Number', 'Borrow Date', 'Due Date', 'Status'],
-        ...currentlyBorrowedBooks.value.map(book => [
+      "Currently Borrowed": [
+        [
+          "Book Title",
+          "Student Name",
+          "Student Number",
+          "Borrow Date",
+          "Due Date",
+          "Status",
+        ],
+        ...currentlyBorrowedBooks.value.map((book) => [
           book.bookTitle,
           book.studentName,
           book.studentNumber,
           formatDate(book.borrowDate),
           formatDate(book.dueDate),
-          isOverdue(book.dueDate) ? 'Overdue' : isNearDue(book.dueDate) ? 'Due Soon' : 'Active'
-        ])
+          isOverdue(book.dueDate)
+            ? "Overdue"
+            : isNearDue(book.dueDate)
+            ? "Due Soon"
+            : "Active",
+        ]),
       ],
-      'Outstanding Fines': [
-        ['Student Name', 'Student Number', 'Amount Owed', 'Books Borrowed'],
-        ...studentsWithFines.value.map(student => [
+      "Outstanding Fines": [
+        ["Student Name", "Student Number", "Amount Owed", "Books Borrowed"],
+        ...studentsWithFines.value.map((student) => [
           student.fullName,
           student.studentNumber,
           `R${(student.outstandingFines || 0).toFixed(2)}`,
-          student.borrowedBooks.length
-        ])
+          student.borrowedBooks.length,
+        ]),
       ],
-      'Lost Books': [
-        ['Book Title', 'Last Borrower', 'Student Number', 'Borrowed Date', 'Due Date', 'Days Missing', 'Replacement Cost'],
-        ...lostBooks.value.map(book => [
+      "Lost Books": [
+        [
+          "Book Title",
+          "Last Borrower",
+          "Student Number",
+          "Borrowed Date",
+          "Due Date",
+          "Days Missing",
+          "Replacement Cost",
+        ],
+        ...lostBooks.value.map((book) => [
           book.bookTitle,
           book.studentName,
           book.studentNumber,
           formatDate(book.borrowDate),
           formatDate(book.dueDate),
           daysMissing(book.dueDate),
-          `R${getBookPrice(book.bookId).toFixed(2)}`
-        ])
-      ]
+          `R${getBookPrice(book.bookId).toFixed(2)}`,
+        ]),
+      ],
     };
 
     // Simulate export delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     // In a real implementation, you would use a library like xlsx to create the Excel file
-    console.log('Exporting data:', workbookData);
-    
+    console.log("Exporting data:", workbookData);
+
     // Create and download a simple CSV for demonstration
-    const csv = createCSVFromData(workbookData['Summary Statistics']);
-    downloadCSV(csv, `library-statistics-${new Date().toISOString().split('T')[0]}.csv`);
-    
+    const csv = createCSVFromData(workbookData["Summary Statistics"]);
+    downloadCSV(
+      csv,
+      `library-statistics-${new Date().toISOString().split("T")[0]}.csv`
+    );
   } catch (error) {
-    console.error('Export failed:', error);
-    alert('Export failed. Please try again.');
+    console.error("Export failed:", error);
+    alert("Export failed. Please try again.");
   } finally {
     isExporting.value = false;
   }
 };
 
 const createCSVFromData = (data: any[][]) => {
-  return data.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+  return data.map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n");
 };
 
 const downloadCSV = (csv: string, filename: string) => {
-  const blob = new Blob([csv], { type: 'text/csv' });
+  const blob = new Blob([csv], { type: "text/csv" });
   const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
@@ -745,126 +832,126 @@ const loadMockData = () => {
   // Mock books
   books.value = [
     {
-      id: '1',
-      title: 'The Great Gatsby',
-      author: 'F. Scott Fitzgerald',
-      isbn: '978-0-7432-7356-5',
+      id: "1",
+      title: "The Great Gatsby",
+      author: "F. Scott Fitzgerald",
+      isbn: "978-0-7432-7356-5",
       publishedYear: 1925,
-      publisher: 'Scribner',
+      publisher: "Scribner",
       pages: 180,
-      language: 'English',
-      price: 250.00,
+      language: "English",
+      price: 250.0,
       grade: 12,
-      status: 'borrowed',
-      category: 'Literature'
+      status: "borrowed",
+      category: "Literature",
     },
     {
-      id: '2',
-      title: 'To Kill a Mockingbird',
-      author: 'Harper Lee',
-      isbn: '978-0-06-112008-4',
+      id: "2",
+      title: "To Kill a Mockingbird",
+      author: "Harper Lee",
+      isbn: "978-0-06-112008-4",
       publishedYear: 1960,
-      publisher: 'J.B. Lippincott & Co.',
+      publisher: "J.B. Lippincott & Co.",
       pages: 376,
-      language: 'English',
-      price: 280.00,
+      language: "English",
+      price: 280.0,
       grade: 11,
-      status: 'available',
-      category: 'Literature'
+      status: "available",
+      category: "Literature",
     },
     {
-      id: '3',
-      title: 'Mathematics Grade 10',
-      author: 'Various Authors',
-      isbn: '978-1-77025-123-4',
+      id: "3",
+      title: "Mathematics Grade 10",
+      author: "Various Authors",
+      isbn: "978-1-77025-123-4",
       publishedYear: 2020,
-      publisher: 'Oxford',
+      publisher: "Oxford",
       pages: 450,
-      language: 'English',
-      price: 350.00,
+      language: "English",
+      price: 350.0,
       grade: 10,
-      status: 'borrowed',
-      category: 'Mathematics'
-    }
+      status: "borrowed",
+      category: "Mathematics",
+    },
   ];
 
   // Mock students
   students.value = [
     {
-      id: '1',
-      fullName: 'John Doe',
+      id: "1",
+      fullName: "John Doe",
       studentNumber: 12345,
-      email: 'john.doe@school.edu',
-      borrowedBooks: ['1', '3'],
-      outstandingFines: 25.50
+      email: "john.doe@school.edu",
+      borrowedBooks: ["1", "3"],
+      outstandingFines: 25.5,
     },
     {
-      id: '2',
-      fullName: 'Jane Smith',
+      id: "2",
+      fullName: "Jane Smith",
       studentNumber: 12346,
-      email: 'jane.smith@school.edu',
+      email: "jane.smith@school.edu",
       borrowedBooks: [],
-      outstandingFines: 0
+      outstandingFines: 0,
     },
     {
-      id: '3',
-      fullName: 'Mike Johnson',
+      id: "3",
+      fullName: "Mike Johnson",
       studentNumber: 12347,
-      email: 'mike.johnson@school.edu',
-      borrowedBooks: ['2'],
-      outstandingFines: 15.00
-    }
+      email: "mike.johnson@school.edu",
+      borrowedBooks: ["2"],
+      outstandingFines: 15.0,
+    },
   ];
 
   // Mock borrowed books
   borrowedBooks.value = [
     {
-      id: '1',
-      bookId: '1',
-      studentId: '1',
+      id: "1",
+      bookId: "1",
+      studentId: "1",
       studentNumber: 12345,
-      bookTitle: 'The Great Gatsby',
-      studentName: 'John Doe',
-      borrowDate: '2024-10-01',
-      dueDate: '2024-10-15',
-      status: 'borrowed',
-      initialConditions: ['📙 Good - Light wear, no damage'],
+      bookTitle: "The Great Gatsby",
+      studentName: "John Doe",
+      borrowDate: "2024-10-01",
+      dueDate: "2024-10-15",
+      status: "borrowed",
+      initialConditions: ["📙 Good - Light wear, no damage"],
       beforeConditionImages: [],
       afterConditionImages: [],
-      barcode: 'GB001'
+      barcode: "GB001",
     },
     {
-      id: '2',
-      bookId: '3',
-      studentId: '1',
+      id: "2",
+      bookId: "3",
+      studentId: "1",
       studentNumber: 12345,
-      bookTitle: 'Mathematics Grade 10',
-      studentName: 'John Doe',
-      borrowDate: '2024-09-20',
-      dueDate: '2024-10-05',
-      status: 'borrowed',
-      initialConditions: ['📙 Good - Light wear, no damage'],
+      bookTitle: "Mathematics Grade 10",
+      studentName: "John Doe",
+      borrowDate: "2024-09-20",
+      dueDate: "2024-10-05",
+      status: "borrowed",
+      initialConditions: ["📙 Good - Light wear, no damage"],
       beforeConditionImages: [],
       afterConditionImages: [],
-      barcode: 'MG001'
+      barcode: "MG001",
     },
     {
-      id: '3',
-      bookId: '2',
-      studentId: '2',
+      id: "3",
+      bookId: "2",
+      studentId: "2",
       studentNumber: 12346,
-      bookTitle: 'To Kill a Mockingbird',
-      studentName: 'Jane Smith',
-      borrowDate: '2024-08-15',
-      dueDate: '2024-09-01',
-      status: 'returned',
-      initialConditions: ['📙 Good - Light wear, no damage'],
+      bookTitle: "To Kill a Mockingbird",
+      studentName: "Jane Smith",
+      borrowDate: "2024-08-15",
+      dueDate: "2024-09-01",
+      status: "returned",
+      initialConditions: ["📙 Good - Light wear, no damage"],
       beforeConditionImages: [],
       afterConditionImages: [],
-      returnDate: '2024-08-30',
-      returnConditions: ['🔖 Lost'],
-      barcode: 'TK001'
-    }
+      returnDate: "2024-08-30",
+      returnConditions: ["🔖 Lost"],
+      barcode: "TK001",
+    },
   ];
 };
 
@@ -886,20 +973,21 @@ onUnmounted(() => {
     margin: 0 !important;
     padding: 1rem !important;
   }
-  
-  button, .btn {
+
+  button,
+  .btn {
     display: none !important;
   }
-  
+
   .no-print {
     display: none !important;
   }
-  
+
   .stats {
     break-inside: avoid;
     page-break-inside: avoid;
   }
-  
+
   table {
     break-inside: avoid;
     font-size: 0.8rem;
