@@ -41,12 +41,11 @@ export interface BorrowedBook {
   bookTitle: string;
   studentName: string;
   borrowDate: string;
-  dueDate: string;
+  returnDate: string;
   status: "borrowed" | "returned";
   initialConditions: string[];
   beforeConditionImages: string[];
   afterConditionImages: string[];
-  returnDate?: string;
   returnConditions?: string[];
   conditionNotes?: string;
   barcode?: string; // Barcode scanned when book was issued to student

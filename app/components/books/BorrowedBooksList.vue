@@ -20,8 +20,8 @@
             <td>{{ book.studentName }}</td>
             <td>{{ formatDate(book.borrowDate) }}</td>
             <td>
-              <span :class="isOverdue(book.dueDate) ? 'text-error' : ''">
-                {{ formatDate(book.dueDate) }}
+              <span :class="isOverdue(book.returnDate) ? 'text-error' : ''">
+                {{ formatDate(book.returnDate) }}
               </span>
             </td>
 
@@ -246,10 +246,10 @@
                     <span class="text-sm text-base-content/60">Due Date</span>
                     <span
                       :class="
-                        isOverdue(selectedBook.dueDate) ? 'text-error' : ''
+                        isOverdue(selectedBook.returnDate) ? 'text-error' : ''
                       "
                     >
-                      {{ formatDate(selectedBook.dueDate) }}
+                      {{ formatDate(selectedBook.returnDate) }}
                     </span>
                   </div>
                   <div
