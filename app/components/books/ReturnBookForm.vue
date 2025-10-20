@@ -21,9 +21,9 @@
               <p>{{ formatDate(book.borrowDate) }}</p>
             </div>
             <div>
-              <p class="text-base-content/60">Due Date</p>
-              <p :class="{ 'text-error': isOverdue(book.dueDate) }">
-                {{ formatDate(book.dueDate) }}
+              <p class="text-base-content/60">Return Date</p>
+              <p :class="{ 'text-error': isOverdue(book.returnDate) }">
+                {{ formatDate(book.returnDate) }}
               </p>
             </div>
             <div>
@@ -114,7 +114,7 @@
             </h4>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div
-                v-for="(image, index) in book.beforeConditionImages"
+                v-for="(image, index) in book.images"
                 :key="`before-${index}`"
                 class="aspect-square rounded-lg overflow-hidden bg-base-200"
               >

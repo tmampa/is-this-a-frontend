@@ -276,9 +276,7 @@
                   </p>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <img
-                      v-for="(
-                        image, index
-                      ) in selectedBook.beforeConditionImages"
+                      v-for="(image, index) in selectedBook.images"
                       :key="`before-${index}`"
                       :src="image"
                       :alt="`Before condition ${index + 1}`"

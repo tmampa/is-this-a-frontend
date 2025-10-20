@@ -44,7 +44,7 @@ export interface BorrowedBook {
   returnDate: string;
   status: "borrowed" | "returned";
   initialConditions: string[];
-  beforeConditionImages: string[];
+  images: string[];
   afterConditionImages: string[];
   returnConditions?: string[];
   conditionNotes?: string;
