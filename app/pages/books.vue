@@ -87,18 +87,6 @@
             />
           </div>
           <div class="form-control">
-            <select v-model="selectedCategory" class="select select-bordered">
-              <option value="">All Categories</option>
-              <option
-                v-for="category in categories"
-                :key="category"
-                :value="category"
-              >
-                {{ category }}
-              </option>
-            </select>
-          </div>
-          <div class="form-control">
             <select v-model="selectedStatus" class="select select-bordered">
               <option value="">All Status</option>
               <option value="available">Available</option>
@@ -116,7 +104,6 @@
               <tr>
                 <th>Title</th>
                 <th>Author</th>
-                <th>Category</th>
                 <th>ISBN</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -134,9 +121,6 @@
                   </div>
                 </td>
                 <td>{{ book.author }}</td>
-                <td>
-                  <span class="badge badge-outline">{{ book.category }}</span>
-                </td>
                 <td class="font-mono text-sm">{{ book.isbn }}</td>
                 <td>
                   <span
