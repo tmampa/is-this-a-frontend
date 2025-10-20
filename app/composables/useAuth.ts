@@ -28,7 +28,7 @@ export const useAuth = () => {
   const isAuthenticated = computed(() => !!user.value);
   const isLoading = ref(false);
 
-  const basePath: string = "http://localhost:8080/api/auth";
+  const basePath: string = "http://172.179.240.23:8080/api/auth";
 
   // Login with API call
   const login = async (credentials: { email: string; password: string }) => {
