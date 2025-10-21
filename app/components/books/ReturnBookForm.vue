@@ -54,7 +54,9 @@
             :class="{
               'input-success': barcodeVerified === true,
               'input-error':
-                barcodeVerified === false && formData.barcodeInput.length > 0,
+                barcodeVerified === false &&
+                formData.barcodeInput.length > 0 &&
+                book.barcode,
             }"
             v-model="formData.barcodeInput"
             @input="handleBarcodeInput"
@@ -76,7 +78,9 @@
             <span
               class="label-text-alt text-error"
               v-else-if="
-                barcodeVerified === false && formData.barcodeInput.length > 0
+                barcodeVerified === false &&
+                formData.barcodeInput.length > 0 &&
+                book.barcode
               "
             >
               ✗ Barcode does not match the one recorded during borrowing
@@ -257,12 +261,17 @@ const handleBarcodeInput = () => {
 
   if (!expectedBarcode) {
     // If no barcode was recorded during borrowing, we can't verify
-    barcodeVerified.value = false;
+    // Set to null instead of false to distinguish from actual mismatch
+    barcodeVerified.value = null;
     return;
   }
 
+  // Convert both to strings and compare (in case one is a number)
+  const inputStr = String(input);
+  const expectedStr = String(expectedBarcode);
+
   // Exact match required - the barcode must match exactly what was scanned during borrowing
-  barcodeVerified.value = input === expectedBarcode;
+  barcodeVerified.value = inputStr === expectedStr;
 };
 
 const handleSubmit = () => {
