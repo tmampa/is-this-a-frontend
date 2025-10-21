@@ -22,8 +22,8 @@
             </div>
             <div>
               <p class="text-base-content/60">Return Date</p>
-              <p :class="{ 'text-error': isOverdue(book.returnDate) }">
-                {{ formatDate(book.returnDate) }}
+              <p :class="{ 'text-error': isOverdue(book.dueDate) }">
+                {{ formatDate(book.dueDate) }}
               </p>
             </div>
             <div>
