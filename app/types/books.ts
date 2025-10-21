@@ -41,7 +41,8 @@ export interface BorrowedBook {
   bookTitle: string;
   studentName: string;
   borrowDate: string;
-  returnDate: string;
+  dueDate: string; // Due date for the borrowed book
+  returnDate?: string;
   status: "borrowed" | "returned";
   initialConditions: string[];
   images: string[];
@@ -58,7 +59,7 @@ export interface BorrowBookData {
   address: string;
   bookConditions: string[];
   beforeConditionImages: File[];
-  returnDate: string;
+  dueDate: string;
   barcode: string; // Barcode scanned during book borrowing
 }
 

@@ -196,7 +196,7 @@
           </div>
           <input
             type="date"
-            v-model="formData.returnDate"
+            v-model="formData.dueDate"
             class="input input-bordered"
             :min="currentDate"
             required
@@ -593,16 +593,13 @@ const handleSubmit = async () => {
     return;
   }
 
-  if (!formData.value.returnDate) {
+  if (!formData.value.dueDate) {
     alert("Please select an expected return date");
     return;
   }
 
-  if (
-    formData.value.returnDate &&
-    new Date(formData.value.returnDate) < new Date()
-  ) {
-    alert("Return date cannot be in the past");
+  if (formData.value.dueDate && new Date(formData.value.dueDate) < new Date()) {
+    alert("Due date cannot be in the past");
     return;
   }
 
@@ -647,7 +644,7 @@ const handleSubmit = async () => {
       address: "", // Backend will get from existing student data
       bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
-      returnDate: formData.value.returnDate,
+      dueDate: formData.value.dueDate,
       barcode: formData.value.barcode,
     });
 
@@ -674,7 +671,7 @@ const handleSubmit = async () => {
       address: "",
       bookConditions: formData.value.bookConditions,
       beforeConditionImages: formData.value.beforeConditionImages,
-      returnDate: formData.value.returnDate,
+      dueDate: formData.value.dueDate,
       barcode: formData.value.barcode,
     });
 

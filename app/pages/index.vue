@@ -251,7 +251,7 @@ const fetchBorrowedBooks = async () => {
     const allRecords = await LibraryAPI.getBorrowRecords();
     // Filter out returned books (books with returnDate are already returned)
     borrowedBooks.value = allRecords.filter((book) => !book.returnDate);
-    console.log("Fetched all records:", allRecords.length);
+    console.log("Fetched all records:", allRecords);
     console.log(
       "Currently borrowed books (no returnDate):",
       borrowedBooks.value.length

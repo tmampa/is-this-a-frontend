@@ -7,7 +7,7 @@ import type {
   ReturnBookData,
 } from "~/types/books";
 
-const API_BASE = "http://172.179.240.23:8080/api/admin";
+const API_BASE = "http://localhost:8080/api/admin";
 
 // Helper function to get auth headers
 const getAuthHeaders = (): Record<string, string> => {
@@ -199,7 +199,7 @@ export const LibraryAPI = {
         address: data.address,
         bookConditions: data.bookConditions,
         barcode: data.barcode,
-        returnDate: data.returnDate,
+        dueDate: data.dueDate,
       };
 
       const response = await $fetch<{ id: number }>(

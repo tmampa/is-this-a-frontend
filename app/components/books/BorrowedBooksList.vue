@@ -20,8 +20,8 @@
             <td>{{ book.studentName }}</td>
             <td>{{ formatDate(book.borrowDate) }}</td>
             <td>
-              <span :class="isOverdue(book.returnDate) ? 'text-error' : ''">
-                {{ formatDate(book.returnDate) }}
+              <span :class="isOverdue(book.dueDate) ? 'text-error' : ''">
+                {{ formatDate(book.dueDate) }}
               </span>
             </td>
 
@@ -246,21 +246,19 @@
                     <span class="text-sm text-base-content/60">Due Date</span>
                     <span
                       :class="
-                        isOverdue(selectedBook.returnDate) ? 'text-error' : ''
+                        isOverdue(selectedBook.dueDate) ? 'text-error' : ''
                       "
                     >
-                      {{ formatDate(selectedBook.returnDate) }}
+                      {{ formatDate(selectedBook.dueDate) }}
                     </span>
                   </div>
                   <div
-                    v-if="selectedBook.returnDate"
+                    v-if="selectedBook.dueDate"
                     class="grid grid-cols-[100px_1fr] gap-2 items-baseline"
                   >
-                    <span class="text-sm text-base-content/60"
-                      >Return Date</span
-                    >
+                    <span class="text-sm text-base-content/60">Due Date</span>
                     <span class="text-success">{{
-                      formatDate(selectedBook.returnDate)
+                      formatDate(selectedBook.dueDate)
                     }}</span>
                   </div>
                 </div>
