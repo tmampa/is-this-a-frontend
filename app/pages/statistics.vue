@@ -606,7 +606,7 @@ const dateRange = ref({
 
 // Computed statistics
 const currentlyBorrowedBooks = computed(() =>
-  borrowedBooks.value.filter((book) => book.status === "borrowed")
+  borrowedBooks.value.filter((book) => !book.returnDate)
 );
 
 const currentlyBorrowedCount = computed(
@@ -624,9 +624,7 @@ const lostBooks = computed(() =>
   borrowedBooks.value.filter(
     (book) =>
       book.returnConditions?.includes("🔖 Lost") ||
-      (book.status === "borrowed" &&
-        book.dueDate &&
-        daysMissing(book.dueDate) > 30)
+      (!book.returnDate && book.dueDate && daysMissing(book.dueDate) > 30)
   )
 );
 
@@ -643,7 +641,7 @@ const activeStudentsCount = computed(() => {
   // Count unique students who have currently borrowed books
   const activeStudentIds = new Set(
     borrowedBooks.value
-      .filter((book) => book.status === "borrowed")
+      .filter((book) => !book.returnDate)
       .map((book) => book.studentId)
   );
   return activeStudentIds.size;
@@ -656,17 +654,13 @@ const studentsWithFines = computed(() => {
     .map((student) => ({
       ...student,
       borrowedBooks: borrowedBooks.value
-        .filter(
-          (book) => book.studentId === student.id && book.status === "borrowed"
-        )
+        .filter((book) => book.studentId === student.id && !book.returnDate)
         .map((book) => book.bookId),
     }));
 });
 
 const averageLoanDuration = computed(() => {
-  const returnedBooks = borrowedBooks.value.filter(
-    (book) => book.status === "returned" && book.returnDate
-  );
+  const returnedBooks = borrowedBooks.value.filter((book) => book.returnDate);
   if (returnedBooks.length === 0) return 0;
 
   const totalDays = returnedBooks.reduce((sum, book) => {
@@ -950,6 +944,14 @@ const loadData = async () => {
       students: students.value.length,
       borrowedBooks: borrowedBooks.value.length,
     });
+
+    // Debug: Log borrowed books details
+    console.log("All borrowed books:", borrowedBooks.value);
+    const currentlyBorrowed = borrowedBooks.value.filter(
+      (book) => !book.returnDate
+    );
+    console.log("Currently borrowed (no return date):", currentlyBorrowed);
+    console.log("Currently borrowed count:", currentlyBorrowed.length);
   } catch (err) {
     console.error("Failed to load statistics data:", err);
     error.value = "Failed to load library statistics. Please try again.";
