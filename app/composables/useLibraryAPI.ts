@@ -277,10 +277,15 @@ export const LibraryAPI = {
         formData.append("knownTags", condition);
       });
 
-      // Add image files
-      data.afterConditionImages.forEach((file, index) => {
-        formData.append("images", file);
-      });
+      // Add image files (always add images parameter, even if empty)
+      if (data.afterConditionImages && data.afterConditionImages.length > 0) {
+        data.afterConditionImages.forEach((file, index) => {
+          formData.append("images", file);
+        });
+      } else {
+        // Backend expects 'images' parameter even if empty, so add an empty field
+        formData.append("images", new Blob(), "");
+      }
 
       // Get auth headers but exclude Content-Type (let browser set it for multipart)
       const authHeaders = getAuthHeaders();

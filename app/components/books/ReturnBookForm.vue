@@ -377,7 +377,9 @@ const handleSubmit = async () => {
       studentNumber: props.book.studentNumber,
       bookTitle: props.book.bookTitle,
       returnConditions: formData.value.returnConditions,
-      afterConditionImages: formData.value.afterConditionImages,
+      afterConditionImages: isBookMarkedAsLost.value
+        ? []
+        : formData.value.afterConditionImages,
       ...(formData.value.conditionNotes
         ? { conditionNotes: formData.value.conditionNotes }
         : {}),
