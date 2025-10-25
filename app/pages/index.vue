@@ -143,6 +143,7 @@
     <!-- Return Book Modal -->
     <ReturnBookForm
       v-if="selectedBook"
+      ref="returnBookFormRef"
       v-model:show="showReturnModal"
       :book="selectedBook"
       @submit="handleReturn"
@@ -313,6 +314,8 @@ const handleReturnBook = (book: BorrowedBook) => {
   showReturnModal.value = true;
 };
 
+const returnBookFormRef = ref();
+
 const handleReturn = async (data: ReturnBookData) => {
   try {
     // Use API to return book
@@ -321,10 +324,18 @@ const handleReturn = async (data: ReturnBookData) => {
     // Refresh the borrowed books list
     await fetchBorrowedBooks();
 
+    // Reset the form and close modal on success
+    if (returnBookFormRef.value) {
+      returnBookFormRef.value.resetForm();
+    }
     showReturnModal.value = false;
     selectedBook.value = null;
   } catch (error) {
     console.error("Failed to return book:", error);
+    // Reset loading state on error too
+    if (returnBookFormRef.value) {
+      returnBookFormRef.value.resetForm();
+    }
   }
 };
 </script>

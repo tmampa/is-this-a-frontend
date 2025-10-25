@@ -102,16 +102,40 @@
           helper-text="Select existing conditions or add custom ones to accurately describe the book's current state"
         />
 
-        <!-- Book Condition Images -->
+        <!-- Book Condition Images (only show if not marked as lost) -->
+        <div v-if="isBookMarkedAsLost" class="alert alert-info">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="stroke-current shrink-0 h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <div>
+            <h3 class="font-bold">Book marked as lost</h3>
+            <div class="text-xs">
+              Image upload is not required for lost books since the physical
+              book is not available for condition assessment.
+            </div>
+          </div>
+        </div>
+
         <ImageUploader
+          v-if="!isBookMarkedAsLost"
           label="Current Book Condition Images"
           :multiple="true"
           :max-images="5"
           @update:images="handleImagesUpdate"
         />
 
-        <!-- Compare Images -->
-        <div class="space-y-6">
+        <!-- Compare Images (only show if not marked as lost) -->
+        <div v-if="!isBookMarkedAsLost" class="space-y-6">
           <div>
             <h4 class="text-sm font-medium mb-3 text-base-content/75">
               Before Condition Images
@@ -164,8 +188,21 @@
 
         <!-- Action Buttons -->
         <div class="modal-action">
-          <button type="button" class="btn" @click="closeModal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Return Book</button>
+          <button
+            type="button"
+            class="btn"
+            @click="closeModal"
+            :disabled="isReturning"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" :disabled="isReturning">
+            <span
+              v-if="isReturning"
+              class="loading loading-spinner loading-sm"
+            ></span>
+            {{ isReturning ? "Returning..." : "Return Book" }}
+          </button>
         </div>
       </form>
     </div>
@@ -176,7 +213,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import type { BorrowedBook, ReturnBookData } from "~/types/books";
 import ImageUploader from "~/components/layout/ImageUploader.vue";
 import MultiSelectWithCreate from "~/components/layout/MultiSelectWithCreate.vue";
@@ -213,6 +250,15 @@ const formData = ref({
 const imagePreviews = ref<string[]>([]);
 const barcodeVerified = ref<boolean | null>(null);
 const bookISBN = ref<string>("");
+const isReturning = ref(false);
+
+// Computed property to check if book is marked as lost
+const isBookMarkedAsLost = computed(() => {
+  return formData.value.returnConditions.some(
+    (condition) =>
+      condition.includes("🔖 Lost") || condition.toLowerCase().includes("lost")
+  );
+});
 
 // Watch for book changes to set expected barcode
 watch(
@@ -274,49 +320,80 @@ const handleBarcodeInput = () => {
   barcodeVerified.value = inputStr === expectedStr;
 };
 
-const handleSubmit = () => {
-  // If no barcode was recorded during borrowing, we can still proceed but warn the user
-  if (!props.book.barcode) {
-    const proceed = confirm(
-      "Warning: No barcode was recorded when this book was issued. " +
-        "Are you sure you want to proceed with returning this book without barcode verification?"
-    );
-    if (!proceed) return;
-  } else {
-    // If barcode exists, require verification
-    if (formData.value.barcodeInput.trim() === "") {
-      alert("Please scan the book barcode to verify you have the correct book");
-      return;
-    }
+const handleSubmit = async () => {
+  isReturning.value = true;
 
-    if (barcodeVerified.value !== true) {
-      alert(
-        "The barcode does not match the one recorded during borrowing. Please verify you have the correct book."
+  try {
+    // If no barcode was recorded during borrowing, we can still proceed but warn the user
+    if (!props.book.barcode) {
+      const proceed = confirm(
+        "Warning: No barcode was recorded when this book was issued. " +
+          "Are you sure you want to proceed with returning this book without barcode verification?"
       );
+      if (!proceed) {
+        isReturning.value = false;
+        return;
+      }
+    } else {
+      // If barcode exists, require verification
+      if (formData.value.barcodeInput.trim() === "") {
+        alert(
+          "Please scan the book barcode to verify you have the correct book"
+        );
+        isReturning.value = false;
+        return;
+      }
+
+      if (barcodeVerified.value !== true) {
+        alert(
+          "The barcode does not match the one recorded during borrowing. Please verify you have the correct book."
+        );
+        isReturning.value = false;
+        return;
+      }
+    }
+
+    // Only require images if book is not marked as lost
+    if (
+      !isBookMarkedAsLost.value &&
+      formData.value.afterConditionImages.length === 0
+    ) {
+      alert("Please upload at least one condition image");
+      isReturning.value = false;
       return;
     }
-  }
 
-  if (formData.value.afterConditionImages.length === 0) {
-    alert("Please upload at least one condition image");
-    return;
-  }
+    if (formData.value.returnConditions.length === 0) {
+      alert("Please select at least one return condition");
+      isReturning.value = false;
+      return;
+    }
 
-  if (formData.value.returnConditions.length === 0) {
-    alert("Please select at least one return condition");
-    return;
-  }
+    // Ensure loading state is visible for at least a short moment
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-  emit("submit", {
-    borrowedBookId: props.book.id,
-    studentNumber: props.book.studentNumber,
-    bookTitle: props.book.bookTitle,
-    returnConditions: formData.value.returnConditions,
-    afterConditionImages: formData.value.afterConditionImages,
-    ...(formData.value.conditionNotes
-      ? { conditionNotes: formData.value.conditionNotes }
-      : {}),
-  } as unknown as ReturnBookData); // Reset form
+    emit("submit", {
+      borrowedBookId: props.book.id,
+      studentNumber: props.book.studentNumber,
+      bookTitle: props.book.bookTitle,
+      returnConditions: formData.value.returnConditions,
+      afterConditionImages: formData.value.afterConditionImages,
+      ...(formData.value.conditionNotes
+        ? { conditionNotes: formData.value.conditionNotes }
+        : {}),
+    } as unknown as ReturnBookData);
+
+    // Don't reset form here - let parent component handle success/failure
+    // The form will be reset when the modal is closed or when parent confirms success
+  } catch (error) {
+    console.error("Error returning book:", error);
+    alert("An error occurred while returning the book. Please try again.");
+    isReturning.value = false;
+  }
+};
+
+const resetForm = () => {
+  // Reset form data
   formData.value = {
     returnConditions: [],
     afterConditionImages: [],
@@ -330,24 +407,29 @@ const handleSubmit = () => {
 
   // Reset barcode verification
   barcodeVerified.value = null;
+
+  // Reset loading state
+  isReturning.value = false;
 };
 
 const closeModal = () => {
-  // Reset form when closing
-  formData.value = {
-    returnConditions: [],
-    afterConditionImages: [],
-    conditionNotes: "",
-    barcodeInput: "",
-  };
-
-  // Clean up previews
-  imagePreviews.value.forEach((url) => URL.revokeObjectURL(url));
-  imagePreviews.value = [];
-
-  // Reset barcode verification
-  barcodeVerified.value = null;
-
+  resetForm();
   emit("update:show", false);
 };
+
+// Watch for modal visibility changes to reset loading state if modal is closed
+watch(
+  () => props.show,
+  (newShow) => {
+    if (!newShow) {
+      // Modal is being closed, reset loading state
+      isReturning.value = false;
+    }
+  }
+);
+
+// Expose resetForm method so parent can call it on successful return
+defineExpose({
+  resetForm,
+});
 </script>
