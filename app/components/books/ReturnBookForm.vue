@@ -230,13 +230,13 @@ const emit = defineEmits<{
 
 // Default return condition options
 const defaultReturnConditions = [
-  "📙 Good - Light wear, no damage",
-  "📄 Pages missing",
-  "📝 Writing/markings added",
-  "💧 Water damage",
-  "🍂 Stains present",
-  "🔖 Lost",
-  "📕 Torn pages",
+  "Good - Light wear, no damage",
+  "Pages missing",
+  "Writing/markings added",
+  "Water damage",
+  "Stains present",
+  "Lost",
+  "Torn pages",
 ];
 
 // Form state

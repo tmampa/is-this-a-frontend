@@ -251,7 +251,7 @@
                   value="good"
                   v-model="formData.bookConditions"
                 />
-                <span class="label-text">📙 Good - Light wear, no damage</span>
+                <span class="label-text">Good - Light wear, no damage</span>
               </label>
             </div>
             <div class="form-control">
@@ -262,7 +262,7 @@
                   value="fair"
                   v-model="formData.bookConditions"
                 />
-                <span class="label-text">📒 Fair - Noticeable wear</span>
+                <span class="label-text">Fair - Noticeable wear</span>
               </label>
             </div>
             <div class="form-control">
@@ -273,7 +273,7 @@
                   value="poor"
                   v-model="formData.bookConditions"
                 />
-                <span class="label-text">📑 Poor - Significant wear</span>
+                <span class="label-text">Poor - Significant wear</span>
               </label>
             </div>
             <div class="form-control">
@@ -284,7 +284,7 @@
                   value="damaged"
                   v-model="formData.bookConditions"
                 />
-                <span class="label-text">📕 Damaged - Visible damage</span>
+                <span class="label-text">Damaged - Visible damage</span>
               </label>
             </div>
           </div>
@@ -713,12 +713,12 @@ const showToastNotification = (message: string) => {
   }, 4000);
 };
 
-// Helper function to get condition label with emoji
+// Helper function to get condition label
 const getConditionLabel = (condition: string): string => {
   const labels = {
-    new: "📗 New",
-    good: "📙 Good",
-    damaged: "📕 Damaged",
+    new: "New",
+    good: "Good",
+    damaged: "Damaged",
   };
   return labels[condition as keyof typeof labels] || condition;
 };
