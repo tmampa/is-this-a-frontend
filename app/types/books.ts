@@ -50,6 +50,7 @@ export interface BorrowedBook {
   returnConditions?: string[];
   conditionNotes?: string;
   barcode?: string; // Barcode scanned when book was issued to student
+  returnTags?: string[];
 }
 
 export interface BorrowBookData {

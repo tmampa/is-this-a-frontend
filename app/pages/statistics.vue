@@ -620,15 +620,29 @@ const totalAmountOwed = computed(() =>
   )
 );
 
-const lostBooks = computed(() =>
-  borrowedBooks.value.filter(
+const lostBooks = computed(() => {
+  // Debug logging - let's see the actual data structure
+  const returnedBooks = borrowedBooks.value.filter((b) => b.returnDate);
+  console.log("Lost books filter - all returned books:", returnedBooks);
+  console.log("Sample returned book structure:", returnedBooks[0]);
+
+  const lost = borrowedBooks.value.filter(
     (book) =>
       book.returnDate &&
-      book.returnConditions?.some((condition) =>
-        condition.toLowerCase().includes("lost")
-      )
-  )
-);
+      book.returnTags?.some((tag: string) => {
+        const tagLower = tag.toLowerCase();
+        return tagLower.includes("lost") || tagLower.includes("🔖");
+      })
+  );
+
+  console.log("Lost books found:", lost);
+  console.log(
+    "Lost books conditions:",
+    lost.map((b) => ({ title: b.bookTitle, conditions: b.returnConditions }))
+  );
+
+  return lost;
+});
 
 const lostBooksCount = computed(() => lostBooks.value.length);
 
