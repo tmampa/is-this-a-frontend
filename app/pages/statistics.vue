@@ -623,8 +623,10 @@ const totalAmountOwed = computed(() =>
 const lostBooks = computed(() =>
   borrowedBooks.value.filter(
     (book) =>
-      book.returnConditions?.includes("🔖 Lost") ||
-      (!book.returnDate && book.dueDate && daysMissing(book.dueDate) > 30)
+      book.returnDate &&
+      book.returnConditions?.some((condition) =>
+        condition.toLowerCase().includes("lost")
+      )
   )
 );
 
