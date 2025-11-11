@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onUnmounted } from "vue";
 
 interface ImageFile {
   file: File;
@@ -215,10 +215,27 @@ const formatFileSize = (bytes: number) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 };
 
+const resetImages = () => {
+  // Revoke all object URLs to prevent memory leaks
+  images.value.forEach((img) => {
+    URL.revokeObjectURL(img.preview);
+  });
+  images.value = [];
+  errorMessage.value = "";
+  if (fileInput.value) {
+    fileInput.value.value = "";
+  }
+  emitFiles();
+};
+
 // Cleanup on unmount
 onUnmounted(() => {
   images.value.forEach((img) => {
     URL.revokeObjectURL(img.preview);
   });
+});
+
+defineExpose({
+  resetImages,
 });
 </script>

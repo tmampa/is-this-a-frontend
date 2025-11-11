@@ -318,6 +318,7 @@
 
         <!-- Multiple Condition Images -->
         <ImageUploader
+          ref="imageUploader"
           label="📸 Document Book Condition (Multiple Photos)"
           :multiple="true"
           :max-images="5"
@@ -474,6 +475,7 @@ const formData = ref({
 const selectedStudent = ref<Student | null>(null);
 const selectedBook = ref<Book | null>(null);
 const barcodeInput = ref<HTMLInputElement>();
+const imageUploader = ref<InstanceType<typeof ImageUploader>>();
 
 // Barcode validation
 const isValidBarcode = computed(() => {
@@ -606,39 +608,39 @@ const handleSubmit = async () => {
   loading.value = true;
   try {
     // Find the selected book to get its title
-    const selectedBook = availableBooks.value.find(
+    const foundBook = availableBooks.value.find(
       (book) => book.id === formData.value.bookId
     );
-    if (!selectedBook) {
+    if (!foundBook) {
       alert("Selected book not found");
       return;
     }
 
     // Find the selected student to get their details
-    const selectedStudent = students.value.find(
+    const foundStudent = students.value.find(
       (student) => student.id === formData.value.studentId
     );
-    if (!selectedStudent) {
+    if (!foundStudent) {
       alert("Selected student not found");
       return;
     }
 
     // Debug logging to help identify data structure issues
-    console.log("Selected student:", selectedStudent);
-    console.log("Student Number field:", selectedStudent.studentNumber);
+    console.log("Selected student:", foundStudent);
+    console.log("Student Number field:", foundStudent.studentNumber);
 
     // Use student number directly
-    const studentNumber = selectedStudent.studentNumber;
+    const studentNumber = foundStudent.studentNumber;
 
     if (!studentNumber || studentNumber === 0) {
-      console.warn("Invalid student number:", selectedStudent.studentNumber);
+      console.warn("Invalid student number:", foundStudent.studentNumber);
       alert("Invalid student number. Please contact administrator.");
       return;
     }
 
     // Step 1: Create borrow record using LibraryAPI
-    const recordId = await LibraryAPI.createBorrowRecord(selectedBook.title, {
-      fullName: `${selectedStudent.fullName}`,
+    const recordId = await LibraryAPI.createBorrowRecord(foundBook.title, {
+      fullName: `${foundStudent.fullName}`,
       studentNumber: studentNumber,
       emails: [], // Backend will get from existing student data
       address: "", // Backend will get from existing student data
@@ -657,15 +659,15 @@ const handleSubmit = async () => {
 
     // Show success notification
     successTitle.value = "📚 Book Issued Successfully!";
-    successMessage.value = `"${selectedBook.title}" has been issued to ${selectedStudent.fullName} (Student #${studentNumber}). The borrow record has been created with condition tracking.`;
+    successMessage.value = `"${foundBook.title}" has been issued to ${foundStudent.fullName} (Student #${studentNumber}). The borrow record has been created with condition tracking.`;
     showSuccessModal.value = true;
     showToastNotification(
-      `🎉 Book issued to ${selectedStudent.fullName} successfully!`
+      `🎉 Book issued to ${foundStudent.fullName} successfully!`
     );
 
     // Emit success event
     emit("submit", {
-      fullName: `${selectedStudent.fullName}`,
+      fullName: `${foundStudent.fullName}`,
       studentNumber: studentNumber,
       emails: [],
       address: "",
@@ -685,6 +687,15 @@ const handleSubmit = async () => {
       barcode: "",
       beforeConditionImages: [],
     };
+
+    // Reset selected items to null
+    selectedStudent.value = null as any;
+    selectedBook.value = null as any;
+
+    // Reset image uploader
+    if (imageUploader.value) {
+      imageUploader.value.resetImages();
+    }
 
     // Close modal after a brief delay to show success
     setTimeout(() => {
